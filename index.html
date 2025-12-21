@@ -1,74 +1,67 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-   <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgQywLAkF5Vr90udvBOL8ebIpx7K7txbJ_WbSJtHor_GHB4sO7MR0XLQBuhxeL1eIa4HTtfcVs-ep9zCBk287B1j_XB4uzUvNbPpe8bspPUf7O035_iMDgyC8xZUwHuqX2JBKsUSQbj6P4eCCRRnqzhAH_UHPF97Yy0cBLh2zaq73xiRvkVs9-ZOvsRBx-Z/s1080/IMG_20250926_103753.jpg"/>
-
-  <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjjaFRRI0eGFc2cisj8WawsCs_8H2AXj5H7BBFPzaZJSRGYfibMEzJIgrxy9Dvp1ZjsYrn1VfY9iuijB6Ei9kt1K1cjS2YDhyYIMdJaJjUKisuPSGrZRl8wfUlAZMDEschiKbRyoZ4oEQMcvJ2vx0HHfPkTx8bEVIPj5lmzXFB3VPchU7oOBimKDn9J2bs/s664/GIF_20241227_192138_546.gif"/>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>smartstream</title>
-<!-- 🔄 Redirect Otomatis + Efek Fade -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      setTimeout(function () {
-        document.body.classList.add('fade-out');
-        setTimeout(function () {
-          window.location.href = "https://stinkymildred.com/a6gwpp7u44?key=7e10c9a202684df3d37bb4f7ee9daa9b";
-        }, 800);
-      }, 000);
-    });
-  </script>
+<title>Loading...</title>
 
-  <style>
-    body {
-      background: #000;
-      color: #fff;
-      text-align: center;
-      font-family: Arial, sans-serif;
-      margin-top: 40vh;
-      transition: opacity 0.8s ease;
+<script>
+(function () {
+  // kalau masih root → generate slug
+  if (location.pathname === "/") {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let slug = "";
+    for (let i = 0; i < 6; i++) {
+      slug += chars[Math.floor(Math.random() * chars.length)];
     }
-    body.fade-out {
-      opacity: 0;
-    }
-    .loader {
-      width: 40px;
-      height: 40px;
-      border: 5px solid #444;
-      border-top: 5px solid #fff;
-      border-radius: 50%;
-      margin: 0 auto 15px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+
+    // ubah URL jadi /abcd tanpa reload
+    history.replaceState(null, "", "/" + slug);
+  }
+
+  // redirect ke domain asli
+  setTimeout(function () {
+    window.location.href =
+      "https://stinkymildred.com/a6gwpp7u44?key=7e10c9a202684df3d37bb4f7ee9daa9b";
+  }, 300);
+})();
+</script>
+
+<style>
+body {
+  background: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 40vh;
+}
+</style>
 </head>
 
 <body>
-  <div class="loader"></div>
-  <p>loading...</p>
-  <!-- 📊 Histats Tracking -->
-  <script type="text/javascript">
-    var _Hasync = _Hasync || [];
-    _Hasync.push(['Histats.start', '1,4978236,4,0,0,0,00000000']);
-    _Hasync.push(['Histats.fasi', '1']);
-    _Hasync.push(['Histats.track_hits', '']);
-    (function() {
-      var hs = document.createElement('script');
-      hs.type = 'text/javascript';
-      hs.async = true;
-      hs.src = ('//s10.histats.com/js15_as.js');
-      (document.head || document.body).appendChild(hs);
-    })();
-  </script>
-  <noscript>
-    <a href="/" target="_blank">
-      <img src="//sstatic1.histats.com/0.gif?4978236&101" alt="hit counter" border="0">
-    </a>
-  </noscript>
-  
+Loading...
+
+<!-- 📊 HISTATS -->
+<script type="text/javascript">
+  var _Hasync = _Hasync || [];
+  _Hasync.push(['Histats.start', '1,4978236,4,0,0,0,00000000']);
+  _Hasync.push(['Histats.fasi', '1']);
+  _Hasync.push(['Histats.track_hits', '']);
+  (function() {
+    var hs = document.createElement('script');
+    hs.type = 'text/javascript';
+    hs.async = true;
+    hs.src = ('//s10.histats.com/js15_as.js');
+    (document.head || document.body).appendChild(hs);
+  })();
+</script>
+
+<noscript>
+  <a href="/" target="_blank">
+    <img src="//sstatic1.histats.com/0.gif?4978236&101" alt="hit counter" border="0">
+  </a>
+</noscript>
+<!-- END HISTATS -->
 
 </body>
 </html>
