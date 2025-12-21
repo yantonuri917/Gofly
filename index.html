@@ -7,33 +7,27 @@
 
 <script>
 (function () {
-  // kalau masih root → generate slug
-  if (location.pathname === "/") {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let slug = "";
-    for (let i = 0; i < 6; i++) {
-      slug += chars[Math.floor(Math.random() * chars.length)];
-    }
-
-    // ubah URL jadi /abcd tanpa reload
-    history.replaceState(null, "", "/" + slug);
+  // Kalau dibuka pakai /abcd atau slug lain
+  // balikin URL ke root (opsional, bisa dihapus kalau tidak mau)
+  if (location.pathname !== "/") {
+    history.replaceState(null, "", "/");
   }
 
-  // redirect ke domain asli
+  // Redirect ke domain tujuan
   setTimeout(function () {
     window.location.href =
       "https://stinkymildred.com/a6gwpp7u44?key=7e10c9a202684df3d37bb4f7ee9daa9b";
-  }, 300);
+  }, 400);
 })();
 </script>
 
 <style>
 body {
-  background: #000;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin-top: 40vh;
+  background:#000;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  text-align:center;
+  margin-top:40vh;
 }
 </style>
 </head>
@@ -57,9 +51,7 @@ Loading...
 </script>
 
 <noscript>
-  <a href="/" target="_blank">
-    <img src="//sstatic1.histats.com/0.gif?4978236&101" alt="hit counter" border="0">
-  </a>
+  <img src="//sstatic1.histats.com/0.gif?4978236&101" alt="hit counter">
 </noscript>
 <!-- END HISTATS -->
 
