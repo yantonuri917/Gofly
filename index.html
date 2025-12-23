@@ -1,96 +1,180 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Loading...</title>
+  <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi2e_8awxzYcBPmm_ToeIazXUg4nBO4zt6EguFA2fguT3krmgY_ynux6uNHeBVNTr32g6_JV-YVpeFWVQ1GK52yn345YPXAMvwpRk56cSQyNzxuZ_Q6hCsfkexw0v9Fe9AE_B5MO3BXczoEf52jGItgDV4vbzCwGQcDhtCrGqiXNRCx0kk1O69fvBh-W25X/s325/IMG_20251223_103947.jpg"/>
 
-<script>
-(function () {
-  // AUTO SLUG kalau masih root
-  if (location.pathname === "/") {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let slug = "";
-    for (let i = 0; i < 4; i++) {
-      slug += chars[Math.floor(Math.random() * chars.length)];
-    }
-    history.replaceState(null, "", "/" + slug);
-  }
-
-  // redirect ke domain tujuan
-  setTimeout(function () {
-    document.body.classList.add("fade-out");
-    setTimeout(function () {
-      window.location.href =
-        "https://stinkymildred.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb";
-    }, 600);
-  }, 400);
-})();
-</script>
+  <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjjaFRRI0eGFc2cisj8WawsCs_8H2AXj5H7BBFPzaZJSRGYfibMEzJIgrxy9Dvp1ZjsYrn1VfY9iuijB6Ei9kt1K1cjS2YDhyYIMdJaJjUKisuPSGrZRl8wfUlAZMDEschiKbRyoZ4oEQMcvJ2vx0HHfPkTx8bEVIPj5lmzXFB3VPchU7oOBimKDn9J2bs/s664/GIF_20241227_192138_546.gif"/>
+  
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xxx</title>
 
 <style>
 body {
-  background: #000;
+  margin: 0;
+  background: #111;
   color: #fff;
   font-family: Arial, sans-serif;
-  text-align: center;
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity .6s ease;
 }
 
-body.fade-out {
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 15px;
+}
+
+.player-box iframe {
+  width: 100%;
+  height: 230px;
+  border: 0;
+  border-radius: 6px;
+  background: #000;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 20px 0 10px;
+}
+
+#relatedGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  background: #1a1a1a;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.item img {
+  width: 120px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.caption {
+  font-size: 14px;
+  overflow: hidden;
+}
+
+.rainbow3d {
+  font-size: 32px;
+  font-weight: 900;
+  text-align: center;
+  margin: 25px 0 20px;
+  background: linear-gradient(90deg,#ff0000,#ff7a00,#ffff00,#00ff00,#00ffff,#0000ff,#8b00ff);
+  background-size: 400%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: rainbowFlow 6s linear infinite, fadeSlide 1.3s ease-out forwards;
   opacity: 0;
 }
 
-.loader {
-  width: 40px;
-  height: 40px;
-  border: 5px solid #444;
-  border-top: 5px solid #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 12px;
+@keyframes rainbowFlow {
+  0% {background-position:0%}
+  100% {background-position:400%}
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+@keyframes fadeSlide {
+  from {opacity:0; transform:translateY(-20px)}
+  to {opacity:1; transform:translateY(0)}
 }
 </style>
 </head>
 
 <body>
-  <div class="wrapper">
-    <div class="loader"></div>
-    <div>loading...</div>
+
+<h1 class="page-title rainbow3d">STREAMP4.ONLINE</h1>
+
+<div class="container">
+
+  <div class="player-box">
+    <iframe id="videoframe" allowfullscreen></iframe>
   </div>
 
-  <!-- 📊 HISTATS -->
-  <script type="text/javascript">
-    var _Hasync = _Hasync || [];
-    _Hasync.push(['Histats.start', '1,4978236,4,0,0,0,00000000']);
-    _Hasync.push(['Histats.fasi', '1']);
-    _Hasync.push(['Histats.track_hits', '']);
-    (function() {
-      var hs = document.createElement('script');
-      hs.type = 'text/javascript';
-      hs.async = true;
-      hs.src = ('//s10.histats.com/js15_as.js');
-      (document.head || document.body).appendChild(hs);
-    })();
-  </script>
+  <div class="section-title">Related Videos</div>
+  <div id="relatedGrid"></div>
 
-  <noscript>
-    <img src="//sstatic1.histats.com/0.gif?4978236&101" alt="hit counter">
+</div>
+
+<script>
+const mainPlayer = document.getElementById("videoframe");
+const url = new URL(window.location.href);
+let videoID = url.searchParams.get("id") || "0dd48bdd-15da-4cb9-a67a-07e814374ce3";
+mainPlayer.src = "https://app.videas.fr/embed/media/" + videoID + "/?autoplay=true";
+
+function repeatList(list, count) {
+  let result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(list[i % list.length]);
+  }
+  return result;
+}
+
+const finalList = repeatList(relatedVideos, 50);
+
+const grid = document.getElementById("relatedGrid");
+
+finalList.forEach((v) => {
+  const item = document.createElement("div");
+  item.className = "item";
+  item.innerHTML = `<img src="${v.thumb}"><div class="caption">${v.title}</div>`;
+  item.onclick = () => {
+    mainPlayer.src = "https://app.videas.fr/embed/media/" + v.video + "/";
+    window.scrollTo({top:0, behavior:"smooth"});
+  };
+  grid.appendChild(item);
+});
+</script>
+  <script type="text/javascript">
+
+var _Hasync=_Hasync||[];
+
+_Hasync.push(['Histats.start','1,4978236,4,0,0,0,00000000']);
+
+_Hasync.push(['Histats.fasi','1']);
+
+_Hasync.push(['Histats.track_hits','']);
+
+(function(){
+
+  var hs=document.createElement('script');hs.type='text/javascript';hs.async=true;
+
+  hs.src=('//s10.histats.com/js15_as.js');
+
+  (document.head||document.body).appendChild(hs);
+
+})();
+
+</script>
+
+<noscript><a href="/" target="_blank"><img src="//sstatic1.histats.com/0.gif?4978236&101" alt="hit counter" border="0"></a>
+
   </noscript>
+
+<script
+
+  type="text/javascript"
+
+  src="//referredrender.com/24/80/7a/24807af29054aa09c282aaebed9201af.js"
+
+></script>
+  <script
+  async="async"
+  data-cfasync="false"
+  src="//referredrender.com/122b006ae61ef549a738f7e587027d5a/invoke.js"
+></script>
+<div id="container-122b006ae61ef549a738f7e587027d5a"></div>
+  
+
 </body>
 </html>
