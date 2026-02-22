@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>goflie.top</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #000; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+        #ad-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 50px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; margin-top: 10px;
+        }
+        video { width: 100%; height: 100%; object-fit: contain; outline: none; }
+        /* Pesan jika domain tidak diizinkan */
+        #error-msg { color: #333; font-family: sans-serif; display: none; z-index: 200; }
+    </style>
+</head>
+<body>
+
+    <div id="ad-container">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="https://behindcanary.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
+    </div>
+
+    <div id="error-msg">Akses</div>
+    <video id="player" controls playsinline autoplay muted loop></video>
+
+    <script>
+        (function() {
+            
+            const allowedDomain = "goflie.top";
+            const currentDomain = window.location.hostname;
+
+            // Proteksi sederhana: Cek domain
+            if (currentDomain !== allowedDomain && currentDomain !== "localhost" && !currentDomain.includes("vercel.app")) {
+                document.getElementById('player').remove();
+                document.getElementById('ad-container').remove();
+                document.getElementById('error-msg').style.display = 'block';
+                return;
+            }
+
+            const p = document.getElementById('player');
+            
+            function g() {
+                let h = window.location.pathname;
+                let i = h.replace(/^\/+|\.mp4$/g, "");
+                return i;
+            }
+
+            const v = g();
+
+            if (v && v !== "index" && v !== "404") {
+                // Link didekripsi secara sederhana di runtime
+                const base = "https://cdn.videy.co/";
+                p.src = base + v + ".mp4";
+                
+                p.play().catch(() => {
+                    // Autoplay fallback
+                });
+            } else {
+                // Video default jika ID kosong
+                p.src = "https://cdn.videy.co/q938Vwfb1.mp4";
+            }
+        })();
+    </script>
+  <!-- === HISTATS === -->
+<script type="text/javascript">
+var _Hasync = _Hasync || [];
+_Hasync.push(['Histats.start', '1,4971583,4,107,170,20,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+    var hs = document.createElement('script');
+    hs.type = 'text/javascript';
+    hs.async = true;
+    hs.src = ('//s10.histats.com/js15_as.js');
+    (document.head || document.body).appendChild(hs);
+})();
+</script>
+
+<noscript>
+<a href="/" target="_blank">
+<img src="//sstatic1.histats.com/0.gif?4971583&101" alt="Histats">
+</a>
+</noscript>
+  
+  <script src="https://behindcanary.com/93/40/7b/93407ba82bd13c152c864f91fc22e019.js"></script>
+  
+</body>
+</html>
