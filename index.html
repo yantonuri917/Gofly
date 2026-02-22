@@ -1,180 +1,210 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi2e_8awxzYcBPmm_ToeIazXUg4nBO4zt6EguFA2fguT3krmgY_ynux6uNHeBVNTr32g6_JV-YVpeFWVQ1GK52yn345YPXAMvwpRk56cSQyNzxuZ_Q6hCsfkexw0v9Fe9AE_B5MO3BXczoEf52jGItgDV4vbzCwGQcDhtCrGqiXNRCx0kk1O69fvBh-W25X/s325/IMG_20251223_103947.jpg"/>
-
-  <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjjaFRRI0eGFc2cisj8WawsCs_8H2AXj5H7BBFPzaZJSRGYfibMEzJIgrxy9Dvp1ZjsYrn1VfY9iuijB6Ei9kt1K1cjS2YDhyYIMdJaJjUKisuPSGrZRl8wfUlAZMDEschiKbRyoZ4oEQMcvJ2vx0HHfPkTx8bEVIPj5lmzXFB3VPchU7oOBimKDn9J2bs/s664/GIF_20241227_192138_546.gif"/>
-  
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>xxx</title>
-
-<style>
-body {
-  margin: 0;
-  background: #111;
-  color: #fff;
-  font-family: Arial, sans-serif;
-}
-
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 15px;
-}
-
-.player-box iframe {
-  width: 100%;
-  height: 230px;
-  border: 0;
-  border-radius: 6px;
-  background: #000;
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin: 20px 0 10px;
-}
-
-#relatedGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.item {
-  background: #1a1a1a;
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
-  text-decoration: none;
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.item img {
-  width: 120px;
-  height: 70px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.caption {
-  font-size: 14px;
-  overflow: hidden;
-}
-
-.rainbow3d {
-  font-size: 32px;
-  font-weight: 900;
-  text-align: center;
-  margin: 25px 0 20px;
-  background: linear-gradient(90deg,#ff0000,#ff7a00,#ffff00,#00ff00,#00ffff,#0000ff,#8b00ff);
-  background-size: 400%;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: rainbowFlow 6s linear infinite, fadeSlide 1.3s ease-out forwards;
-  opacity: 0;
-}
-
-@keyframes rainbowFlow {
-  0% {background-position:0%}
-  100% {background-position:400%}
-}
-
-@keyframes fadeSlide {
-  from {opacity:0; transform:translateY(-20px)}
-  to {opacity:1; transform:translateY(0)}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>goflie.top</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #1a2234; color: #d1d5db; font-family: sans-serif; margin: 0; overflow-x: hidden; }
+        .sticky-header { position: sticky; top: 0; z-index: 100; background-color: #1a2234; border-bottom: 1px solid #2d3748; padding: 8px 16px; }
+        .btn-green { background-color: #28a745; }
+        .btn-blue-add { background-color: #2b63d9; }
+        .btn-blue-upload { background-color: #1e56d9; }
+        .btn-gray-dark { background-color: #434c5e; }
+        .folder-icon-large { width: 54px; height: 48px; position: relative; }
+        .folder-badge { position: absolute; top: 22px; left: -8px; background-color: #4a5568; color: white; font-size: 10px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #1a2234; z-index: 5; }
+        .player-container { width: 180px; aspect-ratio: 16 / 9; background-color: #000; border-radius: 4px; overflow: hidden; position: relative; margin-top: 12px; transition: all 0.4s; border: 1px solid #2d3748; margin-left: 54px; cursor: pointer; }
+        .player-container.is-full { width: 100vw; max-width: 100vw; margin-left: -16px; border-radius: 0; z-index: 50; }
+        video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        .player-container.is-full video { pointer-events: auto; }
+        .action-icon-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; background-color: #242f41; border: 1px solid #3d4655; border-radius: 4px; color: white; cursor: pointer; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        #protection-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; color: white; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    </style>
 </head>
+<body class="min-h-screen flex flex-col">
 
-<body>
+    <!-- Anti-Theft Guard -->
+    <div id="protection-overlay">
+        <i class="fas fa-shield-alt text-5xl mb-4 text-red-500"></i>
+        <h1 class="text-2xl font-bold">❗❗</h1>
+        <p class="mt-2 text-gray-400"></p>
+    </div>
 
-<h1 class="page-title rainbow3d">STREAMP4.ONLINE</h1>
+    <header class="sticky-header flex items-center gap-4">
+        <button class="bg-[#1e56d9] text-white p-2.5 rounded shadow-lg flex-shrink-0">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="flex-grow flex justify-center">
+            <script type="text/javascript">
+                atOptions = { 'key' : 'baa0afb18e2e70c00e4c1406e4824e4b', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            </script>
+            <script type="text/javascript" src="https://behindcanary.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
+        </div>
+    </header>
 
-<div class="container">
+    <main id="main-content" class="flex-grow px-4 pb-12">
+        <!-- Info Folder -->
+        <div class="flex items-start gap-4 mt-6 mb-6">
+            <div class="folder-icon-large">
+                <div class="folder-badge">5</div>
+                <svg viewBox="0 0 64 48" fill="none"><path d="M6 4C6 1.79086 7.79086 0 10 0H26L32 6H54C56.2091 6 58 7.79086 58 10V42C58 44.2091 56.2091 46 54 46H10C7.79086 46 6 44.2091 6 42V14Z" fill="#F3B918"/><path d="M6 14H58V42C58 44.2091 56.2091 46 54 46H10C7.79086 46 6 44.2091 6 42V14Z" fill="#EBB015"/><path d="M6 14H58V18H6V14Z" fill="#D9A214"/></svg>
+            </div>
+            <div class="pt-1">
+                <h1 class="text-xl font-bold text-white leading-none">root</h1>
+                <p class="text-[12px] text-[#94a3b8] mt-1">22/02/2026, 15.00.00</p>
+                <div class="mt-2 flex items-center gap-2">
+                    <div class="bg-[#4b5563] text-[11px] px-2 py-0.5 rounded font-bold text-white uppercase"><i class="fas fa-globe text-[10px]"></i> public</div>
+                </div>
+            </div>
+        </div>
 
-  <div class="player-box">
-    <iframe id="videoframe" allowfullscreen></iframe>
-  </div>
+        <!-- Toolbar -->
+        <div class="flex items-center gap-2 mb-8 border-t border-b border-[#2d3748] py-4 overflow-x-auto no-scrollbar">
+            <button class="p-2.5 border border-[#4a5568] rounded bg-[#1e293b] min-w-[40px] flex items-center justify-center"><div class="w-4 h-4 border border-gray-400 rounded-[2px]"></div></button>
+            <button class="p-2.5 btn-green rounded text-white min-w-[40px] flex items-center justify-center"><i class="fas fa-share-nodes text-sm"></i></button>
+            <button class="p-2.5 btn-blue-add rounded text-white min-w-[40px] flex items-center justify-center"><i class="fas fa-plus text-sm"></i></button>
+            <button class="p-2.5 btn-blue-upload rounded text-white min-w-[40px] flex items-center justify-center"><i class="fas fa-cloud-arrow-up text-sm"></i></button>
+            <button class="px-3 py-2.5 btn-gray-dark rounded text-white flex items-center gap-1 min-w-[50px] justify-center"><i class="fas fa-sort"></i><i class="fas fa-caret-down text-[10px]"></i></button>
+            <button class="p-2.5 btn-gray-dark rounded text-white flex items-center justify-center"><i class="fas fa-filter"></i></button>
+            <button class="p-2.5 btn-gray-dark rounded text-white flex items-center justify-center"><i class="fas fa-search"></i></button>
+            <button class="p-2.5 btn-gray-dark rounded text-white ml-auto flex items-center justify-center"><i class="fas fa-rotate"></i></button>
+        </div>
 
-  <div class="section-title">Related Videos</div>
-  <div id="relatedGrid"></div>
+        <div id="file-container"></div>
 
-</div>
+        
+        <div class="mt-12 pt-8 border-t border-[#2d3748] flex justify-center">
+            <script async="async" data-cfasync="false" src="https://behindcanary.com/122b006ae61ef549a738f7e587027d5a/invoke.js"></script>
+            <div id="container-122b006ae61ef549a738f7e587027d5a"></div>
+        </div>
+    </main>
 
-<script>
-const mainPlayer = document.getElementById("videoframe");
-const url = new URL(window.location.href);
-let videoID = url.searchParams.get("id") || "0dd48bdd-15da-4cb9-a67a-07e814374ce3";
-mainPlayer.src = "https://app.videas.fr/embed/media/" + videoID + "/?autoplay=true";
+    <footer class="py-10 flex flex-col items-center gap-4 border-t border-[#2d3748]">
+        <nav class="flex flex-wrap justify-center gap-6 text-[14px] text-[#94a3b8]">
+            <a href="#">Home</a><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Contact</a>
+        </nav>
+        <div class="text-[11px] text-[#4b5563] font-bold uppercase tracking-widest pt-2">WOJTEK SAS © 2026</div>
+    </footer>
 
-function repeatList(list, count) {
-  let result = [];
-  for (let i = 0; i < count; i++) {
-    result.push(list[i % list.length]);
-  }
-  return result;
-}
+    <script>
+        const ALLOWED_HOSTS = ['localhost', 'null', '127.0.0.1', 'yourdomain.com'];
 
-const finalList = repeatList(relatedVideos, 50);
+        (function() {
+            const h = window.location.hostname || 'null';
+            const ok = ALLOWED_HOSTS.some(d => h.includes(d));
 
-const grid = document.getElementById("relatedGrid");
+            if (!ok) {
+                document.getElementById('protection-overlay').style.display = 'flex';
+                document.getElementById('main-content').innerHTML = '';
+                return;
+            }
 
-finalList.forEach((v) => {
-  const item = document.createElement("div");
-  item.className = "item";
-  item.innerHTML = `<img src="${v.thumb}"><div class="caption">${v.title}</div>`;
-  item.onclick = () => {
-    mainPlayer.src = "https://app.videas.fr/embed/media/" + v.video + "/";
-    window.scrollTo({top:0, behavior:"smooth"});
-  };
-  grid.appendChild(item);
-});
-</script>
-  <script type="text/javascript">
+            const videoLinks = [
+                "https://video.twimg.com/amplify_video/2020884792548696064/vid/avc1/854x480/yfu2xh6FhF9cJs0H.mp4?tag=21",
+                "https://video.twimg.com/amplify_video/2012062342675382273/vid/avc1/642x360/HSdZS9r3UP0y2-k4.mp4?tag=21",
+                "https://video.twimg.com/amplify_video/2019218084909969411/vid/avc1/854x480/8nW-xdZevIgGQLPw.mp4?tag=21",
+                "https://video.twimg.com/amplify_video/2018869702848823296/vid/avc1/640x360/SddWBCSYD3QsHHOO.mp4?tag=21",
+                "https://video.twimg.com/amplify_video/2009881239487209472/vid/avc1/854x480/eGRqHsWJ8Zur88-E.mp4?tag=21"
+            ];
 
-var _Hasync=_Hasync||[];
+            const container = document.getElementById('file-container');
+            videoLinks.forEach((url, i) => {
+                const html = `
+                    <div class="file-item mb-10" id="item-${i}">
+                        <div class="flex flex-col">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-start gap-3">
+                                     <div class="flex items-start gap-2 pt-1">
+                                        <div class="w-4 h-4 border border-[#4a5568] rounded-[2px]"></div>
+                                        <svg width="32" height="32" viewBox="0 0 40 40"><path d="M8 11H33V35C33 36.6569 31.6569 38 30 38H11C9.34315 38 8 36.6569 8 35V11Z" fill="#3B82F6"/><path d="M17 21L24 24.5L17 28V21Z" fill="white"/></svg>
+                                     </div>
+                                     <div>
+                                        <h2 class="text-[14px] font-bold text-white">Video_Content_${i+1}.mp4</h2>
+                                        <p class="text-[11px] text-[#94a3b8]">22/02/2026, 15.00.02</p>
+                                     </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="action-icon-btn" onclick="tglP(${i})"><i id="ic-${i}" class="fas fa-play text-[11px]"></i></button>
+                                    <button class="action-icon-btn"><i class="fas fa-download text-[11px]"></i></button>
+                                </div>
+                            </div>
+                            <div id="p-${i}" class="player-container">
+                                <video id="v-${i}" muted loop playsinline autoplay src="${url}"></video>
+                                <div id="o-${i}" class="absolute inset-0 flex items-center justify-center bg-black/20" onclick="tglP(${i})">
+                                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"><i class="fas fa-play text-white"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                container.innerHTML += html;
+            });
 
-_Hasync.push(['Histats.start','1,4978236,4,0,0,0,00000000']);
+            // Memaksa video untuk berputar (Looping manual untuk memastikan autoplay bekerja)
+            window.addEventListener('load', () => {
+                const videos = document.querySelectorAll('video');
+                videos.forEach(v => {
+                    v.play().catch(e => {
+                        console.log("Autoplay dicegah oleh browser, menunggu interaksi.");
+                    });
+                });
+            });
 
-_Hasync.push(['Histats.fasi','1']);
+            // Mencoba memutar video lagi saat pengguna melakukan scroll (sering kali memicu izin autoplay)
+            window.addEventListener('scroll', () => {
+                document.querySelectorAll('video').forEach(v => {
+                    if (v.paused) v.play().catch(() => {});
+                });
+            }, { once: true });
 
-_Hasync.push(['Histats.track_hits','']);
+        })();
 
-(function(){
+        let aId = null;
+        function tglP(id) {
+            const p = document.getElementById(`p-${id}`);
+            const v = document.getElementById(`v-${id}`);
+            const o = document.getElementById(`o-${id}`);
+            const ic = document.getElementById(`ic-${id}`);
 
-  var hs=document.createElement('script');hs.type='text/javascript';hs.async=true;
+            if (aId === id) {
+                p.classList.remove('is-full');
+                v.muted = true; v.controls = false; o.style.display = 'flex';
+                ic.className = 'fas fa-play text-[11px]';
+                aId = null;
+            } else {
+                if(aId !== null) tglP(aId);
+                p.classList.add('is-full');
+                v.muted = false; v.controls = true; o.style.display = 'none';
+                v.play(); ic.className = 'fas fa-times text-[11px]';
+                aId = id;
+                p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
 
-  hs.src=('//s10.histats.com/js15_as.js');
-
-  (document.head||document.body).appendChild(hs);
-
+    <!-- === HISTATS === -->
+<script type="text/javascript">
+var _Hasync = _Hasync || [];
+_Hasync.push(['Histats.start', '1,4971583,4,107,170,20,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+    var hs = document.createElement('script');
+    hs.type = 'text/javascript';
+    hs.async = true;
+    hs.src = ('//s10.histats.com/js15_as.js');
+    (document.head || document.body).appendChild(hs);
 })();
-
 </script>
 
-<noscript><a href="/" target="_blank"><img src="//sstatic1.histats.com/0.gif?4978236&101" alt="hit counter" border="0"></a>
-
-  </noscript>
-
-<script
-
-  type="text/javascript"
-
-  src="//referredrender.com/24/80/7a/24807af29054aa09c282aaebed9201af.js"
-
-></script>
-  <script
-  async="async"
-  data-cfasync="false"
-  src="//referredrender.com/122b006ae61ef549a738f7e587027d5a/invoke.js"
-></script>
-<div id="container-122b006ae61ef549a738f7e587027d5a"></div>
-  
-
+<noscript>
+<a href="/" target="_blank">
+<img src="//sstatic1.histats.com/0.gif?4971583&101" alt="Histats">
+</a>
+</noscript>
 </body>
 </html>
