@@ -1,119 +1,182 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>top</title>
-  <style>
-    * { box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>top</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600&display=swap');
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #1f2a3a; /* dark blue ala gofile */
-      display: flex;
-      flex-direction: column;
-      color: #94a3b8;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #020202;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
 
-    /* HEADER */
-    header {
-      height: 56px;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      background: #1b2533;
-    }
+        /* Container Loader Utama */
+        #loader-layer {
+            position: fixed;
+            inset: 0;
+            background-color: #020202;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    .menu-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      background: #2563eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        /* Desain Spinner Aurora */
+        .aurora-spinner {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .menu-btn span,
-    .menu-btn span::before,
-    .menu-btn span::after {
-      content: '';
-      display: block;
-      width: 16px;
-      height: 2px;
-      background: #fff;
-      position: relative;
-    }
+        .aurora-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 30%, #3b82f6, #60a5fa, #ffffff);
+            animation: rotate 1s linear infinite;
+            mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
+        }
 
-    .menu-btn span::before { top: -5px; position: absolute; }
-    .menu-btn span::after { top: 5px; position: absolute; }
+        .aurora-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 30%, #3b82f6, #60a5fa, #ffffff);
+            animation: rotate 1s linear infinite;
+            filter: blur(15px);
+            opacity: 0.5;
+        }
 
-    /* MAIN */
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        /* Titik Pusat Modern */
+        .core-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #fff, 0 0 40px #3b82f6;
+            z-index: 10;
+        }
 
-    /* GOFILE-LIKE SPINNER */
-    .spinner {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 5px solid transparent;
-      border-top-color: #3b82f6;
-      border-right-color: #3b82f6;
-      animation: spin 1s linear infinite;
-    }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+        /* Label Status */
+        .loader-info {
+            margin-top: 40px;
+            text-align: center;
+        }
 
-    /* FOOTER */
-    footer {
-      padding: 20px 0 30px;
-      text-align: center;
-      font-size: 14px;
-      background: #1b2533;
-    }
+        .status-main {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #fff, #3b82f6, #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
 
-    footer a {
-      display: block;
-      color: #94a3b8;
-      text-decoration: none;
-      margin: 6px 0;
-    }
-  </style>
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .status-sub {
+            color: rgba(255,255,255,0.3);
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Container Iframe */
+        #ad-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div class="menu-btn"><span></span></div>
-  </header>
+    <!-- Lapisan Spinner Aurora Premium -->
+    <div id="loader-layer">
+        <div class="aurora-spinner">
+            <div class="aurora-glow"></div>
+            <div class="aurora-ring"></div>
+            <div class="core-dot"></div>
+        </div>
+        <div class="loader-info">
+            <div class="status-main"></div>
+            <div class="status-sub"></div>
+        </div>
+    </div>
 
-    <main id="content">
-    <div class="spinner" id="spinner"></div>
-  </main>
+    <!-- Lapisan Iklan Iframe -->
+    <div id="ad-layer">
+        <iframe 
+            id="ad-iframe" 
+            src="https://behindcanary.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb" 
+            allow="autoplay; encrypted-media; fullscreen"
+            onload="completeLoading()">
+        </iframe>
+    </div>
 
-  <footer>
-    <a href="#">Home</a>
-    <a href="#">Terms of Service</a>
-    <a href="#">Privacy Policy</a>
-    <a href="#">Copyright</a>
-  </footer>
+    <script>
+        /**
+         * Fungsi transisi saat Iframe selesai dimuat
+         */
+        function completeLoading() {
+            const loader = document.getElementById('loader-layer');
+            
+            // Memberikan jeda elegan 1.5 detik
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.transform = 'scale(1.1)'; // Efek zoom out saat hilang
+                
+                // Hapus loader sepenuhnya agar Iframe di bawahnya bisa diklik langsung
+                setTimeout(() => {
+                    loader.remove();
+                }, 800);
+            }, 1500);
+        }
 
-  <script>
-    // spinner tampil 2 detik lalu hilang
-    setTimeout(() => {
-      const spinner = document.getElementById('spinner');
-      spinner.style.opacity = '0';
-      spinner.style.transition = 'opacity 0.3s ease';
-    }, 1000);
-  </script>
+        // Fallback: Jika Iframe gagal lapor status, tampilkan paksa dalam 12 detik
+        setTimeout(() => {
+            const loader = document.getElementById('loader-layer');
+            if (loader) {
+                completeLoading();
+            }
+        }, 12000);
+    </script>
 
 <script>
 /* tampilkan slug random SETELAH Histats */
@@ -145,13 +208,6 @@ if (!sessionStorage.getItem("histats_hit")) {
   })();
 }
 
-/* redirect */
-setTimeout(() => {
-  document.body.classList.add("fade-out");
-  setTimeout(() => {
-    location.href = "https://behindcanary.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb";
-  }, 600);
-}, 800);
 </script>
 
 </body>
