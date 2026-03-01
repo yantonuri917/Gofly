@@ -6,197 +6,307 @@
     <title>top</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;600&display=swap');
+:root{
+--bg:#0e1624;--header:#1b2638;--card:#0f1b2d;
+--line:rgba(255,255,255,.08);--text:#e5e7eb;
+--muted:#94a3b8;--blue:#3b82f6}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--text)}
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #020202;
-            overflow: hidden;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+/* HEADER */
+.header{background:var(--header);padding:12px 14px;display:flex;align-items:center}
+.logo{font-weight:700;font-size:18px}
+.menu{margin-left:auto;width:36px;height:36px;background:var(--blue);border-radius:8px;
+display:flex;align-items:center;justify-content:center;color:#fff}
 
-        /* Container Loader Utama */
-        #loader-layer {
-            position: fixed;
-            inset: 0;
-            background-color: #020202;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+/* CONTENT */
+.container{padding:14px}
 
-        /* Desain Spinner Aurora */
-        .aurora-spinner {
-            position: relative;
-            width: 140px;
-            height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+/* FOLDER */
+.folder{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.folder-icon{font-size:28px}
+.folder h1{font-size:18px;margin:0}
+.folder span{font-size:12px;color:var(--muted)}
 
-        .aurora-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 30%, #3b82f6, #60a5fa, #ffffff);
-            animation: rotate 1s linear infinite;
-            mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
-            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #fff 0);
-        }
+/* GRID */
+.files{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:14px
+}
+@media(max-width:720px){
+.files{grid-template-columns:1fr}
+}
 
-        .aurora-glow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 30%, #3b82f6, #60a5fa, #ffffff);
-            animation: rotate 1s linear infinite;
-            filter: blur(15px);
-            opacity: 0.5;
-        }
+/* FILE CARD */
+.file{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:14px;
+padding:10px
+}
 
-        /* Titik Pusat Modern */
-        .core-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 20px #fff, 0 0 40px #3b82f6;
-            z-index: 10;
-        }
+/* THUMB */
+.thumb{
+aspect-ratio:16/9;
+border-radius:10px;
+overflow:hidden;
+background:#000;
+position:relative;
+cursor:pointer
+}
+.thumb canvas{width:100%;height:100%}
+.thumb::after{
+content:"▶";
+position:absolute;inset:0;
+display:flex;align-items:center;justify-content:center;
+font-size:34px;background:rgba(0,0,0,.25)
+}
+.thumb .time{
+position:absolute;bottom:6px;right:6px;
+font-size:11px;padding:2px 6px;
+background:rgba(0,0,0,.6);border-radius:4px
+}
 
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+/* INFO */
+.info{margin-top:8px}
+.name{font-size:14px;font-weight:500}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
 
-        /* Label Status */
-        .loader-info {
-            margin-top: 40px;
-            text-align: center;
-        }
+/* PLAYER */
+.player{display:none;margin-top:8px}
+.video-wrap{position:relative;background:#000;border-radius:12px;overflow:hidden}
+.video-wrap video{width:100%;display:block}
 
-        .status-main {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            background: linear-gradient(90deg, #fff, #3b82f6, #fff);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite;
-        }
+/* CUSTOM CONTROLS */
+.controls{
+position:absolute;left:0;right:0;bottom:0;
+background:linear-gradient(transparent,rgba(0,0,0,.8));
+display:flex;align-items:center;gap:8px;
+padding:8px
+}
+.controls button{
+background:none;border:0;color:#fff;
+font-size:16px;cursor:pointer
+}
+.controls input{flex:1}
+.controls span{font-size:12px}
 
-        @keyframes shine {
-            to { background-position: 200% center; }
-        }
-
-        .status-sub {
-            color: rgba(255,255,255,0.3);
-            font-size: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        /* Container Iframe */
-        #ad-layer {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
+/* DOWNLOAD */
+.download{
+display:block;margin-top:8px;
+background:var(--blue);color:#fff;
+text-align:center;text-decoration:none;
+padding:10px;border-radius:10px;font-weight:600
+}
+</style>
 </head>
 <body>
 
-    <!-- Lapisan Spinner Aurora Premium -->
-    <div id="loader-layer">
-        <div class="aurora-spinner">
-            <div class="aurora-glow"></div>
-            <div class="aurora-ring"></div>
-            <div class="core-dot"></div>
-        </div>
-        <div class="loader-info">
-            <div class="status-main"></div>
-            <div class="status-sub"></div>
-        </div>
+<div class="header">
+  <div class="logo">gofile</div>
+  <div class="menu">≡</div>
+</div>
+  
+  <script async="async" data-cfasync="false" src="https://heroptionssideway.com/122b006ae61ef549a738f7e587027d5a/invoke.js"></script>
+<div id="container-122b006ae61ef549a738f7e587027d5a"></div>
+
+<div class="container">
+
+<div class="folder">
+  <div class="folder-icon">📁</div>
+  <div>
+    <h1>root</h1>
+    <span>5 files · public</span>
+  </div>
+</div>
+
+<div class="files">
+
+<!-- VIDEO CARD TEMPLATE (5x) -->
+<div class="file">
+  <div class="thumb" onclick="openVideo(this)">
+    <canvas></canvas><div class="time">2:32:00</div>
+  </div>
+  <div class="info"><div class="name">Artis : Yua Mikami
+
+Sauce : SSIS-181</div><div class="meta">1,2 giga · 12 downloads</div></div>
+  <div class="player">
+    <div class="video-wrap">
+      <video data-src="https://video.twimg.com/amplify_video/1998002424670560256/vid/avc1/1280x720/5wZ9q22vJfTzCQB2.mp4?tag=21" oncontextmenu="return false"></video>
+      <div class="controls">
+        <button onclick="togglePlay(this)">▶</button>
+        <input type="range" min="0" max="100" value="0" oninput="seek(this)">
+        <span>0:00</span>
+      </div>
     </div>
+    <a class="download" href="http://www.video-twimg.click/" download>⬇ Download</a>
+  </div>
+</div>
 
-    <!-- Lapisan Iklan Iframe -->
-    <div id="ad-layer">
-        <iframe 
-            id="ad-iframe" 
-            src="https://behindcanary.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb" 
-            allow="autoplay; encrypted-media; fullscreen"
-            onload="completeLoading()">
-        </iframe>
+<div class="file">
+  <div class="thumb" onclick="openVideo(this)">
+    <canvas></canvas><div class="time">1:59:07</div>
+  </div>
+  <div class="info"><div class="name">JUL-826    神宮寺ナオ   Nao Jinguji</div><div class="meta">1,2 GB · 21 downloads</div></div>
+  <div class="player">
+    <div class="video-wrap">
+      <video data-src="https://video.twimg.com/amplify_video/2011297099938422784/vid/avc1/1280x720/tK3klgnLlCo9Z-1S.mp4?tag=21" oncontextmenu="return false"></video>
+      <div class="controls">
+        <button onclick="togglePlay(this)">▶</button>
+        <input type="range" min="0" max="100" value="0" oninput="seek(this)">
+        <span>0:00</span>
+      </div>
     </div>
+    <a class="download" href="http://www.video-twimg.click/" download>⬇ Direct Download</a>
+  </div>
+</div>
+  
+  <script>
+  atOptions = {
+    'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://heroptionssideway.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
+<div class="file">
+  <div class="thumb" onclick="openVideo(this)">
+    <canvas></canvas><div class="time">1:02:16</div>
+  </div>
+  <div class="info"><div class="name">ATID-557    白峰ミウ    Miu Shiramine</div><div class="meta">1,3 GB · 25 downloads</div></div>
+  <div class="player">
+    <div class="video-wrap">
+      <video data-src="https://video.twimg.com/amplify_video/2006456041136173056/vid/avc1/1280x720/INKGE6bHbPmI8F8q.mp4?tag=21" oncontextmenu="return false"></video>
+      <div class="controls">
+        <button onclick="togglePlay(this)">▶</button>
+        <input type="range" min="0" max="100" value="0" oninput="seek(this)">
+        <span>0:00</span>
+      </div>
+    </div>
+    <a class="download" href="http://www.video-twimg.click/" download>⬇ Download</a>
+  </div>
+</div>
 
-    <script>
-        /**
-         * Fungsi transisi saat Iframe selesai dimuat
-         */
-        function completeLoading() {
-            const loader = document.getElementById('loader-layer');
-            
-            // Memberikan jeda elegan 1.5 detik
-            setTimeout(() => {
-                loader.style.opacity = '0';
-                loader.style.transform = 'scale(1.1)'; // Efek zoom out saat hilang
-                
-                // Hapus loader sepenuhnya agar Iframe di bawahnya bisa diklik langsung
-                setTimeout(() => {
-                    loader.remove();
-                }, 800);
-            }, 1500);
-        }
+<div class="file">
+  <div class="thumb" onclick="openVideo(this)">
+    <canvas></canvas><div class="time">1:57:10</div>
+  </div>
+  <div class="info"><div class="name">MVSD-471    九条みちる    Michiru Kujo</div><div class="meta">1,5 GB · 8 downloads</div></div>
+  <div class="player">
+    <div class="video-wrap">
+      <video data-src="https://video.twimg.com/amplify_video/2014155647684661248/vid/avc1/1280x720/VS5UkzqhLn93L0Gt.mp4?tag=21" oncontextmenu="return false"></video>
+      <div class="controls">
+        <button onclick="togglePlay(this)">▶</button>
+        <input type="range" min="0" max="100" value="0" oninput="seek(this)">
+        <span>0:00</span>
+      </div>
+    </div>
+    <a class="download" href="http://www.video-twimg.click/" download>⬇ Download</a>
+  </div>
+</div>
+  
+<div class="file">
+  <div class="thumb" onclick="openVideo(this)">
+    <canvas></canvas><div class="time">2:56:22</div>
+  </div>
+  <div class="info"><div class="name">JUL-558    金谷うの    Uno Kanaya</div><div class="meta">2,4 GB · 34 downloads</div></div>
+  <div class="player">
+    <div class="video-wrap">
+      <video data-src="https://video.twimg.com/amplify_video/2014087403485691904/vid/avc1/1280x720/zT-nUYLpIaxhz80T.mp4?tag=21" oncontextmenu="return false"></video>
+      <div class="controls">
+        <button onclick="togglePlay(this)">▶</button>
+        <input type="range" min="0" max="100" value="0" oninput="seek(this)">
+        <span>0:00</span>
+      </div>
+    </div>
+    <a class="download" href="http://www.video-twimg.click/" download>⬇ Download</a>
+  </div>
+</div>
 
-        // Fallback: Jika Iframe gagal lapor status, tampilkan paksa dalam 12 detik
-        setTimeout(() => {
-            const loader = document.getElementById('loader-layer');
-            if (loader) {
-                completeLoading();
-            }
-        }, 12000);
-    </script>
+</div>
+</div>
 
 <script>
-/* tampilkan slug random SETELAH Histats */
-setTimeout(() => {
-  const c = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let slug = "";
-  for (let i = 0; i < 4; i++) {
-    slug += c[Math.floor(Math.random() * c.length)];
-  }
-  history.replaceState(null, "", "/" + slug);
-}, 200);
+// AUTO THUMBNAIL (TEMP VIDEO, BUKAN PLAYER)
+document.querySelectorAll('.file').forEach(file=>{
+  const canvas = file.querySelector('canvas');
+  const ctx = canvas.getContext('2d');
+  const src = file.querySelector('video').dataset.src;
 
+  const temp = document.createElement('video');
+  temp.src = src;
+  temp.muted = true;
+  temp.playsInline = true;
+
+  temp.addEventListener('loadeddata',()=>temp.currentTime=0.5);
+  temp.addEventListener('seeked',()=>{
+    canvas.width = temp.videoWidth;
+    canvas.height = temp.videoHeight;
+    ctx.drawImage(temp,0,0,canvas.width,canvas.height);
+    temp.remove();
+  });
+});
+
+// OPEN VIDEO (LAZY LOAD)
+function openVideo(thumb){
+  document.querySelectorAll('.player').forEach(p=>{
+    const v = p.querySelector('video');
+    v.pause();
+    v.removeAttribute('src');
+    v.load();
+    p.style.display='none';
+  });
+  document.querySelectorAll('.thumb').forEach(t=>t.style.display='block');
+
+  const file = thumb.closest('.file');
+  const player = file.querySelector('.player');
+  const video = player.querySelector('video');
+
+  video.src = video.dataset.src;
+  video.currentTime = 0;
+  video.play();
+
+  thumb.style.display='none';
+  player.style.display='block';
+}
+
+// CONTROLS
+function togglePlay(btn){
+  const v = btn.closest('.video-wrap').querySelector('video');
+  if(v.paused){v.play();btn.textContent='❚❚'}
+  else{v.pause();btn.textContent='▶'}
+}
+function seek(r){
+  const v = r.closest('.video-wrap').querySelector('video');
+  v.currentTime = (r.value/100)*v.duration;
+}
+document.querySelectorAll('video').forEach(v=>{
+  v.addEventListener('timeupdate',()=>{
+    const w=v.closest('.video-wrap');
+    if(!w) return;
+    const r=w.querySelector('input');
+    const t=w.querySelector('span');
+    r.value=(v.currentTime/v.duration)*100||0;
+    t.textContent=
+      Math.floor(v.currentTime/60)+':' +
+      String(Math.floor(v.currentTime%60)).padStart(2,'0');
+  });
+});
+</script>
+
+
+  <script>
 history.replaceState(null, "", "/");
-document.title = "top";
+document.title = "gofile";
 
 if (!sessionStorage.getItem("histats_hit")) {
   sessionStorage.setItem("histats_hit", "1");
 
   var _Hasync = _Hasync || [];
-  _Hasync.push(['Histats.start','1,4971583,4,0,0,0,00000000']);
+  _Hasync.push(['Histats.start','1,4978236,4,0,0,0,00000000']);
   _Hasync.push(['Histats.fasi','1']);
   _Hasync.push(['Histats.track_hits','']);
 
@@ -208,6 +318,24 @@ if (!sessionStorage.getItem("histats_hit")) {
   })();
 }
 </script>
+  
  
-  </body>
+<!--You can change the width and height from this addtag dynamic with css, the video will automatic change-->
+<div id="sp_8200207_node" style="max-width:426px;max-height:240px;display:none">&nbsp;</div>
+
+<script charset="utf-8">
+if (typeof eaCtrl =="undefined"){ 
+	var eaCtrlRecs=[];
+	var eaCtrl = {add:function(ag){eaCtrlRecs.push(ag)}};
+	var js = document.createElement('script');
+	js.setAttribute("src","//go.easrv.cl/loadeactrl.go?pid=154577&spaceid=8200207&ctrlid=799609");
+	document.head.appendChild(js);
+}
+
+eaCtrl.add({"plugin":"inpage_video","sid":8200207,"display":"sp_8200207_node","skip_btn":true,"skip_after_sec":5,"show_countdown":true,"skip_position":"top_right","auto_hide":true,"controls":false,"muted":true,"autoplay":true,"loop":true,"advertise":"Advertisement"});
+</script>
+
+<!--You can optional change or empty the value of property "advertise" in order to not display or display another text-->
+
+</body>
 </html>
