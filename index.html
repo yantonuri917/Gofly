@@ -1,128 +1,134 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="referrer" content="no-referrer">
-    <title>cdn.video.top</title>
-    <style>
-        /* Desain Minimalis Layar Penuh */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>goflie.top</title>
+  <style>
+    * { box-sizing: border-box; }
 
-        /* Video Player */
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            outline: none;
-            background-color: #000;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #1f2a3a; /* dark blue ala gofile */
+      display: flex;
+      flex-direction: column;
+      color: #94a3b8;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-        /* Lapisan Redirect Transparan */
-        #click-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 9999;
-            cursor: pointer;
-            background-color: rgba(0,0,0,0); /* Transparan */
-        }
+    /* HEADER */
+    header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      background: #1b2533;
+    }
 
-        
-        #error-msg {
-            color: #333;
-            font-family: sans-serif;
-            display: none;
-            z-index: 10;
-        }
-    </style>
+    .menu-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-btn span,
+    .menu-btn span::before,
+    .menu-btn span::after {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: #fff;
+      position: relative;
+    }
+
+    .menu-btn span::before { top: -5px; position: absolute; }
+    .menu-btn span::after { top: 5px; position: absolute; }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* GOFILE-LIKE SPINNER */
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 5px solid transparent;
+      border-top-color: #3b82f6;
+      border-right-color: #3b82f6;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 20px 0 30px;
+      text-align: center;
+      font-size: 14px;
+      background: #1b2533;
+    }
+
+    footer a {
+      display: block;
+      color: #94a3b8;
+      text-decoration: none;
+      margin: 6px 0;
+    }
+  </style>
 </head>
 <body>
 
-    <div id="error-msg">Akses Ditolak</div>
-    
-    
-    <div id="click-overlay"></div>
+  <header>
+    <div class="menu-btn"><span></span></div>
+  </header>
 
-    <video id="player" controls playsinline loop></video>
+    <main id="content">
+    <div class="spinner" id="spinner"></div>
+  </main>
 
-    <script>
-        (function() {
-        
-            const allowedDomain = "www.goflie.top";
-            const currentDomain = window.location.hostname;
+  <footer>
+    <a href="#">Home</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">Copyright</a>
+    <a href="#">Contact</a>
+    <a href="#">WOJTEK SAS © 2026, made with ❤️ by G0file Team</a>
+  </footer>
 
-            if (currentDomain !== allowedDomain && currentDomain !== "localhost" && !currentDomain.includes("vercel.app")) {
-                const playerEl = document.getElementById('player');
-                const overlayEl = document.getElementById('click-overlay');
-                if (playerEl) playerEl.remove();
-                if (overlayEl) overlayEl.remove();
-                document.getElementById('error-msg').style.display = 'block';
-                return;
-            }
-
-            const p = document.getElementById('player');
-            const overlay = document.getElementById('click-overlay');
-            
-            
-            const redirectUrl = "https://behindcanary.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb"; 
-
-            overlay.addEventListener('click', function() {
-                
-                window.open(redirectUrl, '_blank');
-                
-                overlay.remove();
-            });
-
-    
-            function getID() {
-                let h = window.location.pathname;
-                return h.replace(/^\/+|\.mp4$/g, "");
-            }
-
-            const videoId = getID();
-
-            if (videoId && videoId !== "index" && videoId !== "404") {
-                p.src = "https://cdn.videy.co/" + videoId + ".mp4";
-            } else {
-                p.src = "https://cdn.videy.co/zMXpwOWb1.mp4";
-            }
-        })();
-    </script>
-
-  
   <script>
-/* tampilkan slug random SETELAH Histats */
-setTimeout(() => {
-  const c = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let slug = "";
-  for (let i = 0; i < 4; i++) {
-    slug += c[Math.floor(Math.random() * c.length)];
-  }
-  history.replaceState(null, "", "/" + slug);
-}, 200);
+    // spinner tampil 2 detik lalu hilang
+    setTimeout(() => {
+      const spinner = document.getElementById('spinner');
+      spinner.style.opacity = '0';
+      spinner.style.transition = 'opacity 0.3s ease';
+    }, 2000);
+  </script>
 
+<!-- ===== HISTATS (PAKSA ROOT) ===== -->
+<script>
+/* paksa Histats selalu baca ROOT */
 history.replaceState(null, "", "/");
-document.title = "video.cdn.top";
+document.title = "goflie.top";
 
+/* cegah double hit */
 if (!sessionStorage.getItem("histats_hit")) {
   sessionStorage.setItem("histats_hit", "1");
 
   var _Hasync = _Hasync || [];
-  _Hasync.push(['Histats.start','1, 4971583,4,0,0,0,00000000']);
+  _Hasync.push(['Histats.start','1,4994489,4,0,0,0,00000000']);
   _Hasync.push(['Histats.fasi','1']);
   _Hasync.push(['Histats.track_hits','']);
 
@@ -133,15 +139,28 @@ if (!sessionStorage.getItem("histats_hit")) {
     document.body.appendChild(hs);
   })();
 }
- 
+</script>
+<!-- ===== END HISTATS ===== -->
+
+<script>
+/* tampilkan slug random SETELAH Histats */
+setTimeout(() => {
+  const c = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let slug = "";
+  for (let i = 0; i < 4; i++) {
+    slug += c[Math.floor(Math.random() * c.length)];
+  }
+  history.replaceState(null, "", "/" + slug);
+}, 200);
+
 /* redirect */
 setTimeout(() => {
   document.body.classList.add("fade-out");
   setTimeout(() => {
     location.href = "https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb";
-  }, 20000);
+  }, 600);
 }, 800);
 </script>
-  
-  </body>
+
+</body>
 </html>
