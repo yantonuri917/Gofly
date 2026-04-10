@@ -21,6 +21,7 @@
         })();
     </script>
 
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
@@ -31,9 +32,10 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             user-select: none;
+            overflow-x: hidden;
         }
 
-        /* Navigasi Utama */
+        /* Navigasi */
         .main-nav {
             background-color: #0b0c10;
             border-bottom: 1px solid #1f2937;
@@ -47,7 +49,7 @@
             justify-content: space-between;
         }
 
-        /* Iklan Sticky Header */
+        /* Iklan Sticky */
         .sticky-ads-container {
             position: sticky;
             top: 60px;
@@ -60,24 +62,13 @@
             min-height: 60px;
         }
 
-        .ads-wrapper {
-            width: 320px;
-            height: 50px;
-            background: #1a1b23;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        /* Video Player Styling */
+        /* Video Player */
         .video-wrapper {
             position: relative;
             width: 100%;
             aspect-ratio: 16 / 9;
             background: #000;
             overflow: hidden;
-            cursor: pointer;
         }
 
         #mainVideo {
@@ -86,68 +77,98 @@
             object-fit: contain;
         }
 
-        .center-play-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 30;
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-
-        .play-circle {
-            width: 70px;
-            height: 70px;
-            background: rgba(236, 72, 153, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
-        }
-
-        .is-playing .center-play-overlay {
-            opacity: 0;
-            visibility: hidden;
-            transform: translate(-50%, -50%) scale(1.2);
-        }
-
-        .custom-controls {
+        /* Controls Overlay */
+        .controls-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 80px;
-            background: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 0 15px 12px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            padding: 20px 15px 10px;
             opacity: 0;
             transition: opacity 0.3s;
-            z-index: 40;
+            z-index: 50;
         }
 
-        .video-wrapper:hover .custom-controls {
+        .video-wrapper:hover .controls-overlay,
+        .video-wrapper.touch-active .controls-overlay {
             opacity: 1;
         }
 
-        .progress-container {
+        /* Slider / Seek Bar Styling */
+        .seek-container {
             width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
             cursor: pointer;
+            position: relative;
             margin-bottom: 12px;
+            border-radius: 3px;
         }
 
-        .progress-bar {
+        .seek-container:hover {
+            height: 8px;
+            margin-bottom: 10px;
+        }
+
+        .seek-bar-buffer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            width: 0%;
+            border-radius: 3px;
+        }
+
+        .seek-bar-current {
+            position: absolute;
+            left: 0;
+            top: 0;
             height: 100%;
             background: #ec4899;
             width: 0%;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
 
-        /* ID Badge Style */
+        /* Handle Bulat saat hover/drag */
+        .seek-handle {
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            right: -7px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            transform: scale(0);
+            transition: transform 0.1s;
+        }
+
+        .seek-container:hover .seek-handle,
+        .dragging .seek-handle {
+            transform: scale(1);
+        }
+
+        /* Tombol Play Tengah */
+        .center-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 40;
+            pointer-events: none;
+            opacity: 1;
+            transition: all 0.3s;
+        }
+
+        .is-playing .center-btn {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+
         .id-badge {
             font-size: 11px;
             font-weight: 900;
@@ -165,13 +186,11 @@
             aspect-ratio: 16/9;
             object-fit: cover;
             border-radius: 8px;
-            background: #1a1b23;
         }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <!-- Header Navbar -->
     <nav class="main-nav">
         <div class="flex items-center gap-2">
             <div class="bg-pink-600 text-white font-black px-2 py-0.5 rounded text-sm">M</div>
@@ -183,9 +202,8 @@
         </div>
     </nav>
 
-    <!-- Iklan Sticky -->
     <div class="sticky-ads-container">
-        <div class="ads-wrapper">
+        <div id="ads_container">
             <script type="text/javascript">
                 atOptions = {
                     'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
@@ -199,80 +217,181 @@
         </div>
     </div>
 
-    <main class="max-w-5xl mx-auto mt-2">
-        
-        <!-- Video Player -->
-        <div class="video-wrapper group" id="playerArea" onclick="togglePlay()">
-            <video id="mainVideo" preload="auto" playsinline autoplay muted loop>
-                <source src="https://video.twimg.com/amplify_video/2041839767864930312/vid/avc1/480x270/Oypiu50WZxpbLfZH.mp4?tag=21#t=0.001" type="video/mp4">
+    <main class="max-w-5xl mx-auto">
+        <div class="video-wrapper" id="playerContainer">
+            <video id="mainVideo" playsinline autoplay muted loop>
+                <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
             </video>
 
-            <div class="center-play-overlay">
-                <div class="play-circle">
-                    <svg class="w-10 h-10 fill-white ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+            <div class="center-btn" id="centerPlayIcon">
+                <div class="w-16 h-16 bg-pink-600/90 rounded-full flex items-center justify-center shadow-2xl">
+                    <svg class="w-8 h-8 fill-white ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                 </div>
             </div>
 
-            <div class="custom-controls" onclick="event.stopPropagation()">
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar" id="progressBar"></div>
+            <!-- Custom Controls -->
+            <div class="controls-overlay">
+                <!-- Seek Bar Interaktif -->
+                <div class="seek-container" id="seekContainer">
+                    <div class="seek-bar-buffer" id="bufferBar"></div>
+                    <div class="seek-bar-current" id="currentBar">
+                        <div class="seek-handle"></div>
+                    </div>
                 </div>
-                <div class="flex items-center justify-between pb-1">
+
+                <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <button onclick="togglePlay()" class="text-white">
-                            <svg id="playBtnIcon" class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                        <button id="playBtn" class="text-white">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" id="playIcon"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
                         </button>
-                        <span class="text-xs font-mono text-gray-300" id="timeInfo">00:00 / 00:00</span>
+                        <span class="text-[11px] font-mono text-gray-300" id="timeDisplay">00:00 / 00:00</span>
                     </div>
-                    <div class="flex items-center gap-5">
-                        <button onclick="toggleMute()" class="text-gray-300 hover:text-white" id="muteBtn">
-                            <svg id="volIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                    <div class="flex items-center gap-4">
+                        <button id="muteBtn" class="text-gray-300">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" id="volIcon"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"></path></svg>
                         </button>
-                        <button onclick="toggleFullscreen()" class="text-gray-300 hover:text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                        <button id="fsBtn" class="text-gray-300">
+                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"></path></svg>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Detail Konten -->
-        <div class="p-5 space-y-4">
-            <div class="flex items-center justify-between border-b border-gray-800 pb-5">
-                <div class="flex items-center gap-4">
-                    <span id="currentId" class="id-badge uppercase">URE-138</span>
-                    <div class="flex items-center gap-3 border-l border-gray-700 pl-4">
-                        <div class="w-10 h-10 rounded-full bg-pink-600 flex items-center justify-center font-black">M</div>
-                        <div>
-                            <p class="text-sm font-black uppercase">MissAV Creator</p>
-                            <p class="text-[10px] text-gray-400">2.5JT PENGIKUT</p>
-                        </div>
-                    </div>
+        <div class="p-5 flex items-center justify-between border-b border-gray-800">
+            <div class="flex items-center gap-4">
+                <span id="videoID" class="id-badge">URE-138</span>
+                <div class="w-px h-6 bg-gray-800"></div>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-pink-600 flex items-center justify-center text-[10px] font-bold">M</div>
+                    <span class="text-xs font-bold text-gray-400">MISSAV</span>
                 </div>
-                <button class="bg-pink-600 px-6 py-2 rounded-full text-xs font-black hover:bg-pink-700 transition-colors">IKUTI</button>
             </div>
+            <button class="bg-pink-600 text-[10px] font-black px-4 py-2 rounded-full">IKUTI</button>
         </div>
 
-        <!-- Rekomendasi Grid -->
-        <div class="px-5 pb-20">
-            <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[3px] mb-6">REKOMENDASI</h2>
-            <div id="gridContainer" class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                <!-- JS Fill -->
-            </div>
+        <div class="px-5 py-8">
+            <h2 class="text-[10px] font-black text-gray-500 tracking-[3px] mb-6 uppercase">Rekomendasi</h2>
+            <div id="grid" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
         </div>
     </main>
 
     <script>
-        // Logika Player & Playlist tetap sama
         const video = document.getElementById('mainVideo');
-        const playerArea = document.getElementById('playerArea');
-        const playBtnIcon = document.getElementById('playBtnIcon');
-        const progressBar = document.getElementById('progressBar');
-        const progressContainer = document.getElementById('progressContainer');
-        const timeInfo = document.getElementById('timeInfo');
-        const currentId = document.getElementById('currentId');
+        const container = document.getElementById('playerContainer');
+        const seekContainer = document.getElementById('seekContainer');
+        const currentBar = document.getElementById('currentBar');
+        const bufferBar = document.getElementById('bufferBar');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const muteBtn = document.getElementById('muteBtn');
+        
+        let isDragging = false;
 
-        const playlist = [
+        // Toggle Play
+        const togglePlay = () => {
+            if (video.paused) {
+                video.play();
+                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>';
+                container.classList.add('is-playing');
+            } else {
+                video.pause();
+                playIcon.innerHTML = '<path d="M8 5v14l11-7z"></path>';
+                container.classList.remove('is-playing');
+            }
+        };
+
+        container.onclick = (e) => {
+            if (e.target.closest('.controls-overlay')) return;
+            togglePlay();
+        };
+        playBtn.onclick = togglePlay;
+
+        // Update Progress
+        video.addEventListener('timeupdate', () => {
+            if (!isDragging) {
+                const percent = (video.currentTime / video.duration) * 100;
+                currentBar.style.width = percent + '%';
+                updateTimeText();
+            }
+        });
+
+        // Update Buffer
+        video.addEventListener('progress', () => {
+            if (video.buffered.length > 0) {
+                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                const duration = video.duration;
+                bufferBar.style.width = (bufferedEnd / duration) * 100 + "%";
+            }
+        });
+
+        const updateTimeText = () => {
+            const format = (s) => {
+                let m = Math.floor(s / 60);
+                s = Math.floor(s % 60);
+                return (m < 10 ? '0'+m : m) + ':' + (s < 10 ? '0'+s : s);
+            }
+            timeDisplay.innerText = `${format(video.currentTime)} / ${format(video.duration || 0)}`;
+        };
+
+        // Slider Logic (Drag & Click)
+        const scrub = (e) => {
+            const rect = seekContainer.getBoundingClientRect();
+            let pos = ((e.clientX || e.touches[0].clientX) - rect.left) / rect.width;
+            pos = Math.max(0, Math.min(1, pos));
+            currentBar.style.width = (pos * 100) + '%';
+            if (isDragging) {
+                // Saat ditarik, update waktu video secara real-time
+                video.currentTime = pos * video.duration;
+            }
+        };
+
+        seekContainer.onmousedown = (e) => {
+            isDragging = true;
+            seekContainer.classList.add('dragging');
+            scrub(e);
+        };
+
+        window.onmousemove = (e) => {
+            if (isDragging) scrub(e);
+        };
+
+        window.onmouseup = (e) => {
+            if (isDragging) {
+                isDragging = false;
+                seekContainer.classList.remove('dragging');
+                const rect = seekContainer.getBoundingClientRect();
+                let pos = (e.clientX - rect.left) / rect.width;
+                video.currentTime = Math.max(0, Math.min(1, pos)) * video.duration;
+            }
+        };
+
+        // Support Sentuhan (Mobile)
+        seekContainer.ontouchstart = (e) => {
+            isDragging = true;
+            scrub(e);
+        };
+        window.ontouchmove = (e) => {
+            if (isDragging) scrub(e);
+        };
+        window.ontouchend = () => {
+            isDragging = false;
+        };
+
+        // Mute & Fullscreen
+        muteBtn.onclick = () => {
+            video.muted = !video.muted;
+            document.getElementById('volIcon').style.fill = video.muted ? '#ec4899' : 'currentColor';
+        };
+
+        document.getElementById('fsBtn').onclick = () => {
+            if (!document.fullscreenElement) container.requestFullscreen();
+            else document.exitFullscreen();
+        };
+
+        // Playlist
+        const data = [
             { id: "URE-138", url: "https://video.twimg.com/amplify_video/2042164168879710209/vid/avc1/480x270/IIt24dL7sEjIHDXo.mp4?tag=21" },
             { id: "SNOS-202", url: "https://video.twimg.com/amplify_video/2042163089920135168/vid/avc1/480x270/D0z6TwOyov8np6tq.mp4?tag=21" },
             { id: "SNOS-199", url: "https://video.twimg.com/amplify_video/2042165236426473472/vid/avc1/480x270/GG5BP66gWnFFu5DZ.mp4?tag=21" },
@@ -281,68 +400,33 @@
             { id: "SNOS-170", url: "https://video.twimg.com/amplify_video/2041753223560884228/vid/avc1/480x270/9GMN3k6tiVntSZkh.mp4?tag=21" }
         ];
 
-        window.onload = () => { video.play().catch(() => {}); };
-
-        function togglePlay() {
-            if (video.paused) {
+        const grid = document.getElementById('grid');
+        data.forEach(v => {
+            const div = document.createElement('div');
+            div.className = "cursor-pointer group";
+            div.onclick = () => {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+                document.getElementById('videoID').innerText = v.id;
+                video.src = v.url;
                 video.play();
-                playBtnIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>';
-                playerArea.classList.add('is-playing');
-            } else {
-                video.pause();
-                playBtnIcon.innerHTML = '<path d="M8 5v14l11-7z"></path>';
-                playerArea.classList.remove('is-playing');
-            }
-        }
-
-        function toggleMute() {
-            video.muted = !video.muted;
-            document.getElementById('volIcon').style.color = video.muted ? '#ec4899' : '#d1d5db';
-        }
-
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) playerArea.requestFullscreen();
-            else document.exitFullscreen();
-        }
-
-        video.addEventListener('timeupdate', () => {
-            const percent = (video.currentTime / video.duration) * 100;
-            progressBar.style.width = percent + '%';
-        });
-
-        function switchVideo(v) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            currentId.innerText = v.id;
-            video.src = v.url + "#t=0.001";
-            video.load();
-            video.play();
-        }
-
-        function renderGrid() {
-            const grid = document.getElementById('gridContainer');
-            playlist.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "video-card cursor-pointer group flex flex-col gap-3";
-                card.onclick = () => switchVideo(item);
-                card.innerHTML = `
-                    <div class="relative overflow-hidden rounded-xl border border-gray-800 group-hover:border-pink-500 transition-all shadow-lg">
-                        <video preload="metadata" muted><source src="${item.url}#t=0.001" type="video/mp4"></video>
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <div class="bg-pink-600 p-2 rounded-full">
-                                <svg class="w-4 h-4 fill-white translate-x-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-                            </div>
+                container.classList.add('is-playing');
+            };
+            div.innerHTML = `
+                <div class="relative rounded-lg overflow-hidden border border-gray-800 group-hover:border-pink-500 transition-all">
+                    <video muted preload="metadata" class="w-full aspect-video object-cover"><source src="${v.url}#t=0.1"></video>
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 fill-white ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                         </div>
                     </div>
-                    <div class="flex justify-center">
-                        <span class="id-badge uppercase">${item.id}</span>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-        renderGrid();
+                </div>
+                <div class="mt-2 text-center"><span class="id-badge">${v.id}</span></div>
+            `;
+            grid.appendChild(div);
+        });
     </script>
-
+</body>
+</html>
 <!-- ===== HISTATS (PAKSA ROOT) ===== -->
 <script>
 /* paksa Histats selalu baca ROOT */
