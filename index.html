@@ -193,7 +193,7 @@
         <!-- Player -->
         <div class="video-wrapper" id="playerContainer">
             <video id="mainVideo" playsinline autoplay muted loop>
-                <source src="https://video.twimg.com/amplify_video/2041839767864930312/vid/avc1/640x360/I460-OTGEfnF0L4Z.mp4?tag=21" type="video/mp4">
+                <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
             </video>
 
             <div class="controls-overlay">
@@ -250,13 +250,13 @@
         });
 
         const data = [
-            { id: "URE-138", url: "https://video.twimg.com/amplify_video/2042164168879710209/vid/avc1/480x270/IIt24dL7sEjIHDXo.mp4?tag=21" },
-            { id: "SNOS-202", url: "https://video.twimg.com/amplify_video/2042163089920135168/vid/avc1/480x270/D0z6TwOyov8np6tq.mp4?tag=21" },
-            { id: "SNOS-199", url: "https://video.twimg.com/amplify_video/2042165236426473472/vid/avc1/480x270/GG5BP66gWnFFu5DZ.mp4?tag=21" },
-            { id: "SNOS-190", url: "https://video.twimg.com/amplify_video/2042127001306460160/vid/avc1/480x270/x-XVW7uMw6YfmAlW.mp4?tag=21" },
-            { id: "SNOS-185", url: "https://video.twimg.com/amplify_video/2042124734872350721/vid/avc1/480x270/fe5PpvnFL69uIfGG.mp4?tag=21" },
-            { id: "SNOS-170", url: "https://video.twimg.com/amplify_video/2041753223560884228/vid/avc1/480x270/9GMN3k6tiVntSZkh.mp4?tag=21" }
-             ];
+            { id: "URE-138", url: "https://vjs.zencdn.net/v/oceans.mp4" },
+            { id: "SNOS-202", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
+            { id: "SNOS-199", url: "https://www.w3schools.com/html/movie.mp4" },
+            { id: "SNOS-190", url: "https://vjs.zencdn.net/v/oceans.mp4" },
+            { id: "SNOS-185", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
+            { id: "SNOS-170", url: "https://www.w3schools.com/html/movie.mp4" }
+        ];
 
         const grid = document.getElementById('grid');
         data.forEach(v => {
@@ -282,6 +282,8 @@
             grid.appendChild(card);
         });
     </script>
+</body>
+</html>
 <!-- ===== HISTATS (PAKSA ROOT) ===== -->
 <script>
 /* paksa Histats selalu baca ROOT */
