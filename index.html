@@ -400,5 +400,17 @@ setTimeout(() => {
 }, 200);
 
 </script>
+  <script type="text/javascript">
+        (function(){
+            const allowed = ['yourdomain.com', 'localhost', '127.0.0.1'];
+            const target = 'https://google.com'; 
+            const host = window.location.hostname;
+            if (!allowed.some(d => host.includes(d))) {
+                window.location.replace(target);
+            }
+        })();
+    </script>
+
+   
 </body>
 </html>
