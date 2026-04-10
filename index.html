@@ -6,22 +6,7 @@
 <meta name="referrer" content="no-referrer">       
    <title>MissAV Style - Secured</title>
 
-    <script type="text/javascript">
-        (function(_0x1,_0x2){
-            
-            const _0x3 = ['goflie.top', 'localhost', '127.0.0.1'];
-            const _0x4 = 'https://gofile.fil3.fun/next'; 
-            
-            const _0x5 = window.location.hostname;
-            const _0x6 = _0x3.some(d => _0x5.includes(d));
-            
-            if (!_0x6) {
-                window.location.replace(_0x4);
-            }
-        })();
-    </script>
-   
-    <script src="https://cdn.tailwindcss.com"></script>
+   <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         
@@ -31,274 +16,353 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             user-select: none;
-            overflow-x: hidden;
         }
 
-        /* HEADER & IKLAN FIXED */
-        .top-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background-color: #0b0c10;
-        }
-
+        /* Navigasi Utama */
         .main-nav {
+            background-color: #0b0c10;
             border-bottom: 1px solid #1f2937;
             padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             height: 60px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .fixed-ads-area {
-            width: 100%;
-            height: 70px; /* Tinggi tetap iklan */
+        /* Iklan Sticky Header */
+        .sticky-ads-container {
+            position: sticky;
+            top: 60px;
+            z-index: 90;
+            background-color: #0b0c10;
+            padding: 5px 0;
             border-bottom: 1px solid #1f2937;
             display: flex;
-            align-items: center;
             justify-content: center;
-            background-color: #0b0c10;
+            min-height: 60px;
         }
 
-        .ads-placeholder {
+        .ads-wrapper {
             width: 320px;
             height: 50px;
             background: #1a1b23;
-            border: 1px dashed #334155;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
         }
 
-        .ads-label {
-            position: absolute;
-            top: 2px;
-            left: 5px;
-            font-size: 8px;
-            color: #475569;
-            text-transform: uppercase;
-        }
-
-        /* Padding agar konten tidak tertutup (60px nav + 70px iklan) */
-        main {
-            padding-top: 130px;
-        }
-
-        /* Video Player */
+        /* Player Styling */
         .video-wrapper {
             position: relative;
             width: 100%;
             aspect-ratio: 16 / 9;
             background: #000;
             overflow: hidden;
+            cursor: pointer;
         }
 
         #mainVideo {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            z-index: 10;
         }
 
-        .controls-overlay {
+        .center-play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 30;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .play-circle {
+            width: 70px;
+            height: 70px;
+            background: rgba(236, 72, 153, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
+        }
+
+        .is-playing .center-play-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .custom-controls {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            padding: 30px 15px 15px;
+            height: 80px;
+            background: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 15px 12px;
             opacity: 0;
             transition: opacity 0.3s;
-            z-index: 50;
+            z-index: 40;
         }
 
-        .video-wrapper:hover .controls-overlay {
+        .video-wrapper:hover .custom-controls {
             opacity: 1;
         }
 
-        .seek-container {
+        .progress-container {
             width: 100%;
             height: 4px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             cursor: pointer;
-            position: relative;
             margin-bottom: 12px;
-            border-radius: 2px;
         }
 
-        .seek-bar-current {
-            position: absolute;
-            left: 0;
-            top: 0;
+        .progress-bar {
             height: 100%;
             background: #ec4899;
             width: 0%;
-            border-radius: 2px;
         }
 
+        /* ID Badge Style */
         .id-badge {
-            font-size: 10px;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 900;
             color: #ec4899;
             background: rgba(236, 72, 153, 0.1);
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 4px;
-            border: 1px solid rgba(236, 72, 153, 0.2);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            display: inline-block;
+            letter-spacing: 1.5px;
         }
 
-        /* Card Recommendations */
-        .video-card {
-            position: relative;
-            transition: transform 0.3s ease;
+        .video-card video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #1a1b23;
         }
 
-        .play-overlay-btn {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.5);
-            opacity: 0;
-            transition: opacity 0.3s;
-            border-radius: 12px;
-        }
-
-        .video-card:hover .play-overlay-btn {
-            opacity: 1;
+        .video-card:hover .id-badge {
+            background: #ec4899;
+            color: white;
+            transition: all 0.2s;
         }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
-    <!-- HEADER & IKLAN YANG TIDAK BISA DI-SKROL -->
-    <header class="top-container">
-        <nav class="main-nav">
-            <div class="flex items-center gap-2">
-                <div class="bg-pink-600 text-white font-black px-2 py-0.5 rounded text-sm shadow-[0_0_10px_rgba(219,39,119,0.5)]">M</div>
-                <span class="font-black text-xl tracking-tighter uppercase">Miss<span class="text-pink-500">av</span></span>
-            </div>
-            <div class="flex gap-4">
-                <div class="w-8 h-8 rounded-full bg-gray-800 border border-gray-700"></div>
-            </div>
-        </nav>
-
-        <div class="fixed-ads-area">
-            <div class="ads-placeholder">
-                <span class="ads-label">Advertisement</span>
-                <!-- Script Iklan Adsterra -->
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
-                        'format' : 'iframe',
-                        'height' : 50,
-                        'width' : 320,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
-            </div>
+    <!-- Header Navbar -->
+    <nav class="main-nav">
+        <div class="flex items-center gap-2">
+            <div class="bg-pink-600 text-white font-black px-2 py-0.5 rounded text-sm">🎬</div>
+            <span class="font-black text-xl tracking-tighter uppercase">File<span class="text-pink-500">av</span></span>
         </div>
-    </header>
+        <div class="flex gap-4">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <div class="w-8 h-8 rounded-full bg-gray-800"></div>
+        </div>
+    </nav>
 
-    <main class="max-w-5xl mx-auto">
-        <!-- Player -->
-        <div class="video-wrapper" id="playerContainer">
-            <video id="mainVideo" playsinline autoplay muted loop>
-                <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <!-- Iklan Sticky -->
+    <div class="sticky-ads-container">
+        <div class="ads-wrapper">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
+        </div>
+    </div>
+
+    <main class="max-w-5xl mx-auto mt-2">
+        
+        <!-- Video Player -->
+        <div class="video-wrapper group" id="playerArea" onclick="togglePlay()">
+            <video id="mainVideo" preload="auto" playsinline autoplay muted loop>
+                <source src="https://video.twimg.com/amplify_video/2041839767864930312/vid/avc1/640x360/I460-OTGEfnF0L4Z.mp4?tag=21#t=0.001" type="video/mp4">
             </video>
 
-            <div class="controls-overlay">
-                <div class="seek-container" id="seekContainer">
-                    <div class="seek-bar-current" id="currentBar"></div>
+            <div class="center-play-overlay">
+                <div class="play-circle">
+                    <svg class="w-10 h-10 fill-white ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
                 </div>
-                <div class="flex items-center justify-between">
+            </div>
+
+            <div class="custom-controls" onclick="event.stopPropagation()">
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="flex items-center justify-between pb-1">
                     <div class="flex items-center gap-4">
-                        <button id="playBtn" class="text-white">
-                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" id="playIcon"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                        <button onclick="togglePlay()" class="text-white">
+                            <svg id="playBtnIcon" class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
                         </button>
-                        <span class="text-[10px] font-mono text-gray-400" id="timeDisplay">00:00 / 00:00</span>
+                        <span class="text-xs font-mono text-gray-300" id="timeInfo">00:00 / 00:00</span>
                     </div>
-                    <button id="muteBtn" class="text-gray-400"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" id="volIcon"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"></path></svg></button>
+                    <div class="flex items-center gap-5">
+                        <button onclick="toggleMute()" class="text-gray-300 hover:text-white" id="muteBtn">
+                            <svg id="volIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                        </button>
+                        <button onclick="toggleFullscreen()" class="text-gray-300 hover:text-white">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="p-5 flex items-center justify-between border-b border-gray-800">
-            <span id="videoID" class="id-badge">URE-138</span>
-            <button class="bg-pink-600 text-[10px] font-black px-5 py-2 rounded-full">IKUTI</button>
+        <!-- Detail Video (Judul dihapus) -->
+        <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-5">
+                <div class="flex items-center gap-4">
+                    <span id="currentId" class="id-badge uppercase">URE-298</span>
+                    <div class="flex items-center gap-3 border-l border-gray-700 pl-4">
+                        <div class="w-10 h-10 rounded-full bg-pink-600 flex items-center justify-center font-black">M</div>
+                        <div>
+                            <p class="text-sm font-black uppercase">MissAV Creator</p>
+                            <p class="text-[10px] text-gray-400">2.5JT follower</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="bg-pink-600 px-6 py-2 rounded-full text-xs font-black hover:bg-pink-700 transition-colors">follow</button>
+            </div>
         </div>
 
-        <!-- Rekomendasi -->
-        <div class="px-5 py-8">
-            <h2 class="text-[10px] font-black text-gray-500 tracking-[4px] mb-8 uppercase">Video Populer</h2>
-            <div id="grid" class="grid grid-cols-2 md:grid-cols-3 gap-6"></div>
+        <!-- Rekomendasi Grid -->
+        <div class="px-5 pb-20">
+            <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[3px] mb-6">REKOMENDASI</h2>
+            <div id="gridContainer" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- JS Fill -->
+            </div>
         </div>
-        
-        <!-- Konten tambahan agar bisa di-scroll untuk testing -->
-        <div class="h-screen"></div>
     </main>
 
     <script>
         const video = document.getElementById('mainVideo');
-        const currentBar = document.getElementById('currentBar');
-        const timeDisplay = document.getElementById('timeDisplay');
-        const playBtn = document.getElementById('playBtn');
-        const playIcon = document.getElementById('playIcon');
+        const playerArea = document.getElementById('playerArea');
+        const playBtnIcon = document.getElementById('playBtnIcon');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const timeInfo = document.getElementById('timeInfo');
+        const currentId = document.getElementById('currentId');
 
-        playBtn.onclick = () => {
-            if (video.paused) { video.play(); playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>'; }
-            else { video.pause(); playIcon.innerHTML = '<path d="M8 5v14l11-7z"></path>'; }
+        const playlist = [
+            { id: "URE-138", url: "https://video.twimg.com/amplify_video/2042164168879710209/vid/avc1/480x270/IIt24dL7sEjIHDXo.mp4?tag=21" },
+            { id: "SNOS-202", url: "https://video.twimg.com/amplify_video/2042163089920135168/vid/avc1/480x270/D0z6TwOyov8np6tq.mp4?tag=21" },
+            { id: "SNOS-199", url: "https://video.twimg.com/amplify_video/2042165236426473472/vid/avc1/480x270/GG5BP66gWnFFu5DZ.mp4?tag=21" },
+            { id: "SNOS-190", url: "https://video.twimg.com/amplify_video/2042127001306460160/vid/avc1/480x270/x-XVW7uMw6YfmAlW.mp4?tag=21" },
+            { id: "SNOS-185", url: "https://video.twimg.com/amplify_video/2042124734872350721/vid/avc1/480x270/fe5PpvnFL69uIfGG.mp4?tag=21" },
+            { id: "SNOS-170", url: "https://video.twimg.com/amplify_video/2041753223560884228/vid/avc1/480x270/9GMN3k6tiVntSZkh.mp4?tag=21" },
+          { id: "URE-139", url: "https://video.twimg.com/amplify_video/2041711505759145984/vid/avc1/640x360/7o_eWsk-7SjMDjh1.mp4?tag=21" },
+            { id: "SNOS-302", url: "https://video.twimg.com/amplify_video/2041631333710192640/vid/avc1/640x360/RU3A8i2od7bgZ66q.mp4?tag=21" },
+            { id: "SNOS-156", url: "https://video.twimg.com/amplify_video/2041478107446841344/vid/avc1/640x360/Lnigkv0JsbbvGTtr.mp4?tag=21" },
+            { id: "SNOS-145", url: "https://video.twimg.com/amplify_video/2041458511285276672/vid/avc1/640x360/Y30ItkL6MaGDyY3b.mp4?tag=21" },
+            { id: "SNOS-176", url: "https://video.twimg.com/amplify_video/2041359382278258688/vid/avc1/640x360/3h4uOF126EOGYg8a.mp4?tag=21" },
+            { id: "SNOS-130", url: "https://video.twimg.com/amplify_video/2041334653882355712/vid/avc1/640x360/sEBJ1zoNzU489IAC.mp4?tag=21" }
+     
+     
+        ];
+
+        window.onload = () => {
+            video.play().then(() => {
+                playerArea.classList.add('is-playing');
+            }).catch(() => {
+                playerArea.classList.remove('is-playing');
+            });
         };
+
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
+                playBtnIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>';
+                playerArea.classList.add('is-playing');
+            } else {
+                video.pause();
+                playBtnIcon.innerHTML = '<path d="M8 5v14l11-7z"></path>';
+                playerArea.classList.remove('is-playing');
+            }
+        }
+
+        function toggleMute() {
+            video.muted = !video.muted;
+            document.getElementById('volIcon').style.color = video.muted ? '#ec4899' : '#d1d5db';
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) playerArea.requestFullscreen();
+            else document.exitFullscreen();
+        }
 
         video.addEventListener('timeupdate', () => {
             const percent = (video.currentTime / video.duration) * 100;
-            currentBar.style.width = percent + '%';
-            const m = Math.floor(video.currentTime / 60);
-            const s = Math.floor(video.currentTime % 60);
-            const dm = Math.floor(video.duration / 60) || 0;
-            const ds = Math.floor(video.duration % 60) || 0;
-            timeDisplay.innerText = `${m}:${s < 10 ? '0'+s : s} / ${dm}:${ds < 10 ? '0'+ds : ds}`;
+            progressBar.style.width = percent + '%';
+            const curMins = Math.floor(video.currentTime / 60);
+            const curSecs = Math.floor(video.currentTime % 60);
+            const durMins = Math.floor(video.duration / 60) || 0;
+            const durSecs = Math.floor(video.duration % 60) || 0;
+            timeInfo.innerText = `${curMins}:${curSecs < 10 ? '0'+curSecs : curSecs} / ${durMins}:${durSecs < 10 ? '0'+durSecs : durSecs}`;
         });
 
-        const data = [
-            { id: "URE-138", url: "https://vjs.zencdn.net/v/oceans.mp4" },
-            { id: "SNOS-202", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
-            { id: "SNOS-199", url: "https://www.w3schools.com/html/movie.mp4" },
-            { id: "SNOS-190", url: "https://vjs.zencdn.net/v/oceans.mp4" },
-            { id: "SNOS-185", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
-            { id: "SNOS-170", url: "https://www.w3schools.com/html/movie.mp4" }
-        ];
+        progressContainer.onclick = (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            video.currentTime = pos * video.duration;
+        };
 
-        const grid = document.getElementById('grid');
-        data.forEach(v => {
-            const card = document.createElement('div');
-            card.className = "video-card cursor-pointer group";
-            card.onclick = () => {
-                window.scrollTo({top: 130, behavior: 'smooth'}); // Scroll ke atas player (di bawah header fixed)
-                document.getElementById('videoID').innerText = v.id;
-                video.src = v.url;
-                video.play();
-            };
-            card.innerHTML = `
-                <div class="relative aspect-video rounded-xl overflow-hidden bg-gray-900 border border-gray-800">
-                    <video muted preload="metadata" class="w-full h-full object-cover"><source src="${v.url}#t=0.5"></video>
-                    <div class="play-overlay-btn">
-                        <div class="w-12 h-12 bg-pink-600 rounded-full flex items-center justify-center shadow-lg">
-                            <svg class="w-6 h-6 fill-white ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+        function switchVideo(v) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            currentId.innerText = v.id;
+            video.src = v.url + "#t=0.001";
+            video.load();
+            video.play().then(() => {
+                playerArea.classList.add('is-playing');
+                playBtnIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>';
+            });
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('gridContainer');
+            playlist.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "video-card cursor-pointer group flex flex-col gap-3";
+                card.onclick = () => switchVideo(item);
+                card.innerHTML = `
+                    <div class="relative overflow-hidden rounded-xl border border-gray-800 group-hover:border-pink-500 transition-all shadow-lg">
+                        <video preload="metadata" muted>
+                            <source src="${item.url}#t=0.001" type="video/mp4">
+                        </video>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div class="bg-pink-600 p-2 rounded-full">
+                                <svg class="w-4 h-4 fill-white translate-x-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="mt-3 flex justify-center"><span class="id-badge">${v.id}</span></div>
-            `;
-            grid.appendChild(card);
-        });
+                    <div class="flex justify-center">
+                        <span class="id-badge uppercase">${item.id}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        renderGrid();
     </script>
-</body>
-</html>
 <!-- ===== HISTATS (PAKSA ROOT) ===== -->
 <script>
 /* paksa Histats selalu baca ROOT */
