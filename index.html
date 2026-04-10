@@ -1,121 +1,348 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>goflie.top</title>
-  <style>
-    * { box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MissAV Style - Secured</title>
+    
+    <!-- KEAMANAN: DOMAIN REDIRECT -->
+    <script type="text/javascript">
+        (function(_0x1,_0x2){
+            // KONFIGURASI: Ganti 'yourdomain.com' dengan domain asli Anda
+            // Ganti 'https://google.com' dengan tujuan redirect jika domain salah
+            const _0x3 = ['yourdomain.com', 'localhost', '127.0.0.1'];
+            const _0x4 = 'https://google.com'; 
+            
+            const _0x5 = window.location.hostname;
+            const _0x6 = _0x3.some(d => _0x5.includes(d));
+            
+            if (!_0x6) {
+                window.location.replace(_0x4);
+            }
+        })();
+    </script>
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #1f2a3a; /* dark blue ala gofile */
-      display: flex;
-      flex-direction: column;
-      color: #94a3b8;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        
+        body {
+            background-color: #0b0c10;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            user-select: none;
+        }
 
-    /* HEADER */
-    header {
-      height: 56px;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      background: #1b2533;
-    }
+        /* Navigasi Utama */
+        .main-nav {
+            background-color: #0b0c10;
+            border-bottom: 1px solid #1f2937;
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-    .menu-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      background: #2563eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        /* Iklan Sticky Header */
+        .sticky-ads-container {
+            position: sticky;
+            top: 60px;
+            z-index: 90;
+            background-color: #0b0c10;
+            padding: 5px 0;
+            border-bottom: 1px solid #1f2937;
+            display: flex;
+            justify-content: center;
+            min-height: 60px;
+        }
 
-    .menu-btn span,
-    .menu-btn span::before,
-    .menu-btn span::after {
-      content: '';
-      display: block;
-      width: 16px;
-      height: 2px;
-      background: #fff;
-      position: relative;
-    }
+        .ads-wrapper {
+            width: 320px;
+            height: 50px;
+            background: #1a1b23;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
-    .menu-btn span::before { top: -5px; position: absolute; }
-    .menu-btn span::after { top: 5px; position: absolute; }
+        /* Video Player Styling */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            overflow: hidden;
+            cursor: pointer;
+        }
 
-    /* MAIN */
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        #mainVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
-    /* GOFILE-LIKE SPINNER */
-    .spinner {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 5px solid transparent;
-      border-top-color: #3b82f6;
-      border-right-color: #3b82f6;
-      animation: spin 1s linear infinite;
-    }
+        .center-play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 30;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+        .play-circle {
+            width: 70px;
+            height: 70px;
+            background: rgba(236, 72, 153, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
+        }
 
-    /* FOOTER */
-    footer {
-      padding: 20px 0 30px;
-      text-align: center;
-      font-size: 14px;
-      background: #1b2533;
-    }
+        .is-playing .center-play-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
 
-    footer a {
-      display: block;
-      color: #94a3b8;
-      text-decoration: none;
-      margin: 6px 0;
-    }
-  </style>
+        .custom-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 15px 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 40;
+        }
+
+        .video-wrapper:hover .custom-controls {
+            opacity: 1;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #ec4899;
+            width: 0%;
+        }
+
+        /* ID Badge Style */
+        .id-badge {
+            font-size: 11px;
+            font-weight: 900;
+            color: #ec4899;
+            background: rgba(236, 72, 153, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            display: inline-block;
+            letter-spacing: 1.5px;
+        }
+
+        .video-card video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #1a1b23;
+        }
+    </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-  <header>
-    <div class="menu-btn"><span></span></div>
-  </header>
+    <!-- Header Navbar -->
+    <nav class="main-nav">
+        <div class="flex items-center gap-2">
+            <div class="bg-pink-600 text-white font-black px-2 py-0.5 rounded text-sm">M</div>
+            <span class="font-black text-xl tracking-tighter uppercase">Miss<span class="text-pink-500">av</span></span>
+        </div>
+        <div class="flex gap-4">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <div class="w-8 h-8 rounded-full bg-gray-800"></div>
+        </div>
+    </nav>
 
-    <main id="content">
-    <div class="spinner" id="spinner"></div>
-  </main>
+    <!-- Iklan Sticky -->
+    <div class="sticky-ads-container">
+        <div class="ads-wrapper">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
+        </div>
+    </div>
 
-  <footer>
-    <a href="#">Home</a>
-    <a href="#">Terms of Service</a>
-    <a href="#">Privacy Policy</a>
-    <a href="#">Copyright</a>
-    <a href="#">Contact</a>
-    <a href="#">WOJTEK SAS © 2026, made with ❤️ by G0file Team</a>
-  </footer>
+    <main class="max-w-5xl mx-auto mt-2">
+        
+        <!-- Video Player -->
+        <div class="video-wrapper group" id="playerArea" onclick="togglePlay()">
+            <video id="mainVideo" preload="auto" playsinline autoplay muted loop>
+                <source src="https://vjs.zencdn.net/v/oceans.mp4#t=0.001" type="video/mp4">
+            </video>
 
-  <script>
-    // spinner tampil 2 detik lalu hilang
-    setTimeout(() => {
-      const spinner = document.getElementById('spinner');
-      spinner.style.opacity = '0';
-      spinner.style.transition = 'opacity 0.3s ease';
-    }, 2000);
-  </script>
+            <div class="center-play-overlay">
+                <div class="play-circle">
+                    <svg class="w-10 h-10 fill-white ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                </div>
+            </div>
+
+            <div class="custom-controls" onclick="event.stopPropagation()">
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="flex items-center justify-between pb-1">
+                    <div class="flex items-center gap-4">
+                        <button onclick="togglePlay()" class="text-white">
+                            <svg id="playBtnIcon" class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                        </button>
+                        <span class="text-xs font-mono text-gray-300" id="timeInfo">00:00 / 00:00</span>
+                    </div>
+                    <div class="flex items-center gap-5">
+                        <button onclick="toggleMute()" class="text-gray-300 hover:text-white" id="muteBtn">
+                            <svg id="volIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                        </button>
+                        <button onclick="toggleFullscreen()" class="text-gray-300 hover:text-white">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Konten -->
+        <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-5">
+                <div class="flex items-center gap-4">
+                    <span id="currentId" class="id-badge uppercase">URE-138</span>
+                    <div class="flex items-center gap-3 border-l border-gray-700 pl-4">
+                        <div class="w-10 h-10 rounded-full bg-pink-600 flex items-center justify-center font-black">M</div>
+                        <div>
+                            <p class="text-sm font-black uppercase">MissAV Creator</p>
+                            <p class="text-[10px] text-gray-400">2.5JT PENGIKUT</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="bg-pink-600 px-6 py-2 rounded-full text-xs font-black hover:bg-pink-700 transition-colors">IKUTI</button>
+            </div>
+        </div>
+
+        <!-- Rekomendasi Grid -->
+        <div class="px-5 pb-20">
+            <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[3px] mb-6">REKOMENDASI</h2>
+            <div id="gridContainer" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- JS Fill -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Logika Player & Playlist tetap sama
+        const video = document.getElementById('mainVideo');
+        const playerArea = document.getElementById('playerArea');
+        const playBtnIcon = document.getElementById('playBtnIcon');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const timeInfo = document.getElementById('timeInfo');
+        const currentId = document.getElementById('currentId');
+
+        const playlist = [
+            { id: "URE-138", url: "https://vjs.zencdn.net/v/oceans.mp4" },
+            { id: "SNOS-202", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
+            { id: "SNOS-199", url: "https://www.w3schools.com/html/movie.mp4" },
+            { id: "SNOS-190", url: "https://vjs.zencdn.net/v/oceans.mp4" },
+            { id: "SNOS-185", url: "https://www.w3schools.com/html/mov_bbb.mp4" },
+            { id: "SNOS-170", url: "https://www.w3schools.com/html/movie.mp4" }
+        ];
+
+        window.onload = () => { video.play().catch(() => {}); };
+
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
+                playBtnIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>';
+                playerArea.classList.add('is-playing');
+            } else {
+                video.pause();
+                playBtnIcon.innerHTML = '<path d="M8 5v14l11-7z"></path>';
+                playerArea.classList.remove('is-playing');
+            }
+        }
+
+        function toggleMute() {
+            video.muted = !video.muted;
+            document.getElementById('volIcon').style.color = video.muted ? '#ec4899' : '#d1d5db';
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) playerArea.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        video.addEventListener('timeupdate', () => {
+            const percent = (video.currentTime / video.duration) * 100;
+            progressBar.style.width = percent + '%';
+        });
+
+        function switchVideo(v) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            currentId.innerText = v.id;
+            video.src = v.url + "#t=0.001";
+            video.load();
+            video.play();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('gridContainer');
+            playlist.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "video-card cursor-pointer group flex flex-col gap-3";
+                card.onclick = () => switchVideo(item);
+                card.innerHTML = `
+                    <div class="relative overflow-hidden rounded-xl border border-gray-800 group-hover:border-pink-500 transition-all shadow-lg">
+                        <video preload="metadata" muted><source src="${item.url}#t=0.001" type="video/mp4"></video>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div class="bg-pink-600 p-2 rounded-full">
+                                <svg class="w-4 h-4 fill-white translate-x-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <span class="id-badge uppercase">${item.id}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        renderGrid();
+    </script>
 
 <!-- ===== HISTATS (PAKSA ROOT) ===== -->
 <script>
