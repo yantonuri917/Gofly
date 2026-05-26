@@ -1,6 +1,6 @@
 /**
  * ads.js - Skrip Iklan Terpisah untuk Gofile Clone
- * Menggunakan kode iklan Adsterra (320x50 iframe) secara dinamis.
+ * Mengatur iklan Adsterra (320x50) menjadi STICKY / MELAYANG di bawah layar.
  */
 
 (function() {
@@ -8,53 +8,56 @@
     // CONFIGURATION (Pengaturan Iklan Anda)
     // ==========================================
     const CONFIG = {
-        // Aktifkan auto-inject banner iklan kotak di bawah toolbar (true = aktif, false = mati)
-        enableBannerInject: true
+        enableStickyBanner: true
     };
 
     // ==========================================
-    // LOGIC: INJECT SCRIPT BANNER SECARA DINAMIS
+    // LOGIC: INJECT STICKY BANNER
     // ==========================================
-    if (CONFIG.enableBannerInject) {
+    if (CONFIG.enableStickyBanner) {
         window.addEventListener('DOMContentLoaded', function() {
-            // Mencari toolbar utama sebagai patokan penempatan iklan
-            const toolbar = document.querySelector('.main-toolbar');
+            // 1. Buat kontainer pembungkus iklan dengan gaya Sticky/Fixed
+            const adContainer = document.createElement('div');
+            adContainer.className = 'sticky-ad-space';
             
-            if (toolbar) {
-                // 1. Buat kontainer pembungkus iklan banner
-                const adContainer = document.createElement('div');
-                adContainer.className = 'external-ad-space';
-                adContainer.style.width = '100%';
-                adContainer.style.textAlign = 'center';
-                adContainer.style.margin = '10px 0 16px 0';
-                adContainer.style.minHeight = '50px'; // Menghindari pergeseran tata letak yang drastis
+            // Gaya CSS agar melayang di bawah tengah layar
+            adContainer.style.position = 'fixed';
+            adContainer.style.bottom = '10px';       // Jarak dari bawah layar
+            adContainer.style.left = '50%';
+            adContainer.style.transform = 'translateX(-50%)'; // Agar posisi pas di tengah horizontal
+            adContainer.style.zIndex = '998';         // Di bawah z-index sidebar (999) agar tidak menutupi menu saat sidebar buka
+            adContainer.style.width = '320px';
+            adContainer.style.height = '50px';
+            adContainer.style.backgroundColor = 'rgba(24, 36, 54, 0.8)'; // Background samar agar teks di belakangnya tersamar
+            adContainer.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.5)';
+            adContainer.style.borderRadius = '4px';
+            adContainer.style.overflow = 'hidden';
 
-                // 2. Buat elemen script pertama untuk konfigurasi 'atOptions'
-                const scriptOptions = document.createElement('script');
-                scriptOptions.type = 'text/javascript';
-                scriptOptions.text = `
-                    atOptions = {
-                        'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
-                        'format' : 'iframe',
-                        'height' : 50,
-                        'width' : 320,
-                        'params' : {}
-                    };
-                `;
+            // 2. Buat elemen script untuk konfigurasi 'atOptions'
+            const scriptOptions = document.createElement('script');
+            scriptOptions.type = 'text/javascript';
+            scriptOptions.text = `
+                atOptions = {
+                    'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            `;
 
-                // 3. Buat elemen script kedua untuk memanggil 'invoke.js'
-                const scriptInvoke = document.createElement('script');
-                scriptInvoke.type = 'text/javascript';
-                scriptInvoke.src = 'https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js';
+            // 3. Buat elemen script untuk memanggil 'invoke.js'
+            const scriptInvoke = document.createElement('script');
+            scriptInvoke.type = 'text/javascript';
+            scriptInvoke.src = 'https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js';
 
-                // 4. Masukkan kedua script tersebut ke dalam kontainer iklan
-                adContainer.appendChild(scriptOptions);
-                adContainer.appendChild(scriptInvoke);
+            // 4. Masukkan kedua script ke dalam kontainer melayang
+            adContainer.appendChild(scriptOptions);
+            adContainer.appendChild(scriptInvoke);
 
-                // 5. Suntikkan kontainer iklan tepat di bawah toolbar utama
-                toolbar.parentNode.insertBefore(adContainer, toolbar.nextSibling);
-                console.log("Adsterra Banner injected successfully via ads.js");
-            }
+            // 5. Masukkan ke dalam elemen <body> agar melayang di atas semua konten
+            document.body.appendChild(adContainer);
+            console.log("Sticky Adsterra Banner injected successfully.");
         });
     }
 
