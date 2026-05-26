@@ -1,22 +1,18 @@
 /**
- * ads.js - Skrip Iklan All-in-One Terpisah untuk Gofile Clone
- * Menggabungkan iklan atas (320x50) dan iklan bawah (728x90) secara dinamis.
+ * ads.js - Skrip Iklan All-in-One Terpisah (Fixed Version)
+ * Mengisolasi variabel 'atOptions' agar kedua iklan tampil bersamaan tanpa bentrok.
  */
 
 (function() {
-    // ==========================================
-    // CONFIGURATION (Aktifkan / Matikan Iklan)
-    // ==========================================
     const CONFIG = {
         enableHeaderAd: true,        // Iklan 320x50 di samping menu garis tiga
         enableBottomStickyAd: true   // Iklan 728x90 melayang di bawah layar
     };
 
-    // Tunggu sampai seluruh struktur halaman web selesai dimuat
     window.addEventListener('DOMContentLoaded', function() {
 
         // ------------------------------------------
-        // SLOT 1: INJECT IKLAN KE HEADER (320x50)
+        // SLOT 1: INJECT IKLAN KE HEADER (320x50) - ISOLATED
         // ------------------------------------------
         if (CONFIG.enableHeaderAd) {
             const header = document.querySelector('header');
@@ -24,7 +20,6 @@
                 const headerAdContainer = document.createElement('div');
                 headerAdContainer.className = 'header-ad-space';
                 
-                // Gaya CSS agar pas di samping tombol menu dan responsif
                 headerAdContainer.style.display = 'flex';
                 headerAdContainer.style.justifyContent = 'center';
                 headerAdContainer.style.alignItems = 'center';
@@ -36,14 +31,17 @@
 
                 const scriptOptions1 = document.createElement('script');
                 scriptOptions1.type = 'text/javascript';
+                // Dibungkus dalam fungsi anonim agar variabel atOptions tidak bocor keluar
                 scriptOptions1.text = `
-                    atOptions = {
-                        'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
-                        'format' : 'iframe',
-                        'height' : 50,
-                        'width' : 320,
-                        'params' : {}
-                    };
+                    (function() {
+                        window.atOptions = {
+                            'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                    })();
                 `;
 
                 const scriptInvoke1 = document.createElement('script');
@@ -53,18 +51,17 @@
                 headerAdContainer.appendChild(scriptOptions1);
                 headerAdContainer.appendChild(scriptInvoke1);
                 header.appendChild(headerAdContainer);
-                console.log("Header Adsterra Banner (320x50) loaded.");
+                console.log("Header Adsterra Banner (320x50) initialized.");
             }
         }
 
         // ------------------------------------------
-        // SLOT 2: INJECT IKLAN STICKY BAWAH (728x90)
+        // SLOT 2: INJECT IKLAN STICKY BAWAH (728x90) - ISOLATED
         // ------------------------------------------
         if (CONFIG.enableBottomStickyAd) {
             const bottomAdContainer = document.createElement('div');
             bottomAdContainer.className = 'bottom-sticky-ad-space';
             
-            // Gaya CSS agar melayang pas di bawah tengah layar
             bottomAdContainer.style.position = 'fixed';
             bottomAdContainer.style.bottom = '0';          
             bottomAdContainer.style.left = '50%';
@@ -82,15 +79,17 @@
 
             const scriptOptions2 = document.createElement('script');
             scriptOptions2.type = 'text/javascript';
-            // Variabel harus dibedakan namanya/langsung eksekusi agar tidak bentrok dengan slot 1
+            // Dibungkus dalam fungsi anonim agar tidak menimpa atOptions milik Slot 1
             scriptOptions2.text = `
-                atOptions = {
-                    'key' : '64e783bd557c30cbf66293b5c5fda05f',
-                    'format' : 'iframe',
-                    'height' : 90,
-                    'width' : 728,
-                    'params' : {}
-                };
+                (function() {
+                    window.atOptions = {
+                        'key' : '64e783bd557c30cbf66293b5c5fda05f',
+                        'format' : 'iframe',
+                        'height' : 90,
+                        'width' : 728,
+                        'params' : {}
+                    };
+                })();
             `;
 
             const scriptInvoke2 = document.createElement('script');
@@ -100,7 +99,7 @@
             bottomAdContainer.appendChild(scriptOptions2);
             bottomAdContainer.appendChild(scriptInvoke2);
             document.body.appendChild(bottomAdContainer);
-            console.log("Bottom Sticky Adsterra Banner (728x90) loaded.");
+            console.log("Bottom Sticky Adsterra Banner (728x90) initialized.");
         }
 
     });
