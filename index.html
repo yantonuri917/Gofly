@@ -24,15 +24,21 @@
             position: relative;
         }
 
-    /* Navbar Atas - Disesuaikan untuk menampung iklan di samping menu */
+   /* Navbar Atas - Dibuat FIXED STICKY di atas layar */
         header {
+            position: fixed; /* Membuat header terkunci melayang */
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #182436; /* Biar konten di bawahnya tidak tembus pandang */
             padding: 8px 16px;
             border-bottom: 1px solid #23334a;
             display: flex;
             align-items: center;
-            justify-content: space-between; /* Membuat menu di kiri, iklan di kanan */
-            min-height: 66px; /* Tinggi disesuaikan pas dengan iklan 50px + padding */
+            justify-content: space-between;
+            min-height: 66px;
             gap: 12px;
+            z-index: 990; /* Berada di bawah z-index sidebar (1000) agar tidak balapan */
         }
 
         .menu-btn {
@@ -43,7 +49,17 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            flex-shrink: 0; /* Mencegah tombol menu gepeng saat layar menyempit */
+            flex-shrink: 0;
+        }
+
+        /* KONTEN UTAMA - Diberi padding-top agar tidak amblas tertutup header */
+        main {
+            flex: 1;
+            padding: 16px;
+            padding-top: 82px; /* Jarak aman (tinggi header 66px + jarak 16px) */
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         /* ==================== SIDEBAR MENU (OVERLAY SLIDE) ==================== */
