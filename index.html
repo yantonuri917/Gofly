@@ -1,166 +1,713 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gofile</title>
-  <style>
-    * { box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gofile Interface - Clean Layout</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ==================== CORE RESET & BASE ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #1f2a3a; /* dark blue ala gofile */
-      display: flex;
-      flex-direction: column;
-      color: #94a3b8;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+        body {
+            background-color: #182436;
+            color: #f4f6f8;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-    /* HEADER */
-    header {
-      height: 56px;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      background: #1b2533;
-    }
+        /* Navbar Atas */
+        header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #23334a;
+            display: flex;
+            align-items: center;
+        }
 
-    .menu-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      background: #2563eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .menu-btn {
+            background-color: #1d68d5;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
 
-    .menu-btn span,
-    .menu-btn span::before,
-    .menu-btn span::after {
-      content: '';
-      display: block;
-      width: 16px;
-      height: 2px;
-      background: #fff;
-      position: relative;
-    }
+        /* ==================== SIDEBAR MENU (OVERLAY SLIDE) ==================== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background-color: #151f2c;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            padding: 20px 16px;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+        }
 
-    .menu-btn span::before { top: -5px; position: absolute; }
-    .menu-btn span::after { top: 5px; position: absolute; }
+        .sidebar.is-open {
+            left: 0;
+        }
 
-    /* MAIN */
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
 
-    /* GOFILE-LIKE SPINNER */
-    .spinner {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 5px solid transparent;
-      border-top-color: #3b82f6;
-      border-right-color: #3b82f6;
-      animation: spin 1s linear infinite;
-    }
+        .sidebar-overlay.is-visible {
+            display: block;
+        }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
 
-    /* FOOTER */
-    footer {
-      padding: 20px 0 30px;
-      text-align: center;
-      font-size: 14px;
-      background: #1b2533;
-    }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+        }
 
-    footer a {
-      display: block;
-      color: #94a3b8;
-      text-decoration: none;
-      margin: 6px 0;
-    }
-  </style>
+        .brand i {
+            color: #f1b418;
+            font-size: 24px;
+        }
+
+        .close-sidebar-btn {
+            background: #23334a;
+            color: #4b8bf4;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .user-box {
+            background-color: #1e293b;
+            border: 1px solid #3b82f6;
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #f4f6f8;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            background: #e11d48;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .btn-add-account {
+            width: 100%;
+            background-color: #1d68d5;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #a2b0c3;
+            text-decoration: none;
+            padding: 12px 8px;
+            font-size: 15px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: #1e293b;
+            color: white;
+        }
+
+        .sidebar-menu li a i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background-color: #23334a;
+            margin: 16px 0;
+        }
+
+        /* ==================== MAIN KONTEN UTAMA ==================== */
+        main {
+            flex: 1;
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Kustomisasi Ikon Folder Gofile */
+        .folder-section {
+            margin-bottom: 16px;
+        }
+
+        .folder-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .folder-icon-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .folder-icon-container .fa-folder {
+            font-size: 46px;
+            color: #f3b007;
+            position: relative;
+        }
+
+        /* Efek Lubang Segitiga di Tengah Folder */
+        .folder-icon-container::after {
+            content: "";
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 10px solid #182436;
+            pointer-events: none;
+        }
+
+        /* Lencana Angka di Kanan Bawah */
+        .folder-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -4px;
+            background-color: #475971;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 1px 6px;
+            border-radius: 10px;
+            border: 2px solid #182436;
+            z-index: 2;
+        }
+
+        .folder-meta h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .folder-meta p {
+            font-size: 12px;
+            color: #798b9e;
+            margin-top: 2px;
+        }
+
+        .btn-ellipsis-small {
+            background: #23334a;
+            border: none;
+            color: #a2b0c3;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        /* Toolbar Menu Alat */
+        .main-toolbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-bottom: 1px solid #23334a;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .main-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #1d68d5;
+            margin-right: 8px;
+        }
+
+        .btn-tool {
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-tool.green { background-color: #24a148; }
+        .btn-tool.blue { background-color: #1d68d5; }
+        .btn-tool.gray { background-color: #2b3a4e; color: #a2b0c3; }
+
+        .toolbar-split {
+            display: flex;
+            background-color: #2b3a4e;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .toolbar-split button {
+            background: transparent;
+            color: #a2b0c3;
+            border: none;
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+
+        /* ==================== STRUKTUR ROW FILE DATA ==================== */
+        .file-row {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #23334a;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .file-info-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .file-left-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding-top: 4px;
+        }
+
+        .file-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #1d68d5;
+        }
+
+        .file-icon {
+            font-size: 20px;
+            color: #4b8bf4;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f4f6f8;
+            margin-bottom: 4px;
+        }
+
+        .file-specs {
+            font-size: 12px;
+            color: #798b9e;
+            line-height: 1.4;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 6px;
+            align-self: flex-start;
+        }
+
+        .btn-action {
+            background-color: transparent;
+            color: #a2b0c3;
+            border: 1px solid #33445c;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .btn-action:hover {
+            background-color: #23334a;
+        }
+
+        .btn-action.close-trigger { display: none; }
+
+        .media-display-area {
+            margin-top: 12px;
+            margin-left: 28px;
+            display: flex;
+        }
+
+        .preview-box {
+            width: 180px;
+            max-height: 240px;
+            background-color: #0b131e;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .preview-box video {
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            object-fit: contain;
+            background-color: #050a12;
+        }
+
+        .inline-actions {
+            display: flex;
+            align-items: flex-start;
+            margin-left: 12px;
+        }
+
+        /* ==================== STATE AKTIF PLAYING VIDEO ==================== */
+        .file-row.is-playing .inline-actions {
+            display: none;
+        }
+
+        .file-row.is-playing .btn-action.play-trigger { display: none; }
+        .file-row.is-playing .btn-action.close-trigger { display: flex; }
+
+        .file-row.is-playing .media-display-area {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .file-row.is-playing .preview-box {
+            width: 100%;
+            max-height: 500px;
+            cursor: default;
+        }
+
+        .file-row.is-playing .preview-box video {
+            max-height: 500px;
+        }
+
+        /* Footer & Pagination */
+        .pagination-text {
+            text-align: center;
+            font-size: 12px;
+            color: #798b9e;
+            line-height: 1.5;
+            margin: 24px 0;
+        }
+
+        footer {
+            border-top: 1px solid #23334a;
+            padding: 24px 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #58697d;
+        }
+
+        footer nav {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        footer nav a {
+            color: #798b9e;
+            text-decoration: none;
+        }
+
+        .heart { color: #e14d4d; }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div class="menu-btn"><span></span></div>
-  </header>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <main id="content">
-    <div class="spinner" id="spinner"></div>
-  </main>
+    <aside class="sidebar" id="sidebarMenu">
+        <div class="sidebar-header">
+            <div class="brand">
+                <i class="fa-solid fa-folder-open"></i> Gofile
+            </div>
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+        </div>
 
-  <footer>
-    <a href="#">Home</a>
-    <a href="#">Terms of Service</a>
-    <a href="#">Privacy Policy</a>
-    <a href="#">Copyright</a>
-    <a href="#">Contact</a>
-    <a href="#">WOJTEK SAS © 2026, made with ❤️ by G0file Team</a>
-  </footer>
+        <div class="user-box">
+            <div class="user-info">
+                <div class="user-avatar">G</div>
+                <span>guest0818209611</span>
+            </div>
+            <i class="fa-solid fa-chevron-down" style="color: #a2b0c3; font-size: 12px;"></i>
+        </div>
 
-  <script>
-    // spinner tampil 2 detik lalu hilang
-    setTimeout(() => {
-      const spinner = document.getElementById('spinner');
-      spinner.style.opacity = '0';
-      spinner.style.transition = 'opacity 0.3s ease';
-    }, 2000);
-  </script>
+        <button class="btn-add-account">
+            <i class="fa-solid fa-plus"></i> Add Account
+        </button>
 
-<!-- ===== HISTATS (PAKSA ROOT) ===== -->
-<script>
-/* paksa Histats selalu baca ROOT */
-history.replaceState(null, "", "/");
-document.title = "top";
+        <ul class="sidebar-menu">
+            <li><a href="#"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="#"><i class="fa-solid fa-crown" style="color: #f1b418;"></i> Premium</a></li>
+            <li><a href="#"><i class="fa-solid fa-gear"></i> API</a></li>
+            <li><a href="#"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
+            <li><a href="#"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+            <div class="sidebar-divider"></div>
+            <li><a href="#"><i class="fa-brands fa-x-twitter"></i> @gofile_io</a></li>
+        </ul>
+    </aside>
 
-/* cegah double hit */
-if (!sessionStorage.getItem("histats_hit")) {
-  sessionStorage.setItem("histats_hit", "1");
+    <header>
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    </header>
 
-  var _Hasync = _Hasync || [];
-  _Hasync.push(['Histats.start','1,4971849,4,0,0,0,00000000']);
-  _Hasync.push(['Histats.fasi','1']);
-  _Hasync.push(['Histats.track_hits','']);
+    <main>
+        <div class="folder-section">
+            <div class="folder-header">
+                <div class="folder-icon-container">
+                    <i class="fa-solid fa-folder"></i>
+                    <span class="folder-badge">2</span>
+                </div>
+                <div class="folder-meta">
+                    <h2>root</h2>
+                    <p>24/5/2026, 01.59.12</p>
+                    <button class="btn-ellipsis-small"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+            </div>
+        </div>
 
-  (function() {
-    var hs = document.createElement('script');
-    hs.async = true;
-    hs.src = '//s10.histats.com/js15_as.js';
-    document.body.appendChild(hs);
-  })();
-}
-</script>
-<!-- ===== END HISTATS ===== -->
+        <div class="main-toolbar">
+            <input type="checkbox" class="main-checkbox">
+            <button class="btn-tool green"><i class="fa-solid fa-share-nodes"></i></button>
+            <button class="btn-tool blue"><i class="fa-solid fa-folder-plus"></i></button>
+            <button class="btn-tool blue"><i class="fa-solid fa-upload"></i></button>
+            <div class="toolbar-split">
+                <button><i class="fa-solid fa-arrows-up-down"></i></button>
+                <button><i class="fa-solid fa-caret-down"></i></button>
+            </div>
+            <button class="btn-tool gray"><i class="fa-solid fa-filter"></i></button>
+            <button class="btn-tool gray"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="btn-tool gray"><i class="fa-solid fa-rotate"></i></button>
+        </div>
 
-<script>
-/* tampilkan slug random SETELAH Histats */
-setTimeout(() => {
-  const c = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let slug = "";
-  for (let i = 0; i < 4; i++) {
-    slug += c[Math.floor(Math.random() * c.length)];
-  }
-  history.replaceState(null, "", "/" + slug);
-}, 200);
 
-/* redirect */
-setTimeout(() => {
-  document.body.classList.add("fade-out");
-  setTimeout(() => {
-    location.href = "https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb";
-  }, 600);
-}, 800);
-</script>
+        <div class="file-row">
+            <div class="file-info-container">
+                <div class="file-left-controls">
+                    <input type="checkbox" class="file-checkbox">
+                    <i class="fa-solid fa-file-video file-icon"></i>
+                </div>
+                
+                <div class="file-details">
+                    <div class="file-name" data-short="EPORNER.COM - [LCK7..." data-full="EPORNER.COM - [LCK7m_Vertical_Full_Name].mp4">EPORNER.COM - [LCK7m_Vertical_Full_Name].mp4</div>
+                    <div class="file-specs">24/5/2026, 02.00.54 • 43.0 MB • 0 downloads</div>
+                </div>
 
+                <div class="action-group top-action-anchor"></div>
+            </div>
+
+            <div class="media-display-area">
+                <div class="preview-box" data-video="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-inline-skating-43224-large.mp4" onclick="handleThumbnailClick(this)">
+                    <video preload="metadata">
+                        <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-inline-skating-43224-large.mp4#t=0.5" type="video/mp4">
+                    </video>
+                </div>
+
+                <div class="inline-actions side-action-box">
+                    <div class="action-group action-buttons">
+                        <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
+                        <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
+                        <button class="btn-action"><i class="fa-solid fa-download"></i></button>
+                        <button class="btn-action"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="file-row">
+            <div class="file-info-container">
+                <div class="file-left-controls">
+                    <input type="checkbox" class="file-checkbox">
+                    <i class="fa-solid fa-file-video file-icon"></i>
+                </div>
+                
+                <div class="file-details">
+                    <div class="file-name" data-short="SAMPLE_LANDSCAPE - [AB..." data-full="SAMPLE_LANDSCAPE - [AB88_Horizontal_Full_Name].mp4">SAMPLE_LANDSCAPE - [AB88_Horizontal_Full_Name].mp4</div>
+                    <div class="file-specs">24/5/2026, 02.05.10 • 15.4 MB • 12 downloads</div>
+                </div>
+
+                <div class="action-group top-action-anchor"></div>
+            </div>
+
+            <div class="media-display-area">
+                <div class="preview-box" data-video="https://www.w3schools.com/html/mov_bbb.mp4" onclick="handleThumbnailClick(this)">
+                    <video preload="metadata">
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4#t=0.5" type="video/mp4">
+                    </video>
+                </div>
+
+                <div class="inline-actions side-action-box">
+                    <div class="action-group action-buttons">
+                        <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
+                        <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
+                        <button class="btn-action"><i class="fa-solid fa-download"></i></button>
+                        <button class="btn-action"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="pagination-text">
+            Showing 1000 items per page<br>
+            Total 2 items
+        </div>
+    </main>
+
+    <footer>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Copyright</a>
+            <a href="#">Contact</a>
+        </nav>
+        <div>WOJTEK SAS © 2026 , made with <span class="heart">❤</span> by Gofile Team</div>
+    </footer>
+
+    <script>
+        // MANAJEMEN SIDEBAR MENU SYSTEM
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            sidebar.classList.toggle('is-open');
+            overlay.classList.toggle('is-visible');
+        }
+
+        // MANAJEMEN MULTIPLE FILE AUDIO-VIDEO SYSTEM
+        function getFileRowScope(element) {
+            return element.closest('.file-row');
+        }
+
+        function handleThumbnailClick(previewBox) {
+            const fileRow = getFileRowScope(previewBox);
+            if (!fileRow.classList.contains('is-playing')) {
+                const playBtn = fileRow.querySelector('.play-trigger');
+                handlePlay(playBtn);
+            }
+        }
+
+        function handlePlay(btnElement) {
+            const fileRow = getFileRowScope(btnElement);
+            const videoElement = fileRow.querySelector('video');
+            const previewBox = fileRow.querySelector('.preview-box');
+            const actionButtons = fileRow.querySelector('.action-buttons');
+            const topActionAnchor = fileRow.querySelector('.top-action-anchor');
+            const fileNameText = fileRow.querySelector('.file-name');
+            const originalVideoURL = previewBox.getAttribute('data-video');
+
+            fileRow.classList.add('is-playing');
+            fileNameText.innerText = fileNameText.getAttribute('data-short');
+
+            videoElement.setAttribute('controls', 'true');
+            videoElement.src = originalVideoURL;
+            videoElement.play();
+
+            topActionAnchor.appendChild(actionButtons);
+        }
+
+        function handleClose(btnElement) {
+            const fileRow = getFileRowScope(btnElement);
+            const videoElement = fileRow.querySelector('video');
+            const previewBox = fileRow.querySelector('.preview-box');
+            const actionButtons = fileRow.querySelector('.action-buttons');
+            const sideActionBox = fileRow.querySelector('.side-action-box');
+            const fileNameText = fileRow.querySelector('.file-name');
+            const originalVideoURL = previewBox.getAttribute('data-video');
+
+            fileRow.classList.remove('is-playing');
+            fileNameText.innerText = fileNameText.getAttribute('data-full');
+
+            videoElement.pause();
+            videoElement.removeAttribute('controls');
+            videoElement.src = originalVideoURL + "#t=0.5";
+            videoElement.load();
+
+            sideActionBox.appendChild(actionButtons);
+        }
+    </script>
+
+    <script src="ads.js"></script>
 </body>
 </html>
