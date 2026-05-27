@@ -3,94 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Gofile Interface - Premium Portal</title>
+    <meta name="referrer" content="no-referrer">
+    <title>Gofile Interface - Unlimited Video Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background-color: #182436; color: #f4f6f8; min-height: 100vh; }
-        main { max-width: 600px; margin: 0 auto; padding: 16px; }
-        
-        /* Admin Panel */
-        .admin-panel { background: #151f2c; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; flex-direction: column; gap: 10px; }
-        .admin-panel input { width: 100%; background: #0b131e; border: 1px solid #33445c; color: white; padding: 12px; border-radius: 6px; }
-        .btn-submit { background: #24a148; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-
-        /* Video List */
-        .file-row { border-bottom: 1px solid #23334a; padding: 16px 0; }
-        .file-name { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
-        
-        /* Thumbnail & Player */
-        .preview-box { 
-            width: 100%; height: 220px; background-color: #000; border-radius: 8px; 
-            position: relative; overflow: hidden; cursor: pointer;
-            background-size: cover; background-position: center; 
-            display: flex; align-items: center; justify-content: center;
-        }
-        .preview-box video { width: 100%; height: 100%; display: none; }
-        .play-overlay { font-size: 40px; color: #fff; background: rgba(0,0,0,0.5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: absolute; }
-        
-        .is-playing .play-overlay { display: none; }
-        .is-playing video { display: block; }
-        .is-playing .preview-box { cursor: default; }
+        /* ==================== CORE RESET & BASE ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #182436; color: #f4f6f8; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
+        header { padding: 12px 16px; border-bottom: 1px solid #23334a; display: flex; align-items: center; }
+        .menu-btn { background-color: #1d68d5; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        main { flex: 1; padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; }
+        .folder-section { margin-bottom: 16px; }
+        .folder-header { display: flex; align-items: flex-start; gap: 12px; }
+        .folder-icon-container { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+        .folder-icon-container .fa-folder { font-size: 46px; color: #f3b007; }
+        .folder-icon-container::after { content: ""; position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #182436; }
+        .folder-badge { position: absolute; bottom: -2px; right: -4px; background-color: #475971; color: white; font-size: 11px; font-weight: bold; padding: 1px 6px; border-radius: 10px; border: 2px solid #182436; z-index: 2; }
+        .folder-meta h2 { font-size: 16px; font-weight: 600; }
+        .folder-meta p { font-size: 12px; color: #798b9e; margin-top: 2px; }
+        .admin-panel { background-color: #151f2c; border: 1px solid #23334a; border-radius: 8px; padding: 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .admin-panel input { width: 100%; background-color: #0b131e; border: 1px solid #33445c; color: white; padding: 10px; border-radius: 6px; font-size: 14px; outline: none; }
+        .btn-submit { background-color: #24a148; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .file-list-container { display: flex; flex-direction: column; }
+        .file-row { display: flex; flex-direction: column; border-bottom: 1px solid #23334a; padding-bottom: 16px; margin-bottom: 16px; }
+        .file-info-container { display: flex; gap: 12px; align-items: flex-start; }
+        .file-left-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 4px; }
+        .file-icon { font-size: 20px; color: #4b8bf4; }
+        .file-details { flex: 1; }
+        .file-name { font-size: 14px; font-weight: 600; color: #f4f6f8; margin-bottom: 4px; word-break: break-all; }
+        .file-specs { font-size: 12px; color: #798b9e; }
+        .media-display-area { margin-top: 12px; margin-left: 28px; display: flex; }
+        .preview-box { width: 180px; height: 120px; background-color: #0b131e; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; background-size: cover; background-position: center; }
+        .preview-box video { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+        .preview-box .click-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
+        .inline-actions { display: flex; align-items: flex-start; margin-left: 12px; }
+        .action-group { display: flex; gap: 6px; align-self: flex-start; }
+        .btn-action { background-color: transparent; color: #a2b0c3; border: 1px solid #33445c; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .btn-action.close-trigger { display: none; }
+        .file-row.is-playing .inline-actions { display: none; }
+        .file-row.is-playing .preview-box .click-overlay { display: none; }
+        .file-row.is-playing .btn-action.play-trigger { display: none; }
+        .file-row.is-playing .btn-action.close-trigger { display: flex; }
+        .file-row.is-playing .media-display-area { margin-left: 0; width: 100%; }
+        .file-row.is-playing .preview-box { width: 100%; height: 320px; cursor: default; }
+        .file-row.is-playing .preview-box video { pointer-events: auto; }
+        .pagination-text { text-align: center; font-size: 12px; color: #798b9e; margin: 24px 0; }
+        footer { border-top: 1px solid #23334a; padding: 24px 16px; text-align: center; font-size: 12px; color: #58697d; }
     </style>
 </head>
 <body>
-
+    <header><button class="menu-btn"><i class="fa-solid fa-bars"></i></button></header>
     <main>
-        <div class="admin-panel" id="adminFormPanel">
-            <input type="text" id="videoNameInput" placeholder="Judul Video">
-            <input type="text" id="videoUrlInput" placeholder="URL Video">
-            <input type="text" id="videoPosterInput" placeholder="URL Thumbnail (Gambar)">
-            <button class="btn-submit" onclick="submitNewVideo()">Tambah Video</button>
+        <div class="folder-section">
+            <div class="folder-header">
+                <div class="folder-icon-container"><i class="fa-solid fa-folder"></i><span class="folder-badge" id="totalFilesBadge">0</span></div>
+                <div class="folder-meta"><h2>Cloud Streaming Pool</h2><p id="folderTime">Mengambil data...</p></div>
+            </div>
         </div>
-
-        <div id="fileListContainer"></div>
+        <div class="admin-panel" id="adminFormPanel" style="display: none;">
+            <div style="font-size: 13px; color: #24a148; font-weight: bold;"><i class="fa-solid fa-user-shield"></i> Mode Admin Aktif</div>
+            <input type="text" id="videoNameInput" placeholder="Masukkan Judul Video">
+            <input type="text" id="videoUrlInput" placeholder="URL Direct Video">
+            <input type="text" id="videoPosterInput" placeholder="URL Thumbnail Gambar (Opsional)">
+            <button class="btn-submit" onclick="submitNewVideo()">Tambah Video ke Situs</button>
+        </div>
+        <div class="file-list-container" id="fileListContainer"></div>
+        <div class="pagination-text" id="paginationSummary">Total 0 item</div>
     </main>
-
+    <footer><div>WOJTEK SAS © 2026 , Unlimited System</div></footer>
     <script>
         const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
-        
+        let databaseFiles = [];
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
-        if (isAdmin) document.getElementById('adminFormPanel').style.display = 'flex';
-
+        window.onload = function() {
+            document.getElementById('folderTime').innerText = new Date().toLocaleString('id-ID');
+            if (isAdmin) document.getElementById('adminFormPanel').style.display = 'flex';
+            fetchVideosFromDatabase();
+        };
         async function fetchVideosFromDatabase() {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            const data = await res.json();
-            const container = document.getElementById('fileListContainer');
-            container.innerHTML = '';
-            
-            data.forEach(f => {
-                const posterStyle = f.poster_url ? `style="background-image: url('${f.poster_url}')"` : '';
-                container.innerHTML += `
-                    <div class="file-row">
-                        <div class="file-name">${f.name}</div>
-                        <div class="preview-box" ${posterStyle} onclick="this.classList.add('is-playing'); this.querySelector('video').play();">
-                            <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
-                            <video src="${f.url}" controls></video>
-                        </div>
-                    </div>
-                `;
-            });
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, { headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }});
+            databaseFiles = await res.json();
+            renderFileList();
         }
-
         async function submitNewVideo() {
-            const body = { 
-                name: document.getElementById('videoNameInput').value, 
-                url: document.getElementById('videoUrlInput').value, 
-                poster_url: document.getElementById('videoPosterInput').value 
-            };
+            const name = document.getElementById('videoNameInput').value;
+            const url = document.getElementById('videoUrlInput').value;
+            const poster_url = document.getElementById('videoPosterInput').value;
+            if (!name || !url) return alert('Judul & URL wajib diisi!');
             await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
                 method: 'POST',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, url, poster_url, size: "External", cloud_path: "external_link" })
             });
             location.reload();
         }
-
-        fetchVideosFromDatabase();
+        function renderFileList() {
+            const container = document.getElementById('fileListContainer');
+            container.innerHTML = '';
+            document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
+            databaseFiles.forEach(file => {
+                const bgStyle = file.poster_url ? `style="background-image: url('${file.poster_url}')"` : '';
+                container.innerHTML += `
+                    <div class="file-row" id="row-${file.id}">
+                        <div class="file-info-container">
+                            <div class="file-left-controls"><i class="fa-solid fa-file-video file-icon"></i></div>
+                            <div class="file-details">
+                                <div class="file-name">${file.name}</div>
+                                <div class="file-specs">${new Date(file.created_at).toLocaleString('id-ID')}</div>
+                            </div>
+                            <div class="action-group top-action-anchor"></div>
+                        </div>
+                        <div class="media-display-area">
+                            <div class="preview-box" ${bgStyle} onclick="handlePlay(this)">
+                                <div class="click-overlay"></div>
+                                <video src="${file.url}"></video>
+                            </div>
+                            <div class="inline-actions side-action-box">
+                                <div class="action-group action-buttons">
+                                    <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
+                                    <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
+                                    ${isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+        function handlePlay(el) {
+            const row = el.closest('.file-row');
+            row.classList.add('is-playing');
+            row.querySelector('video').setAttribute('controls', 'true');
+            row.querySelector('video').play();
+            row.querySelector('.top-action-anchor').appendChild(row.querySelector('.action-buttons'));
+        }
+        function handleClose(el) {
+            const row = el.closest('.file-row');
+            row.classList.remove('is-playing');
+            row.querySelector('video').pause();
+            row.querySelector('video').removeAttribute('controls');
+            row.querySelector('.side-action-box').appendChild(row.querySelector('.action-buttons'));
+        }
+        async function deleteFile(id) {
+            if (!confirm("Hapus video?")) return;
+            await fetch(`${SUPABASE_URL}/rest/v1/videos_list?id=eq.${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }});
+            location.reload();
+        }
     </script>
 </body>
 </html>
