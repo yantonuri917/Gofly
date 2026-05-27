@@ -2,8 +2,9 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="referrer" content="no-referrer">      <title>Gofile Interface - Unlimited Video Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer">      
+    <title>Gofile Interface - Unlimited Video Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ==================== CORE RESET & BASE ==================== */
@@ -115,8 +116,10 @@
             border-radius: 4px; overflow: hidden; display: flex;
             align-items: center; justify-content: center; cursor: pointer; position: relative;
         }
-        .preview-box video { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-        .preview-box .click-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
+        .preview-box video, .preview-box iframe { width: 100%; height: 100%; object-fit: contain; }
+        .preview-box video { pointer-events: none; }
+        .preview-box iframe { display: none; border: none; }
+        .preview-box .click-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; background: transparent; }
 
         .inline-actions { display: flex; align-items: flex-start; margin-left: 12px; }
         .action-group { display: flex; gap: 6px; align-self: flex-start; }
@@ -134,7 +137,19 @@
         .file-row.is-playing .btn-action.play-trigger { display: none; }
         .file-row.is-playing .btn-action.close-trigger { display: flex; }
         .file-row.is-playing .media-display-area { margin-left: 0; width: 100%; }
-        .file-row.is-playing .preview-box { width: 100%; height: 320px; cursor: default; }
+        
+        /* Modifikasi Rasio Player 16:9 yang Sempurna untuk HP */
+        .file-row.is-playing .preview-box { 
+            width: 100%; 
+            height: 0; 
+            padding-bottom: 56.25%; /* Rasio Video Terstandar */
+            position: relative; 
+            cursor: default; 
+        }
+        .file-row.is-playing .preview-box video, 
+        .file-row.is-playing .preview-box iframe { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        }
         .file-row.is-playing .preview-box video { pointer-events: auto; }
 
         .pagination-text { text-align: center; font-size: 12px; color: #798b9e; margin: 24px 0; }
@@ -164,7 +179,7 @@
         <div class="admin-panel" id="adminFormPanel" style="display: none;">
             <div style="font-size: 13px; color: #24a148; font-weight: bold;"><i class="fa-solid fa-user-shield"></i> Mode Admin Aktif</div>
             <input type="text" id="videoNameInput" placeholder="Masukkan Judul Video">
-            <input type="text" id="videoUrlInput" placeholder="Tempel URL Direct Video (Telegram/Filebin/dll)">
+            <input type="text" id="videoUrlInput" placeholder="Tempel URL Direct Video atau Link PlayMogo / DoodStream">
             <button class="btn-submit" onclick="submitNewVideo()">Tambah Video ke Situs</button>
         </div>
 
@@ -176,11 +191,12 @@
     <footer><div>WOJTEK SAS © 2026 , Unlimited System</div></footer>
 
     <script>
-      // =========================================================================
-        // HUBUNGKAN DENGAN API SUPABASE ANDA DI SINI (SUDAH DIKOREKSI 100% BENAR)
+        // =========================================================================
+        // HUBUNGKAN DENGAN API SUPABASE ANDA DI SINI
         // =========================================================================
         const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";     let databaseFiles = [];
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";     
+        let databaseFiles = [];
 
         // Deteksi hak akses admin melalui URL (?admin=1)
         const urlParams = new URLSearchParams(window.location.search);
@@ -215,11 +231,20 @@
         // SIMPAN DATA LINK VIDEO BARU KE DATABASE
         async function submitNewVideo() {
             const name = document.getElementById('videoNameInput').value;
-            const url = document.getElementById('videoUrlInput').value;
+            let url = document.getElementById('videoUrlInput').value.trim();
 
             if (!name || !url) {
                 alert('Judul dan URL Video wajib diisi!');
                 return;
+            }
+
+            // Normalisasi Link Otomatis untuk Kenyamanan Admin
+            if (url.includes('playmogo.com') && !url.includes('/e/')) {
+                // Jika tidak sengaja mengopi link nonton biasa, ubah otomatis menjadi link embed (/e/)
+                url = url.replace('playmogo.com/', 'playmogo.com/e/');
+            }
+            if ((url.includes('doodstream.com') || url.includes('dood.li')) && !url.includes('/e/')) {
+                url = url.replace('/d/', '/e/');
             }
 
             try {
@@ -232,7 +257,7 @@
                     },
                     body: JSON.stringify({
                         name: name,
-                        size: "External Storage",
+                        size: "Cloud Network",
                         cloud_path: "external_link",
                         url: url
                     })
@@ -269,6 +294,9 @@
                 const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('id-ID') : 'Baru';
                 const deleteButtonHtml = isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : '';
 
+                // Cek tipe link: iframe (cuan) atau video biasa
+                const isEmbed = file.url.includes('playmogo.com') || file.url.includes('doodstream.com') || file.url.includes('dood.li');
+
                 const fileRowHtml = `
                     <div class="file-row" id="row-${file.id}">
                         <div class="file-info-container">
@@ -285,7 +313,12 @@
                         <div class="media-display-area">
                             <div class="preview-box" onclick="handleThumbnailClick(this)">
                                 <div class="click-overlay"></div>
-                                <video preload="metadata" src="${file.url}#t=0.5"></video>
+                                ${isEmbed ? 
+                                    `<iframe data-src="${file.url}" scrolling="no" allowfullscreen></iframe>
+                                     <div style="color: #798b9e; font-size: 11px; font-weight: bold; position: absolute; z-index: 1;"><i class="fa-solid fa-play" style="font-size:24px; color:#1d68d5;"></i></div>` 
+                                    : 
+                                    `<video preload="metadata" src="${file.url}#t=0.5"></video>`
+                                }
                             </div>
 
                             <div class="inline-actions side-action-box">
@@ -314,28 +347,48 @@
         function handlePlay(btnElement) {
             const fileRow = getFileRowScope(btnElement);
             const video = fileRow.querySelector('video');
+            const iframe = fileRow.querySelector('iframe');
             const topAction = fileRow.querySelector('.top-action-anchor');
             const actionGroup = fileRow.querySelector('.action-buttons');
             const nameText = fileRow.querySelector('.file-name');
 
             fileRow.classList.add('is-playing');
             nameText.innerText = nameText.getAttribute('data-short');
-            video.setAttribute('controls', 'true');
-            video.play();
+            
+            // Logika Pemutaran
+            if (iframe) {
+                iframe.style.display = 'block';
+                if (!iframe.getAttribute('src')) {
+                    iframe.setAttribute('src', iframe.getAttribute('data-src')); // Lazy load iframe
+                }
+            } else if (video) {
+                video.setAttribute('controls', 'true');
+                video.play();
+            }
+
             topAction.appendChild(actionGroup);
         }
 
         function handleClose(btnElement) {
             const fileRow = getFileRowScope(btnElement);
             const video = fileRow.querySelector('video');
+            const iframe = fileRow.querySelector('iframe');
             const sideAction = fileRow.querySelector('.side-action-box');
             const actionGroup = fileRow.querySelector('.action-buttons');
             const nameText = fileRow.querySelector('.file-name');
 
             fileRow.classList.remove('is-playing');
             nameText.innerText = nameText.getAttribute('data-full');
-            video.pause();
-            video.removeAttribute('controls');
+            
+            // Logika Menghentikan Pemutaran
+            if (iframe) {
+                iframe.removeAttribute('src'); // Hentikan suara iklan/video iframe secara total
+                iframe.style.display = 'none';
+            } else if (video) {
+                video.pause();
+                video.removeAttribute('controls');
+            }
+
             sideAction.appendChild(actionGroup);
         }
 
