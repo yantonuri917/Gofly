@@ -2,405 +2,99 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta "viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="referrer" content="no-referrer">      
-    <title>Gofile Interface - Unlimited Video Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gofile Interface - Mobile Optimized</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ==================== CORE RESET & BASE ==================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: #182436;
-            color: #f4f6f8;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        header {
-            padding: 12px 16px;
-            border-bottom: 1px solid #23334a;
-            display: flex;
-            align-items: center;
-        }
-
-        .menu-btn {
-            background-color: #1d68d5;
-            color: white;
-            border: none;
-            padding: 10px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        /* ==================== MAIN KONTEN UTAMA ==================== */
-        main {
-            flex: 1;
-            padding: 16px;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .folder-section { margin-bottom: 16px; }
-        .folder-header { display: flex; align-items: flex-start; gap: 12px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #182436; color: #f4f6f8; min-height: 100vh; width: 100%; overflow-x: hidden; }
         
-        .folder-icon-container {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
+        header { padding: 15px; border-bottom: 1px solid #23334a; display: flex; align-items: center; }
+        main { width: 100%; padding: 15px; max-width: 600px; margin: 0 auto; }
 
-        .folder-icon-container .fa-folder { font-size: 46px; color: #f3b007; }
-        .folder-icon-container::after {
-            content: ""; position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%);
-            width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent;
-            border-bottom: 10px solid #182436;
-        }
+        /* Admin Panel */
+        .admin-panel { background: #151f2c; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; flex-direction: column; gap: 10px; }
+        .admin-panel input { width: 100%; background: #0b131e; border: 1px solid #33445c; color: white; padding: 12px; border-radius: 6px; }
+        .btn-submit { background: #24a148; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        .folder-badge {
-            position: absolute; bottom: -2px; right: -4px; background-color: #475971;
-            color: white; font-size: 11px; font-weight: bold; padding: 1px 6px;
-            border-radius: 10px; border: 2px solid #182436; z-index: 2;
-        }
-
-        .folder-meta h2 { font-size: 16px; font-weight: 600; }
-        .folder-meta p { font-size: 12px; color: #798b9e; margin-top: 2px; }
-
-        /* Panel Input Admin */
-        .admin-panel {
-            background-color: #151f2c; border: 1px solid #23334a;
-            border-radius: 8px; padding: 14px; margin-bottom: 16px;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-
-        .admin-panel input {
-            width: 100%; background-color: #0b131e; border: 1px solid #33445c;
-            color: white; padding: 10px; border-radius: 6px; font-size: 14px;
-            outline: none;
-        }
-
-        .btn-submit {
-            background-color: #24a148; color: white; border: none;
-            padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;
-        }
-
-        /* ==================== FILE ROW DATA ==================== */
-        .file-list-container { display: flex; flex-direction: column; }
-
-        .file-row {
-            display: flex; flex-direction: column;
-            border-bottom: 1px solid #23334a; padding-bottom: 16px; margin-bottom: 16px;
-        }
-
-        .file-info-container { display: flex; gap: 12px; align-items: flex-start; }
-        .file-left-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 4px; }
-        .file-icon { font-size: 20px; color: #4b8bf4; }
-        .file-details { flex: 1; }
-        .file-name { font-size: 14px; font-weight: 600; color: #f4f6f8; margin-bottom: 4px; word-break: break-all; }
-        .file-specs { font-size: 12px; color: #798b9e; }
-
-        .media-display-area { margin-top: 12px; margin-left: 28px; display: flex; }
+        /* File List */
+        .file-row { border-bottom: 1px solid #23334a; padding: 15px 0; }
+        .file-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .file-name { font-size: 14px; font-weight: 600; flex: 1; word-break: break-all; }
         
-        .preview-box {
-            width: 180px; height: 120px; background-color: #0b131e;
-            border-radius: 4px; overflow: hidden; display: flex;
-            align-items: center; justify-content: center; cursor: pointer; position: relative;
-            background-size: cover; background-position: center; background-repeat: no-repeat;
+        /* Player Box */
+        .preview-box { 
+            width: 100%; height: 200px; background: #000; border-radius: 8px; 
+            position: relative; overflow: hidden; background-size: cover; 
+            background-position: center; display: flex; align-items: center; justify-content: center;
         }
-        .preview-box video, .preview-box iframe { width: 100%; height: 100%; object-fit: contain; position: absolute; top:0; left:0; }
-        .preview-box video { pointer-events: none; }
-        .preview-box iframe { display: none; border: none; z-index: 4; }
+        .preview-box iframe, .preview-box video { width: 100%; height: 100%; display: none; }
         
-        /* Tombol Play Overlay Modern ala Layar Kaca */
-        .preview-box .click-overlay { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; 
-            background: rgba(0, 0, 0, 0.3); display: flex; align-items: center; justify-content: center;
-        }
-        .preview-box .click-overlay::after {
-            content: "\f04b"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 20px;
-            color: #1d68d5; background: rgba(255, 255, 255, 0.95); width: 44px; height: 44px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; padding-left: 3px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: transform 0.2s;
-        }
-        .preview-box:hover .click-overlay::after { transform: scale(1.1); }
-
-        .inline-actions { display: flex; align-items: flex-start; margin-left: 12px; }
-        .action-group { display: flex; gap: 6px; align-self: flex-start; }
+        /* Play Button */
+        .play-overlay { position: absolute; cursor: pointer; background: rgba(0,0,0,0.3); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .play-overlay i { font-size: 40px; color: white; background: #1d68d5; padding: 15px 20px; border-radius: 50px; }
         
-        .btn-action {
-            background-color: transparent; color: #a2b0c3; border: 1px solid #33445c;
-            width: 32px; height: 32px; border-radius: 4px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 12px;
-        }
-        .btn-action.close-trigger { display: none; }
-
-        /* PLAYING STATE */
-        .file-row.is-playing .inline-actions { display: none; }
-        .file-row.is-playing .preview-box .click-overlay { display: none; }
-        .file-row.is-playing .btn-action.play-trigger { display: none; }
-        .file-row.is-playing .btn-action.close-trigger { display: flex; }
-        .file-row.is-playing .media-display-area { margin-left: 0; width: 100%; }
+        .is-playing .play-overlay { display: none; }
+        .is-playing iframe, .is-playing video { display: block; }
         
-        .file-row.is-playing .preview-box { 
-            width: 100%; height: 0; padding-bottom: 56.25%; position: relative; cursor: default; background-image: none !important;
-        }
-        .file-row.is-playing .preview-box video { pointer-events: auto; }
-
-        .pagination-text { text-align: center; font-size: 12px; color: #798b9e; margin: 24px 0; }
-        footer { border-top: 1px solid #23334a; padding: 24px 16px; text-align: center; font-size: 12px; color: #58697d; }
+        footer { padding: 20px; text-align: center; font-size: 11px; color: #58697d; }
     </style>
 </head>
 <body>
 
-    <header>
-        <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
-    </header>
+    <header><button class="menu-btn"><i class="fa-solid fa-bars"></i></button></header>
 
     <main>
-        <div class="folder-section">
-            <div class="folder-header">
-                <div class="folder-icon-container">
-                    <i class="fa-solid fa-folder"></i>
-                    <span class="folder-badge" id="totalFilesBadge">0</span>
-                </div>
-                <div class="folder-meta">
-                    <h2>Cloud Streaming Pool</h2>
-                    <p id="folderTime">Mengambil data...</p>
-                </div>
-            </div>
+        <div class="admin-panel" id="adminFormPanel">
+            <input type="text" id="videoNameInput" placeholder="Judul Video">
+            <input type="text" id="videoUrlInput" placeholder="URL Video / Link Embed">
+            <input type="text" id="videoPosterInput" placeholder="URL Gambar Thumbnail">
+            <button class="btn-submit" onclick="submitNewVideo()">Tambah Video</button>
         </div>
 
-        <div class="admin-panel" id="adminFormPanel" style="display: none;">
-            <div style="font-size: 13px; color: #24a148; font-weight: bold;"><i class="fa-solid fa-user-shield"></i> Mode Admin Aktif</div>
-            <input type="text" id="videoNameInput" placeholder="Masukkan Judul Video">
-            <input type="text" id="videoUrlInput" placeholder="Tempel URL Pemutar (PlayMogo / DoodStream / MP4)">
-            <input type="text" id="videoPosterInput" placeholder="Tempel URL Link Thumbnail Gambar (Opsional)">
-            <button class="btn-submit" onclick="submitNewVideo()">Tambah Video ke Situs</button>
-        </div>
-
-        <div class="file-list-container" id="fileListContainer"></div>
-
-        <div class="pagination-text" id="paginationSummary">Total 0 item</div>
+        <div id="fileListContainer"></div>
     </main>
-
-    <footer><div>WOJTEK SAS © 2026 , Unlimited System</div></footer>
 
     <script>
         const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";     
-        let databaseFiles = [];
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const isAdmin = urlParams.get('admin') === '1';
-
-        window.onload = function() {
-            document.getElementById('folderTime').innerText = new Date().toLocaleString('id-ID');
-            if (isAdmin) {
-                document.getElementById('adminFormPanel').style.display = 'flex';
-            }
-            fetchVideosFromDatabase();
-        };
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
+        
+        const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+        if (isAdmin) document.getElementById('adminFormPanel').style.display = 'flex';
 
         async function fetchVideosFromDatabase() {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }
-                });
-                if (!response.ok) throw new Error('Gagal memuat database.');
-                databaseFiles = await response.json();
-                renderFileList();
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        async function submitNewVideo() {
-            const name = document.getElementById('videoNameInput').value;
-            let url = document.getElementById('videoUrlInput').value.trim();
-            const poster = document.getElementById('videoPosterInput').value.trim();
-
-            if (!name || !url) {
-                alert('Judul dan URL Video wajib diisi!');
-                return;
-            }
-
-            if (url.includes('playmogo.com') && !url.includes('/e/')) {
-                url = url.replace('playmogo.com/', 'playmogo.com/e/');
-            }
-            if ((url.includes('doodstream.com') || url.includes('dood.li')) && !url.includes('/e/')) {
-                url = url.replace('/d/', '/e/');
-            }
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'apikey': SUPABASE_KEY,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        size: "Cloud Network",
-                        cloud_path: "external_link",
-                        url: url,
-                        poster_url: poster || null
-                    })
-                });
-
-                if (!response.ok) throw new Error('Gagal menyimpan ke database.');
-
-                document.getElementById('videoNameInput').value = '';
-                document.getElementById('videoUrlInput').value = '';
-                document.getElementById('videoPosterInput').value = '';
-                fetchVideosFromDatabase();
-
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        }
-
-        function renderFileList() {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = await res.json();
             const container = document.getElementById('fileListContainer');
-            const badge = document.getElementById('totalFilesBadge');
-            const summary = document.getElementById('paginationSummary');
-            
             container.innerHTML = '';
-            badge.innerText = databaseFiles.length;
-            summary.innerText = `Total ${databaseFiles.length} item`;
-
-            if (databaseFiles.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#798b9e; font-size:14px;"><i class="fa-solid fa-video-slash" style="font-size:32px; display:block; margin-bottom:10px;"></i>Belum ada video di cloud database.</div>`;
-                return;
-            }
-
-            databaseFiles.forEach(file => {
-                const shortName = file.name.length > 25 ? file.name.substring(0, 22) + "..." : file.name;
-                const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('id-ID') : 'Baru';
-                const deleteButtonHtml = isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : '';
-
-                const isEmbed = file.url.includes('playmogo.com') || file.url.includes('doodstream.com') || file.url.includes('dood.li');
-                
-                // Set background poster jika diinput admin
-                const bgStyle = file.poster_url ? `style="background-image: url('${file.poster_url}');"` : '';
-
-                const fileRowHtml = `
-                    <div class="file-row" id="row-${file.id}">
-                        <div class="file-info-container">
-                            <div class="file-left-controls">
-                                <i class="fa-solid fa-file-video file-icon"></i>
-                            </div>
-                            <div class="file-details">
-                                <div class="file-name" data-short="${shortName}" data-full="${file.name}">${file.name}</div>
-                                <div class="file-specs">${dateClean} • ${file.size}</div>
-                            </div>
-                            <div class="action-group top-action-anchor"></div>
-                        </div>
-
-                        <div class="media-display-area">
-                            <div class="preview-box" ${bgStyle} onclick="handleThumbnailClick(this)">
-                                <div class="click-overlay"></div>
-                                ${isEmbed ? 
-                                    `<iframe data-src="${file.url}" scrolling="no" allowfullscreen></iframe>` 
-                                    : 
-                                    `<video preload="metadata" src="${file.url}#t=0.5"></video>`
-                                }
-                            </div>
-
-                            <div class="inline-actions side-action-box">
-                                <div class="action-group action-buttons">
-                                    <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
-                                    <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
-                                    ${deleteButtonHtml}
-                                </div>
-                            </div>
+            
+            data.forEach(f => {
+                const isEmbed = f.url.includes('playmogo') || f.url.includes('dood');
+                container.innerHTML += `
+                    <div class="file-row" id="row-${f.id}">
+                        <div class="file-info"><div class="file-name">${f.name}</div></div>
+                        <div class="preview-box" style="background-image: url('${f.poster_url}')">
+                            ${isEmbed ? `<iframe src="${f.url}" allowfullscreen></iframe>` : `<video src="${f.url}"></video>`}
+                            <div class="play-overlay" onclick="this.parentElement.classList.add('is-playing')"><i class="fa-solid fa-play"></i></div>
                         </div>
                     </div>
                 `;
-                container.innerHTML += fileRowHtml;
             });
         }
 
-        function getFileRowScope(element) { return element.closest('.file-row'); }
-
-        function handleThumbnailClick(previewBox) {
-            const fileRow = getFileRowScope(previewBox);
-            if (!fileRow.classList.contains('is-playing')) {
-                handlePlay(fileRow.querySelector('.play-trigger'));
-            }
+        async function submitNewVideo() {
+            const body = { name: document.getElementById('videoNameInput').value, url: document.getElementById('videoUrlInput').value, poster_url: document.getElementById('videoPosterInput').value };
+            await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            location.reload();
         }
 
-        function handlePlay(btnElement) {
-            const fileRow = getFileRowScope(btnElement);
-            const video = fileRow.querySelector('video');
-            const iframe = fileRow.querySelector('iframe');
-            const topAction = fileRow.querySelector('.top-action-anchor');
-            const actionGroup = fileRow.querySelector('.action-buttons');
-            const nameText = fileRow.querySelector('.file-name');
-
-            fileRow.classList.add('is-playing');
-            nameText.innerText = nameText.getAttribute('data-short');
-            
-            if (iframe) {
-                iframe.style.display = 'block';
-                if (!iframe.getAttribute('src')) {
-                    iframe.setAttribute('src', iframe.getAttribute('data-src'));
-                }
-            } else if (video) {
-                video.setAttribute('controls', 'true');
-                video.play();
-            }
-
-            topAction.appendChild(actionGroup);
-        }
-
-        function handleClose(btnElement) {
-            const fileRow = getFileRowScope(btnElement);
-            const video = fileRow.querySelector('video');
-            const iframe = fileRow.querySelector('iframe');
-            const sideAction = fileRow.querySelector('.side-action-box');
-            const actionGroup = fileRow.querySelector('.action-buttons');
-            const nameText = fileRow.querySelector('.file-name');
-
-            fileRow.classList.remove('is-playing');
-            nameText.innerText = nameText.getAttribute('data-full');
-            
-            if (iframe) {
-                iframe.removeAttribute('src');
-                iframe.style.display = 'none';
-            } else if (video) {
-                video.pause();
-                video.removeAttribute('controls');
-            }
-
-            sideAction.appendChild(actionGroup);
-        }
-
-        async function deleteFile(id) {
-            if (!confirm("Apakah Anda yakin ingin menghapus video ini dari daftar website?")) return;
-            try {
-                const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?id=eq.${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }
-                });
-                if (!dbRes.ok) throw new Error('Gagal menghapus data dari database.');
-                fetchVideosFromDatabase();
-            } catch (error) {
-                alert(error.message);
-            }
-        }
+        fetchVideosFromDatabase();
     </script>
-    <script src="ads.js"></script>
 </body>
 </html>
