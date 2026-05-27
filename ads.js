@@ -1,6 +1,6 @@
 /**
- * ads.js - Skrip Iklan All-in-One Terpisah (Queue Timeout Version)
- * Memberikan jeda waktu eksekusi agar sistem Adsterra tidak tabrakan di memori browser.
+ * ads.js - Skrip Iklan All-in-One Terpisah (Iframe Isolation Version)
+ * Isolasi window.atOptions menggunakan iframe dinamis agar tidak tabrakan di memori.
  */
 
 (function() {
@@ -9,10 +9,50 @@
         enableBottomStickyAd: true   // Iklan 728x90 melayang di bawah layar
     };
 
+    // Fungsi pembantu untuk membuat iklan di dalam ruang lingkup terisolasi
+    function injectAdIsolated(container, adKey, width, height, scriptSrc) {
+        // 1. Buat iframe kosong
+        const iframe = document.createElement('iframe');
+        iframe.style.width = width + 'px';
+        iframe.style.height = height + 'px';
+        iframe.style.border = 'none';
+        iframe.style.overflow = 'hidden';
+        iframe.scrolling = 'no';
+        
+        container.appendChild(iframe);
+
+        // 2. Ambil dokumen di dalam iframe tersebut
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+        // 3. Tulis kode iklan langsung ke dalam dokumen iframe
+        iframeDoc.open();
+        iframeDoc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>html, body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style>
+            </head>
+            <body>
+                <script type="text/javascript">
+                    window.atOptions = {
+                        'key' : '${adKey}',
+                        'format' : 'iframe',
+                        'height' : ${height},
+                        'width' : ${width},
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="${scriptSrc}"></script>
+            </body>
+            </html>
+        `);
+        iframeDoc.close();
+    }
+
     window.addEventListener('DOMContentLoaded', function() {
 
         // ==========================================================
-        // SLOT 1: LANGSUNG MUAT IKLAN ATAS (320x50) SAAT START
+        // SLOT 1: MUAT IKLAN ATAS (320x50)
         // ==========================================================
         if (CONFIG.enableHeaderAd) {
             const header = document.querySelector('header');
@@ -29,66 +69,53 @@
                 headerAdContainer.style.overflow = 'hidden';
                 headerAdContainer.style.marginLeft = 'auto'; 
 
-                // Set konfigurasi global untuk Iklan Pertama
-                window.atOptions = {
-                    'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                };
-
-                const scriptInvoke1 = document.createElement('script');
-                scriptInvoke1.type = 'text/javascript';
-                scriptInvoke1.src = 'https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js';
-
-                headerAdContainer.appendChild(scriptInvoke1);
                 header.appendChild(headerAdContainer);
-                console.log("Slot 1: Header Adsterra dipanggil.");
+
+                // Inject menggunakan metode terisolasi
+                injectAdIsolated(
+                    headerAdContainer, 
+                    'baa0afb18e2e70c00e4c1406e4824e4b', 
+                    320, 
+                    50, 
+                    'https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js'
+                );
+                console.log("Slot 1: Header Adsterra terisolasi disuntikkan.");
             }
         }
 
         // ==========================================================
-        // SLOT 2: BERI JEDA WAKTU (1.5 DETIK) BARU MUAT IKLAN BAWAH (728x90)
+        // SLOT 2: MUAT IKLAN BAWAH (728x90)
         // ==========================================================
         if (CONFIG.enableBottomStickyAd) {
-            // Kita beri jeda 1500ms (1.5 detik) agar iklan pertama selesai dirender oleh Adsterra
-            setTimeout(function() {
-                const bottomAdContainer = document.createElement('div');
-                bottomAdContainer.className = 'bottom-sticky-ad-space';
-                
-                bottomAdContainer.style.position = 'fixed';
-                bottomAdContainer.style.bottom = '0';          
-                bottomAdContainer.style.left = '50%';
-                bottomAdContainer.style.transform = 'translateX(-50%)'; 
-                bottomAdContainer.style.zIndex = '995';         
-                bottomAdContainer.style.width = '100%';         
-                bottomAdContainer.style.maxWidth = '728px';     
-                bottomAdContainer.style.height = '90px';        
-                bottomAdContainer.style.display = 'flex';
-                bottomAdContainer.style.justifyContent = 'center';
-                bottomAdContainer.style.alignItems = 'center';
-                bottomAdContainer.style.backgroundColor = 'rgba(24, 36, 54, 0.9)'; 
-                bottomAdContainer.style.boxShadow = '0 -4px 12px rgba(0,0,0,0.5)'; 
-                bottomAdContainer.style.overflow = 'hidden';
+            const bottomAdContainer = document.createElement('div');
+            bottomAdContainer.className = 'bottom-sticky-ad-space';
+            
+            bottomAdContainer.style.position = 'fixed';
+            bottomAdContainer.style.bottom = '0';          
+            bottomAdContainer.style.left = '50%';
+            bottomAdContainer.style.transform = 'translateX(-50%)'; 
+            bottomAdContainer.style.zIndex = '995';         
+            bottomAdContainer.style.width = '100%';         
+            bottomAdContainer.style.maxWidth = '728px';     
+            bottomAdContainer.style.height = '90px';        
+            bottomAdContainer.style.display = 'flex';
+            bottomAdContainer.style.justifyContent = 'center';
+            bottomAdContainer.style.alignItems = 'center';
+            bottomAdContainer.style.backgroundColor = 'rgba(24, 36, 54, 0.9)'; 
+            bottomAdContainer.style.boxShadow = '0 -4px 12px rgba(0,0,0,0.5)'; 
+            bottomAdContainer.style.overflow = 'hidden';
 
-                // Timpa atOptions secara aman karena iklan pertama sudah selesai dibuat
-                window.atOptions = {
-                    'key' : '64e783bd557c30cbf66293b5c5fda05f',
-                    'format' : 'iframe',
-                    'height' : 90,
-                    'width' : 728,
-                    'params' : {}
-                };
+            document.body.appendChild(bottomAdContainer);
 
-                const scriptInvoke2 = document.createElement('script');
-                scriptInvoke2.type = 'text/javascript';
-                scriptInvoke2.src = 'https://braverybreezebinding.com/64e783bd557c30cbf66293b5c5fda05f/invoke.js';
-
-                bottomAdContainer.appendChild(scriptInvoke2);
-                document.body.appendChild(bottomAdContainer);
-                console.log("Slot 2: Bottom Sticky Adsterra dipanggil setelah jeda.");
-            }, 1500); 
+            // Inject menggunakan metode terisolasi (Tanpa perlu setTimeout lagi!)
+            injectAdIsolated(
+                bottomAdContainer, 
+                '64e783bd557c30cbf66293b5c5fda05f', 
+                728, 
+                90, 
+                'https://braverybreezebinding.com/64e783bd557c30cbf66293b5c5fda05f/invoke.js'
+            );
+            console.log("Slot 2: Bottom Sticky Adsterra terisolasi disuntikkan.");
         }
 
     });
