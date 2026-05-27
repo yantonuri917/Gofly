@@ -85,6 +85,7 @@
         .admin-panel input {
             width: 100%; background-color: #0b131e; border: 1px solid #33445c;
             color: white; padding: 10px; border-radius: 6px; font-size: 14px;
+            outline: none;
         }
 
         .btn-submit {
@@ -163,7 +164,7 @@
         <div class="admin-panel" id="adminFormPanel" style="display: none;">
             <div style="font-size: 13px; color: #24a148; font-weight: bold;"><i class="fa-solid fa-user-shield"></i> Mode Admin Aktif</div>
             <input type="text" id="videoNameInput" placeholder="Masukkan Judul Video">
-            <input type="text" id="videoUrlInput" placeholder="Tempel URL Direct Video (Telegram/Gdrive/dll)">
+            <input type="text" id="videoUrlInput" placeholder="Tempel URL Direct Video (Telegram/Filebin/dll)">
             <button class="btn-submit" onclick="submitNewVideo()">Tambah Video ke Situs</button>
         </div>
 
@@ -176,13 +177,14 @@
 
     <script>
         // =========================================================================
-        // HUBUNGKAN DENGAN API SUPABASE ANDA DI SINI
+        // DATA KREDENSIAL SUPABASE ANDA (SUDAH OTOMATIS TERISI)
         // =========================================================================
-        const SUPABASE_URL = "TEMPEL_PROJECT_URL_DI_SINI"; 
-        const SUPABASE_KEY = "TEMPEL_ANON_KEY_DI_SINI";
+        const SUPABASE_URL = "https://xgmsumukxuwjpzbeuwxl.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
 
         let databaseFiles = [];
 
+        // Deteksi hak akses admin melalui URL (?admin=1)
         const urlParams = new URLSearchParams(window.location.search);
         const isAdmin = urlParams.get('admin') === '1';
 
@@ -194,7 +196,7 @@
             fetchVideosFromDatabase();
         };
 
-        // AMBIL DAFTAR VIDEO DARI DATABASE
+        // AMBIL DAFTAR VIDEO DARI DATABASE SUPABASE
         async function fetchVideosFromDatabase() {
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, {
@@ -212,7 +214,7 @@
             }
         }
 
-        // SIMPAN DATA LINK VIDEO BARU (TANPA BATAS 50MB KARENA BERUPA DATA LINK)
+        // SIMPAN DATA LINK VIDEO BARU KE DATABASE
         async function submitNewVideo() {
             const name = document.getElementById('videoNameInput').value;
             const url = document.getElementById('videoUrlInput').value;
@@ -232,7 +234,7 @@
                     },
                     body: JSON.stringify({
                         name: name,
-                        size: "Unlimited size",
+                        size: "External Storage",
                         cloud_path: "external_link",
                         url: url
                     })
@@ -249,7 +251,7 @@
             }
         }
 
-        // TAMPILKAN FILEROW VIDEO
+        // TAMPILKAN DAFTAR BARIS FILE VIDEO DI HALAMAN
         function renderFileList() {
             const container = document.getElementById('fileListContainer');
             const badge = document.getElementById('totalFilesBadge');
@@ -260,7 +262,7 @@
             summary.innerText = `Total ${databaseFiles.length} item`;
 
             if (databaseFiles.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#798b9e; font-size:14px;">Belum ada video.</div>`;
+                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#798b9e; font-size:14px;"><i class="fa-solid fa-video-slash" style="font-size:32px; display:block; margin-bottom:10px;"></i>Belum ada video di cloud database.</div>`;
                 return;
             }
 
@@ -285,7 +287,7 @@
                         <div class="media-display-area">
                             <div class="preview-box" onclick="handleThumbnailClick(this)">
                                 <div class="click-overlay"></div>
-                                <video preload="metadata" src="${file.url}"></video>
+                                <video preload="metadata" src="${file.url}#t=0.5"></video>
                             </div>
 
                             <div class="inline-actions side-action-box">
@@ -339,9 +341,9 @@
             sideAction.appendChild(actionGroup);
         }
 
-        // HAPUS DATA LINK DARI DATABASE
+        // HAPUS DATA LINK DARI DATABASE (HANYA AKTIF DI MODE ADMIN)
         async function deleteFile(id) {
-            if (!confirm("Hapus video ini dari daftar website?")) return;
+            if (!confirm("Apakah Anda yakin ingin menghapus video ini dari daftar website?")) return;
             try {
                 const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?id=eq.${id}`, {
                     method: 'DELETE',
@@ -350,7 +352,7 @@
                         'apikey': SUPABASE_KEY
                     }
                 });
-                if (!dbRes.ok) throw new Error('Gagal menghapus.');
+                if (!dbRes.ok) throw new Error('Gagal menghapus data dari database.');
                 fetchVideosFromDatabase();
             } catch (error) {
                 alert(error.message);
