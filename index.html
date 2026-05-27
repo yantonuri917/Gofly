@@ -2,53 +2,45 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gofile Interface - Mobile Optimized</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Gofile Interface - Premium Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #182436; color: #f4f6f8; min-height: 100vh; width: 100%; overflow-x: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background-color: #182436; color: #f4f6f8; min-height: 100vh; }
+        main { max-width: 600px; margin: 0 auto; padding: 16px; }
         
-        header { padding: 15px; border-bottom: 1px solid #23334a; display: flex; align-items: center; }
-        main { width: 100%; padding: 15px; max-width: 600px; margin: 0 auto; }
-
         /* Admin Panel */
         .admin-panel { background: #151f2c; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; flex-direction: column; gap: 10px; }
         .admin-panel input { width: 100%; background: #0b131e; border: 1px solid #33445c; color: white; padding: 12px; border-radius: 6px; }
         .btn-submit { background: #24a148; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* File List */
-        .file-row { border-bottom: 1px solid #23334a; padding: 15px 0; }
-        .file-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .file-name { font-size: 14px; font-weight: 600; flex: 1; word-break: break-all; }
+        /* Video List */
+        .file-row { border-bottom: 1px solid #23334a; padding: 16px 0; }
+        .file-name { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
         
-        /* Player Box */
+        /* Thumbnail & Player */
         .preview-box { 
-            width: 100%; height: 200px; background: #000; border-radius: 8px; 
-            position: relative; overflow: hidden; background-size: cover; 
-            background-position: center; display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 220px; background-color: #000; border-radius: 8px; 
+            position: relative; overflow: hidden; cursor: pointer;
+            background-size: cover; background-position: center; 
+            display: flex; align-items: center; justify-content: center;
         }
-        .preview-box iframe, .preview-box video { width: 100%; height: 100%; display: none; }
-        
-        /* Play Button */
-        .play-overlay { position: absolute; cursor: pointer; background: rgba(0,0,0,0.3); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .play-overlay i { font-size: 40px; color: white; background: #1d68d5; padding: 15px 20px; border-radius: 50px; }
+        .preview-box video { width: 100%; height: 100%; display: none; }
+        .play-overlay { font-size: 40px; color: #fff; background: rgba(0,0,0,0.5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: absolute; }
         
         .is-playing .play-overlay { display: none; }
-        .is-playing iframe, .is-playing video { display: block; }
-        
-        footer { padding: 20px; text-align: center; font-size: 11px; color: #58697d; }
+        .is-playing video { display: block; }
+        .is-playing .preview-box { cursor: default; }
     </style>
 </head>
 <body>
 
-    <header><button class="menu-btn"><i class="fa-solid fa-bars"></i></button></header>
-
     <main>
         <div class="admin-panel" id="adminFormPanel">
             <input type="text" id="videoNameInput" placeholder="Judul Video">
-            <input type="text" id="videoUrlInput" placeholder="URL Video / Link Embed">
-            <input type="text" id="videoPosterInput" placeholder="URL Gambar Thumbnail">
+            <input type="text" id="videoUrlInput" placeholder="URL Video">
+            <input type="text" id="videoPosterInput" placeholder="URL Thumbnail (Gambar)">
             <button class="btn-submit" onclick="submitNewVideo()">Tambah Video</button>
         </div>
 
@@ -71,13 +63,13 @@
             container.innerHTML = '';
             
             data.forEach(f => {
-                const isEmbed = f.url.includes('playmogo') || f.url.includes('dood');
+                const posterStyle = f.poster_url ? `style="background-image: url('${f.poster_url}')"` : '';
                 container.innerHTML += `
-                    <div class="file-row" id="row-${f.id}">
-                        <div class="file-info"><div class="file-name">${f.name}</div></div>
-                        <div class="preview-box" style="background-image: url('${f.poster_url}')">
-                            ${isEmbed ? `<iframe src="${f.url}" allowfullscreen></iframe>` : `<video src="${f.url}"></video>`}
-                            <div class="play-overlay" onclick="this.parentElement.classList.add('is-playing')"><i class="fa-solid fa-play"></i></div>
+                    <div class="file-row">
+                        <div class="file-name">${f.name}</div>
+                        <div class="preview-box" ${posterStyle} onclick="this.classList.add('is-playing'); this.querySelector('video').play();">
+                            <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
+                            <video src="${f.url}" controls></video>
                         </div>
                     </div>
                 `;
@@ -85,7 +77,11 @@
         }
 
         async function submitNewVideo() {
-            const body = { name: document.getElementById('videoNameInput').value, url: document.getElementById('videoUrlInput').value, poster_url: document.getElementById('videoPosterInput').value };
+            const body = { 
+                name: document.getElementById('videoNameInput').value, 
+                url: document.getElementById('videoUrlInput').value, 
+                poster_url: document.getElementById('videoPosterInput').value 
+            };
             await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
                 method: 'POST',
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
