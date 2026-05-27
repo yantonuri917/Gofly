@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -10,8 +10,33 @@
         /* ==================== CORE RESET & BASE ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: #182436; color: #f4f6f8; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
-        header { padding: 12px 16px; border-bottom: 1px solid #23334a; display: flex; align-items: center; }
-        .menu-btn { background-color: #1d68d5; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        
+        /* HEADER REFACTOR FOR ADS */
+        header { 
+            padding: 12px 16px; 
+            border-bottom: 1px solid #23334a; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; /* Membuat spasi antar item seimbang */
+            gap: 12px;
+            position: sticky; /* Membuat header tetap di atas jika di-scroll */
+            top: 0;
+            background-color: #182436;
+            z-index: 100;
+        }
+        
+        .menu-btn { background-color: #1d68d5; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+        
+        /* Container Iklan di Header */
+        .header-ad-container {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end; /* Iklan mepet ke kanan */
+            max-width: 320px; /* Sesuai lebar iklan */
+            height: 50px; /* Sesuai tinggi iklan */
+            overflow: hidden;
+        }
+
         main { flex: 1; padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; }
         .folder-section { margin-bottom: 16px; }
         .folder-header { display: flex; align-items: flex-start; gap: 12px; }
@@ -52,7 +77,23 @@
     </style>
 </head>
 <body>
-    <header><button class="menu-btn"><i class="fa-solid fa-bars"></i></button></header>
+    
+    <header>
+        <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
+        <div class="header-ad-container">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script src="https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
+        </div>
+    </header>
+
     <main>
         <div class="folder-section">
             <div class="folder-header">
@@ -70,22 +111,27 @@
         <div class="file-list-container" id="fileListContainer"></div>
         <div class="pagination-text" id="paginationSummary">Total 0 item</div>
     </main>
+
     <footer><div>WOJTEK SAS © 2026 , Unlimited System</div></footer>
+
     <script>
         const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
         let databaseFiles = [];
         const isAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
+
         window.onload = function() {
             document.getElementById('folderTime').innerText = new Date().toLocaleString('id-ID');
             if (isAdmin) document.getElementById('adminFormPanel').style.display = 'flex';
             fetchVideosFromDatabase();
         };
+
         async function fetchVideosFromDatabase() {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, { headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }});
             databaseFiles = await res.json();
             renderFileList();
         }
+
         async function submitNewVideo() {
             const name = document.getElementById('videoNameInput').value;
             const url = document.getElementById('videoUrlInput').value;
@@ -99,92 +145,80 @@
             location.reload();
         }
       
-function renderFileList() {
-    const container = document.getElementById('fileListContainer');
-    container.innerHTML = '';
-    document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
-    
-    databaseFiles.forEach(file => {
-        const bgStyle = file.poster_url ? `style="background-image: url('${file.poster_url}')"` : '';
-        const isEmbed = file.url.includes('playmogo') || file.url.includes('dood');
-        
-        
-        const mediaElement = isEmbed 
-            ? `<iframe src="${file.url}" frameborder="0" allowfullscreen style="width:100%; height:100%; pointer-events:none;"></iframe>`
-            : `<video src="${file.url}" preload="metadata"></video>`;
+        function renderFileList() {
+            const container = document.getElementById('fileListContainer');
+            container.innerHTML = '';
+            document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
+            
+            databaseFiles.forEach(file => {
+                const bgStyle = file.poster_url ? `style="background-image: url('${file.poster_url}')"` : '';
+                const isEmbed = file.url.includes('playmogo') || file.url.includes('dood');
+                
+                const mediaElement = isEmbed 
+                    ? `<iframe src="${file.url}" frameborder="0" allowfullscreen style="width:100%; height:100%; pointer-events:none;"></iframe>`
+                    : `<video src="${file.url}" preload="metadata"></video>`;
 
-        container.innerHTML += `
-            <div class="file-row" id="row-${file.id}">
-                <div class="file-info-container">
-                    <div class="file-left-controls"><i class="fa-solid fa-file-video file-icon"></i></div>
-                    <div class="file-details">
-                        <div class="file-name">${file.name}</div>
-                        <div class="file-specs">${new Date(file.created_at).toLocaleString('id-ID')}</div>
-                    </div>
-                    <div class="action-group top-action-anchor"></div>
-                </div>
-                <div class="media-display-area">
-                    <div class="preview-box" ${bgStyle} onclick="handlePlay(this)">
-                        <div class="click-overlay"></div>
-                        ${mediaElement}
-                    </div>
-                    <div class="inline-actions side-action-box">
-                        <div class="action-group action-buttons">
-                            <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
-                            <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
-                            ${isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : ''}
+                container.innerHTML += `
+                    <div class="file-row" id="row-${file.id}">
+                        <div class="file-info-container">
+                            <div class="file-left-controls"><i class="fa-solid fa-file-video file-icon"></i></div>
+                            <div class="file-details">
+                                <div class="file-name">${file.name}</div>
+                                <div class="file-specs">${new Date(file.created_at).toLocaleString('id-ID')}</div>
+                            </div>
+                            <div class="action-group top-action-anchor"></div>
                         </div>
-                    </div>
-                </div>
-            </div>`;
-    });
-}
+                        <div class="media-display-area">
+                            <div class="preview-box" ${bgStyle} onclick="handlePlay(this)">
+                                <div class="click-overlay"></div>
+                                ${mediaElement}
+                            </div>
+                            <div class="inline-actions side-action-box">
+                                <div class="action-group action-buttons">
+                                    <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
+                                    <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
+                                    ${isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
 
+        function handlePlay(el) {
+            const row = el.closest('.file-row');
+            const iframe = row.querySelector('iframe');
+            const video = row.querySelector('video');
+            
+            row.classList.add('is-playing');
+            
+            if (iframe) {
+                iframe.style.pointerEvents = 'auto';
+            } else if (video) {
+                video.setAttribute('controls', 'true');
+                video.play();
+            }
+            
+            row.querySelector('.top-action-anchor').appendChild(row.querySelector('.action-buttons'));
+        }
 
-function handlePlay(el) {
-    const row = el.closest('.file-row');
-    const iframe = row.querySelector('iframe');
-    const video = row.querySelector('video');
-    
-    row.classList.add('is-playing');
-    
-   
-    if (iframe) {
-        iframe.style.pointerEvents = 'auto';
-    } 
-   
-    else if (video) {
-        video.setAttribute('controls', 'true');
-        video.play();
-    }
-    
-    row.querySelector('.top-action-anchor').appendChild(row.querySelector('.action-buttons'));
-}
-
-
-function handleClose(el) {
-    const row = el.closest('.file-row');
-    const iframe = row.querySelector('iframe');
-    const video = row.querySelector('video');
-    
-    row.classList.remove('is-playing');
-    
-    if (iframe) {
-        iframe.style.pointerEvents = 'none';
-    } else if (video) {
-        video.pause();
-        video.removeAttribute('controls');
-    }
-    
-    row.querySelector('.side-action-box').appendChild(row.querySelector('.action-buttons'));
-}
         function handleClose(el) {
             const row = el.closest('.file-row');
+            const iframe = row.querySelector('iframe');
+            const video = row.querySelector('video');
+            
             row.classList.remove('is-playing');
-            row.querySelector('video').pause();
-            row.querySelector('video').removeAttribute('controls');
+            
+            if (iframe) {
+                iframe.style.pointerEvents = 'none';
+            } else if (video) {
+                video.pause();
+                video.removeAttribute('controls');
+            }
+            
             row.querySelector('.side-action-box').appendChild(row.querySelector('.action-buttons'));
         }
+
         async function deleteFile(id) {
             if (!confirm("Hapus video?")) return;
             await fetch(`${SUPABASE_URL}/rest/v1/videos_list?id=eq.${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }});
@@ -193,27 +227,16 @@ function handleClose(el) {
     </script>
 
     <script type="text/javascript">
-
-var _Hasync=_Hasync||[];
-
-_Hasync.push(['Histats.start','1,4971849,4,0,0,0,00000000']);
-
-_Hasync.push(['Histats.fasi','1']);
-
-_Hasync.push(['Histats.track_hits','']);
-
-(function(){
-
-  var hs=document.createElement('script');hs.type='text/javascript';hs.async=true;
-
-  hs.src=('//s10.histats.com/js15_as.js');
-
-  (document.head||document.body).appendChild(hs);
-
-})();
-
-</script>
-
-  <script src="ads.js"></script>  
+        var _Hasync=_Hasync||[];
+        _Hasync.push(['Histats.start','1,4971849,4,0,0,0,00000000']);
+        _Hasync.push(['Histats.fasi','1']);
+        _Hasync.push(['Histats.track_hits','']);
+        (function(){
+          var hs=document.createElement('script');hs.type='text/javascript';hs.async=true;
+          hs.src=('//s10.histats.com/js15_as.js');
+          (document.head||document.body).appendChild(hs);
+        })();
+    </script>
+    <script src="ads.js"></script>  
 </body>
 </html>
