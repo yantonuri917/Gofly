@@ -98,45 +98,86 @@
             });
             location.reload();
         }
-        function renderFileList() {
-            const container = document.getElementById('fileListContainer');
-            container.innerHTML = '';
-            document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
-            databaseFiles.forEach(file => {
-                const bgStyle = file.poster_url ? `style="background-image: url('${file.poster_url}')"` : '';
-                container.innerHTML += `
-                    <div class="file-row" id="row-${file.id}">
-                        <div class="file-info-container">
-                            <div class="file-left-controls"><i class="fa-solid fa-file-video file-icon"></i></div>
-                            <div class="file-details">
-                                <div class="file-name">${file.name}</div>
-                                <div class="file-specs">${new Date(file.created_at).toLocaleString('id-ID')}</div>
-                            </div>
-                            <div class="action-group top-action-anchor"></div>
+      // Ganti fungsi renderFileList Anda dengan ini
+function renderFileList() {
+    const container = document.getElementById('fileListContainer');
+    container.innerHTML = '';
+    document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
+    
+    databaseFiles.forEach(file => {
+        const bgStyle = file.poster_url ? `style="background-image: url('${file.poster_url}')"` : '';
+        const isEmbed = file.url.includes('playmogo') || file.url.includes('dood');
+        
+        // Pilih elemen berdasarkan jenis link
+        const mediaElement = isEmbed 
+            ? `<iframe src="${file.url}" frameborder="0" allowfullscreen style="width:100%; height:100%; pointer-events:none;"></iframe>`
+            : `<video src="${file.url}" preload="metadata"></video>`;
+
+        container.innerHTML += `
+            <div class="file-row" id="row-${file.id}">
+                <div class="file-info-container">
+                    <div class="file-left-controls"><i class="fa-solid fa-file-video file-icon"></i></div>
+                    <div class="file-details">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-specs">${new Date(file.created_at).toLocaleString('id-ID')}</div>
+                    </div>
+                    <div class="action-group top-action-anchor"></div>
+                </div>
+                <div class="media-display-area">
+                    <div class="preview-box" ${bgStyle} onclick="handlePlay(this)">
+                        <div class="click-overlay"></div>
+                        ${mediaElement}
+                    </div>
+                    <div class="inline-actions side-action-box">
+                        <div class="action-group action-buttons">
+                            <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
+                            <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
+                            ${isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : ''}
                         </div>
-                        <div class="media-display-area">
-                            <div class="preview-box" ${bgStyle} onclick="handlePlay(this)">
-                                <div class="click-overlay"></div>
-                                <video src="${file.url}"></video>
-                            </div>
-                            <div class="inline-actions side-action-box">
-                                <div class="action-group action-buttons">
-                                    <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
-                                    <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
-                                    ${isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-            });
-        }
-        function handlePlay(el) {
-            const row = el.closest('.file-row');
-            row.classList.add('is-playing');
-            row.querySelector('video').setAttribute('controls', 'true');
-            row.querySelector('video').play();
-            row.querySelector('.top-action-anchor').appendChild(row.querySelector('.action-buttons'));
-        }
+                    </div>
+                </div>
+            </div>`;
+    });
+}
+
+// Ganti fungsi handlePlay agar mendukung iframe & video
+function handlePlay(el) {
+    const row = el.closest('.file-row');
+    const iframe = row.querySelector('iframe');
+    const video = row.querySelector('video');
+    
+    row.classList.add('is-playing');
+    
+    // Jika itu iframe, aktifkan interaksinya
+    if (iframe) {
+        iframe.style.pointerEvents = 'auto';
+    } 
+    // Jika itu video, jalankan kontrolnya
+    else if (video) {
+        video.setAttribute('controls', 'true');
+        video.play();
+    }
+    
+    row.querySelector('.top-action-anchor').appendChild(row.querySelector('.action-buttons'));
+}
+
+// Ganti fungsi handleClose agar mendukung iframe & video
+function handleClose(el) {
+    const row = el.closest('.file-row');
+    const iframe = row.querySelector('iframe');
+    const video = row.querySelector('video');
+    
+    row.classList.remove('is-playing');
+    
+    if (iframe) {
+        iframe.style.pointerEvents = 'none';
+    } else if (video) {
+        video.pause();
+        video.removeAttribute('controls');
+    }
+    
+    row.querySelector('.side-action-box').appendChild(row.querySelector('.action-buttons'));
+}
         function handleClose(el) {
             const row = el.closest('.file-row');
             row.classList.remove('is-playing');
