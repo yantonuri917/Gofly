@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gofile Interface - Clean Layout</title>
+    <title>Gofile Interface - Public Video List</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ==================== CORE RESET & BASE ==================== */
@@ -24,21 +24,11 @@
             position: relative;
         }
 
-   /* Navbar Atas - Dibuat FIXED STICKY di atas layar */
         header {
-            position: fixed; /* Membuat header terkunci melayang */
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #182436; /* Biar konten di bawahnya tidak tembus pandang */
-            padding: 8px 16px;
+            padding: 12px 16px;
             border-bottom: 1px solid #23334a;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            min-height: 66px;
-            gap: 12px;
-            z-index: 990; /* Berada di bawah z-index sidebar (1000) agar tidak balapan */
         }
 
         .menu-btn {
@@ -49,12 +39,9 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            flex-shrink: 0;
         }
 
-      
-
-        /* ==================== SIDEBAR MENU (OVERLAY SLIDE) ==================== */
+        /* ==================== SIDEBAR MENU ==================== */
         .sidebar {
             position: fixed;
             top: 0;
@@ -68,9 +55,7 @@
             box-shadow: 4px 0 15px rgba(0,0,0,0.3);
         }
 
-        .sidebar.is-open {
-            left: 0;
-        }
+        .sidebar.is-open { left: 0; }
 
         .sidebar-overlay {
             position: fixed;
@@ -83,9 +68,7 @@
             display: none;
         }
 
-        .sidebar-overlay.is-visible {
-            display: block;
-        }
+        .sidebar-overlay.is-visible { display: block; }
 
         .sidebar-header {
             display: flex;
@@ -103,10 +86,7 @@
             color: white;
         }
 
-        .brand i {
-            color: #f1b418;
-            font-size: 24px;
-        }
+        .brand i { color: #f1b418; font-size: 24px; }
 
         .close-sidebar-btn {
             background: #23334a;
@@ -119,91 +99,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-        }
-
-        .user-box {
-            background-color: #1e293b;
-            border: 1px solid #3b82f6;
-            border-radius: 6px;
-            padding: 10px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            color: #f4f6f8;
-        }
-
-        .user-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
-            background: #e11d48;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .btn-add-account {
-            width: 100%;
-            background-color: #1d68d5;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .sidebar-menu li a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            color: #a2b0c3;
-            text-decoration: none;
-            padding: 12px 8px;
-            font-size: 15px;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-
-        .sidebar-menu li a:hover {
-            background-color: #1e293b;
-            color: white;
-        }
-
-        .sidebar-menu li a i {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar-divider {
-            height: 1px;
-            background-color: #23334a;
-            margin: 16px 0;
         }
 
         /* ==================== MAIN KONTEN UTAMA ==================== */
@@ -215,17 +110,9 @@
             width: 100%;
         }
 
-        /* Kustomisasi Ikon Folder Gofile */
-        .folder-section {
-            margin-bottom: 16px;
-        }
-
-        .folder-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
+        .folder-section { margin-bottom: 16px; }
+        .folder-header { display: flex; align-items: flex-start; gap: 12px; }
+        
         .folder-icon-container {
             position: relative;
             display: inline-flex;
@@ -233,272 +120,93 @@
             justify-content: center;
         }
 
-        .folder-icon-container .fa-folder {
-            font-size: 46px;
-            color: #f3b007;
-            position: relative;
-        }
-
-        /* Efek Lubang Segitiga di Tengah Folder */
+        .folder-icon-container .fa-folder { font-size: 46px; color: #f3b007; }
         .folder-icon-container::after {
-            content: "";
-            position: absolute;
-            top: 52%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 0;
-            height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
+            content: ""; position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%);
+            width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent;
             border-bottom: 10px solid #182436;
-            pointer-events: none;
         }
 
-        /* Lencana Angka di Kanan Bawah */
         .folder-badge {
-            position: absolute;
-            bottom: -2px;
-            right: -4px;
-            background-color: #475971;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 1px 6px;
-            border-radius: 10px;
-            border: 2px solid #182436;
-            z-index: 2;
+            position: absolute; bottom: -2px; right: -4px; background-color: #475971;
+            color: white; font-size: 11px; font-weight: bold; padding: 1px 6px;
+            border-radius: 10px; border: 2px solid #182436; z-index: 2;
         }
 
-        .folder-meta h2 {
-            font-size: 16px;
-            font-weight: 600;
-        }
+        .folder-meta h2 { font-size: 16px; font-weight: 600; }
+        .folder-meta p { font-size: 12px; color: #798b9e; margin-top: 2px; }
 
-        .folder-meta p {
-            font-size: 12px;
-            color: #798b9e;
-            margin-top: 2px;
-        }
-
-        .btn-ellipsis-small {
-            background: #23334a;
-            border: none;
-            color: #a2b0c3;
-            padding: 2px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-top: 6px;
-        }
-
-        /* Toolbar Menu Alat */
+        /* Toolbar & Upload Input Hidden */
         .main-toolbar {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            border-bottom: 1px solid #23334a;
-            padding-bottom: 16px;
-            margin-bottom: 16px;
-        }
-
-        .main-checkbox {
-            width: 18px;
-            height: 18px;
-            accent-color: #1d68d5;
-            margin-right: 8px;
+            display: flex; gap: 8px; align-items: center;
+            border-bottom: 1px solid #23334a; padding-bottom: 16px; margin-bottom: 16px;
         }
 
         .btn-tool {
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
+            color: white; border: none; padding: 8px 12px; border-radius: 4px;
+            cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
         }
-
-        .btn-tool.green { background-color: #24a148; }
         .btn-tool.blue { background-color: #1d68d5; }
-        .btn-tool.gray { background-color: #2b3a4e; color: #a2b0c3; }
 
-        .toolbar-split {
-            display: flex;
-            background-color: #2b3a4e;
-            border-radius: 4px;
-            overflow: hidden;
+        /* Status Loading Bar */
+        .upload-progress-container {
+            background-color: #151f2c; border: 1px solid #23334a;
+            border-radius: 6px; padding: 12px; margin-bottom: 16px; display: none;
+        }
+        .progress-bar-bg {
+            background-color: #23334a; width: 100%; height: 8px;
+            border-radius: 4px; overflow: hidden; margin-top: 8px;
+        }
+        .progress-bar-fill {
+            background-color: #24a148; width: 0%; height: 100%; transition: width 0.2s;
         }
 
-        .toolbar-split button {
-            background: transparent;
-            color: #a2b0c3;
-            border: none;
-            padding: 8px 10px;
-            cursor: pointer;
-        }
+        /* ==================== FILE ROW DATA ==================== */
+        .file-list-container { display: flex; flex-direction: column; }
 
-        /* ==================== STRUKTUR ROW FILE DATA ==================== */
         .file-row {
-            display: flex;
-            flex-direction: column;
-            border-bottom: 1px solid #23334a;
-            padding-bottom: 16px;
-            margin-bottom: 16px;
+            display: flex; flex-direction: column;
+            border-bottom: 1px solid #23334a; padding-bottom: 16px; margin-bottom: 16px;
         }
 
-        .file-info-container {
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-            position: relative;
-        }
+        .file-info-container { display: flex; gap: 12px; align-items: flex-start; }
+        .file-left-controls { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 4px; }
+        .file-icon { font-size: 20px; color: #4b8bf4; }
+        .file-details { flex: 1; }
+        .file-name { font-size: 14px; font-weight: 600; color: #f4f6f8; margin-bottom: 4px; word-break: break-all; }
+        .file-specs { font-size: 12px; color: #798b9e; }
 
-        .file-left-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            padding-top: 4px;
+        .media-display-area { margin-top: 12px; margin-left: 28px; display: flex; }
+        
+        .preview-box {
+            width: 180px; height: 120px; background-color: #0b131e;
+            border-radius: 4px; overflow: hidden; display: flex;
+            align-items: center; justify-content: center; cursor: pointer; position: relative;
         }
+        .preview-box video { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+        .preview-box .click-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
 
-        .file-checkbox {
-            width: 16px;
-            height: 16px;
-            accent-color: #1d68d5;
-        }
-
-        .file-icon {
-            font-size: 20px;
-            color: #4b8bf4;
-        }
-
-        .file-details {
-            flex: 1;
-        }
-
-        .file-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #f4f6f8;
-            margin-bottom: 4px;
-        }
-
-        .file-specs {
-            font-size: 12px;
-            color: #798b9e;
-            line-height: 1.4;
-        }
-
-        .action-group {
-            display: flex;
-            gap: 6px;
-            align-self: flex-start;
-        }
-
+        .inline-actions { display: flex; align-items: flex-start; margin-left: 12px; }
+        .action-group { display: flex; gap: 6px; align-self: flex-start; }
+        
         .btn-action {
-            background-color: transparent;
-            color: #a2b0c3;
-            border: 1px solid #33445c;
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
+            background-color: transparent; color: #a2b0c3; border: 1px solid #33445c;
+            width: 32px; height: 32px; border-radius: 4px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 12px;
         }
-
-        .btn-action:hover {
-            background-color: #23334a;
-        }
-
         .btn-action.close-trigger { display: none; }
 
-        .media-display-area {
-            margin-top: 12px;
-            margin-left: 28px;
-            display: flex;
-        }
-
-        .preview-box {
-            width: 180px;
-            max-height: 240px;
-            background-color: #0b131e;
-            border-radius: 4px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .preview-box video {
-            width: 100%;
-            height: auto;
-            max-height: 100%;
-            object-fit: contain;
-            background-color: #050a12;
-        }
-
-        .inline-actions {
-            display: flex;
-            align-items: flex-start;
-            margin-left: 12px;
-        }
-
-        /* ==================== STATE AKTIF PLAYING VIDEO ==================== */
-        .file-row.is-playing .inline-actions {
-            display: none;
-        }
-
+        /* PLAYING STATE */
+        .file-row.is-playing .inline-actions { display: none; }
+        .file-row.is-playing .preview-box .click-overlay { display: none; }
         .file-row.is-playing .btn-action.play-trigger { display: none; }
         .file-row.is-playing .btn-action.close-trigger { display: flex; }
+        .file-row.is-playing .media-display-area { margin-left: 0; width: 100%; }
+        .file-row.is-playing .preview-box { width: 100%; height: 320px; cursor: default; }
+        .file-row.is-playing .preview-box video { pointer-events: auto; }
 
-        .file-row.is-playing .media-display-area {
-            margin-left: 0;
-            width: 100%;
-        }
-
-        .file-row.is-playing .preview-box {
-            width: 100%;
-            max-height: 500px;
-            cursor: default;
-        }
-
-        .file-row.is-playing .preview-box video {
-            max-height: 500px;
-        }
-
-        /* Footer & Pagination */
-        .pagination-text {
-            text-align: center;
-            font-size: 12px;
-            color: #798b9e;
-            line-height: 1.5;
-            margin: 24px 0;
-        }
-
-        footer {
-            border-top: 1px solid #23334a;
-            padding: 24px 16px;
-            text-align: center;
-            font-size: 12px;
-            color: #58697d;
-        }
-
-        footer nav {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 12px;
-        }
-
-        footer nav a {
-            color: #798b9e;
-            text-decoration: none;
-        }
-
-        .heart { color: #e14d4d; }
+        .pagination-text { text-align: center; font-size: 12px; color: #798b9e; margin: 24px 0; }
+        footer { border-top: 1px solid #23334a; padding: 24px 16px; text-align: center; font-size: 12px; color: #58697d; }
     </style>
 </head>
 <body>
@@ -507,34 +215,11 @@
 
     <aside class="sidebar" id="sidebarMenu">
         <div class="sidebar-header">
-            <div class="brand">
-                <i class="fa-solid fa-folder-open"></i> Gofile
-            </div>
-            <button class="close-sidebar-btn" onclick="toggleSidebar()">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
+            <div class="brand"><i class="fa-solid fa-folder-open"></i> Gofile</div>
+            <button class="close-sidebar-btn" onclick="toggleSidebar()"><i class="fa-solid fa-chevron-left"></i></button>
         </div>
-
-        <div class="user-box">
-            <div class="user-info">
-                <div class="user-avatar">G</div>
-                <span>guest0818209611</span>
-            </div>
-            <i class="fa-solid fa-chevron-down" style="color: #a2b0c3; font-size: 12px;"></i>
-        </div>
-
-        <button class="btn-add-account">
-            <i class="fa-solid fa-plus"></i> Add Account
-        </button>
-
-        <ul class="sidebar-menu">
-            <li><a href="#"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li><a href="#"><i class="fa-solid fa-crown" style="color: #f1b418;"></i> Premium</a></li>
-            <li><a href="#"><i class="fa-solid fa-gear"></i> API</a></li>
-            <li><a href="#"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
-            <li><a href="#"><i class="fa-solid fa-envelope"></i> Contact</a></li>
-            <div class="sidebar-divider"></div>
-            <li><a href="#"><i class="fa-brands fa-x-twitter"></i> @gofile_io</a></li>
+        <ul class="sidebar-menu" style="list-style:none; padding-top:20px;">
+            <li><a href="#" style="color:#a2b0c3; text-decoration:none;"><i class="fa-solid fa-house"></i> Home</a></li>
         </ul>
     </aside>
 
@@ -547,242 +232,291 @@
             <div class="folder-header">
                 <div class="folder-icon-container">
                     <i class="fa-solid fa-folder"></i>
-                    <span class="folder-badge">2</span>
+                    <span class="folder-badge" id="totalFilesBadge">0</span>
                 </div>
                 <div class="folder-meta">
-                    <h2>root</h2>
-                    <p>24/5/2026, 01.59.12</p>
-                    <button class="btn-ellipsis-small"><i class="fa-solid fa-ellipsis"></i></button>
+                    <h2>Cloud Storage</h2>
+                    <p id="folderTime">Mengambil data...</p>
                 </div>
             </div>
         </div>
 
-        <div class="main-toolbar">
-            <input type="checkbox" class="main-checkbox">
-            <button class="btn-tool green"><i class="fa-solid fa-share-nodes"></i></button>
-            <button class="btn-tool blue"><i class="fa-solid fa-folder-plus"></i></button>
-            <button class="btn-tool blue"><i class="fa-solid fa-upload"></i></button>
-            <div class="toolbar-split">
-                <button><i class="fa-solid fa-arrows-up-down"></i></button>
-                <button><i class="fa-solid fa-caret-down"></i></button>
-            </div>
-            <button class="btn-tool gray"><i class="fa-solid fa-filter"></i></button>
-            <button class="btn-tool gray"><i class="fa-solid fa-magnifying-glass"></i></button>
-            <button class="btn-tool gray"><i class="fa-solid fa-rotate"></i></button>
+        <div class="main-toolbar" id="adminToolbar" style="display: none;">
+            <input type="file" id="hiddenFileInput" accept="video/*" style="display: none;" onchange="handleFileUpload(this)">
+            <button class="btn-tool blue" onclick="triggerFileInput()"><i class="fa-solid fa-upload"></i>&nbsp; Upload Video</button>
         </div>
 
-
-        <div class="file-row">
-            <div class="file-info-container">
-                <div class="file-left-controls">
-                    <input type="checkbox" class="file-checkbox">
-                    <i class="fa-solid fa-file-video file-icon"></i>
-                </div>
-                
-                <div class="file-details">
-                    <div class="file-name" data-short="EPORNER.COM - [LCK7..." data-full="EPORNER.COM - [LCK7m_Vertical_Full_Name].mp4">EPORNER.COM - [LCK7m_Vertical_Full_Name].mp4</div>
-                    <div class="file-specs">24/5/2026, 02.00.54 • 43.0 MB • 0 downloads</div>
-                </div>
-
-                <div class="action-group top-action-anchor"></div>
+        <div class="upload-progress-container" id="uploadProgressBox">
+            <div style="display:flex; justify-content:space-between; font-size:12px;">
+                <span id="uploadStatusText">Mengunggah video ke cloud...</span>
+                <span id="uploadPercentText">0%</span>
             </div>
-
-            <div class="media-display-area">
-                <div class="preview-box" data-video="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-inline-skating-43224-large.mp4" onclick="handleThumbnailClick(this)">
-                    <video preload="metadata">
-                        <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-inline-skating-43224-large.mp4#t=0.5" type="video/mp4">
-                    </video>
-                </div>
-
-                <div class="inline-actions side-action-box">
-                    <div class="action-group action-buttons">
-                        <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
-                        <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
-                        <button class="btn-action"><i class="fa-solid fa-download"></i></button>
-                        <button class="btn-action"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                    </div>
-                </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
             </div>
         </div>
 
+        <div class="file-list-container" id="fileListContainer"></div>
 
-        <div class="file-row">
-            <div class="file-info-container">
-                <div class="file-left-controls">
-                    <input type="checkbox" class="file-checkbox">
-                    <i class="fa-solid fa-file-video file-icon"></i>
-                </div>
-                
-                <div class="file-details">
-                    <div class="file-name" data-short="SAMPLE_LANDSCAPE - [AB..." data-full="SAMPLE_LANDSCAPE - [AB88_Horizontal_Full_Name].mp4">SAMPLE_LANDSCAPE - [AB88_Horizontal_Full_Name].mp4</div>
-                    <div class="file-specs">24/5/2026, 02.05.10 • 15.4 MB • 12 downloads</div>
-                </div>
-
-                <div class="action-group top-action-anchor"></div>
-            </div>
-
-            <div class="media-display-area">
-                <div class="preview-box" data-video="https://www.w3schools.com/html/mov_bbb.mp4" onclick="handleThumbnailClick(this)">
-                    <video preload="metadata">
-                        <source src="https://www.w3schools.com/html/mov_bbb.mp4#t=0.5" type="video/mp4">
-                    </video>
-                </div>
-
-                <div class="inline-actions side-action-box">
-                    <div class="action-group action-buttons">
-                        <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
-                        <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
-                        <button class="btn-action"><i class="fa-solid fa-download"></i></button>
-                        <button class="btn-action"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-     <div class="file-row">
-            <div class="file-info-container">
-                <div class="file-left-controls">
-                    <input type="checkbox" class="file-checkbox">
-                    <i class="fa-solid fa-file-video file-icon"></i>
-                </div>
-                
-                <div class="file-details">
-                    <div class="file-name" data-short="EPORNER.COM - [LCK7..." data-full="EPORNER.COM - [LCK7m_Vertical_Full_Name].mp4">EPORNER.COM - [LCK7m_Vertical_Full_Name].mp4</div>
-                    <div class="file-specs">24/5/2026, 02.00.54 • 43.0 MB • 0 downloads</div>
-                </div>
-
-                <div class="action-group top-action-anchor"></div>
-            </div>
-
-            <div class="media-display-area">
-                <div class="preview-box" data-video="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-inline-skating-43224-large.mp4" onclick="handleThumbnailClick(this)">
-                    <video preload="metadata">
-                        <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-inline-skating-43224-large.mp4#t=0.5" type="video/mp4">
-                    </video>
-                </div>
-
-                <div class="inline-actions side-action-box">
-                    <div class="action-group action-buttons">
-                        <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
-                        <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
-                        <button class="btn-action"><i class="fa-solid fa-download"></i></button>
-                        <button class="btn-action"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="file-row">
-            <div class="file-info-container">
-                <div class="file-left-controls">
-                    <input type="checkbox" class="file-checkbox">
-                    <i class="fa-solid fa-file-video file-icon"></i>
-                </div>
-                
-                <div class="file-details">
-                    <div class="file-name" data-short="SAMPLE_LANDSCAPE - [AB..." data-full="SAMPLE_LANDSCAPE - [AB88_Horizontal_Full_Name].mp4">SAMPLE_LANDSCAPE - [AB88_Horizontal_Full_Name].mp4</div>
-                    <div class="file-specs">24/5/2026, 02.05.10 • 15.4 MB • 12 downloads</div>
-                </div>
-
-                <div class="action-group top-action-anchor"></div>
-            </div>
-
-            <div class="media-display-area">
-                <div class="preview-box" data-video="https://www.w3schools.com/html/mov_bbb.mp4" onclick="handleThumbnailClick(this)">
-                    <video preload="metadata">
-                        <source src="https://www.w3schools.com/html/mov_bbb.mp4#t=0.5" type="video/mp4">
-                    </video>
-                </div>
-
-                <div class="inline-actions side-action-box">
-                    <div class="action-group action-buttons">
-                        <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
-                        <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
-                        <button class="btn-action"><i class="fa-solid fa-download"></i></button>
-                        <button class="btn-action"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="pagination-text">
-            Showing 1000 items per page<br>
-            Total 2 items
-        </div>
+        <div class="pagination-text" id="paginationSummary">Total 0 item</div>
     </main>
 
-    <footer>
-        <nav>
-            <a href="#">Home</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Copyright</a>
-            <a href="#">Contact</a>
-        </nav>
-        <div>WOJTEK SAS © 2026 , made with <span class="heart">❤</span> by Gofile Team</div>
-    </footer>
+    <footer><div>WOJTEK SAS © 2026 , Gofile Automatic System</div></footer>
 
     <script>
-        // MANAJEMEN SIDEBAR MENU SYSTEM
+        // =========================================================================
+        // HUBUNGKAN DENGAN API SUPABASE ANDA DI SINI
+        // =========================================================================
+        const SUPABASE_URL = "TEMPEL_PROJECT_URL_DI_SINI"; 
+        const SUPABASE_KEY = "TEMPEL_ANON_KEY_DI_SINI";
+        const BUCKET_NAME = "video"; 
+
+        let databaseFiles = [];
+
+        // Cek apakah Anda yang membuka sebagai Admin (?admin=1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdmin = urlParams.get('admin') === '1';
+
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebarMenu');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            sidebar.classList.toggle('is-open');
-            overlay.classList.toggle('is-visible');
+            document.getElementById('sidebarMenu').classList.toggle('is-open');
+            document.getElementById('sidebarOverlay').classList.toggle('is-visible');
         }
 
-        // MANAJEMEN MULTIPLE FILE AUDIO-VIDEO SYSTEM
-        function getFileRowScope(element) {
-            return element.closest('.file-row');
+        function triggerFileInput() {
+            document.getElementById('hiddenFileInput').click();
         }
+
+        window.onload = function() {
+            document.getElementById('folderTime').innerText = new Date().toLocaleString('id-ID');
+            
+            // Jika Anda yang buka lewat link khusus admin, tombol upload dimunculkan
+            if (isAdmin) {
+                document.getElementById('adminToolbar').style.display = 'flex';
+            }
+            
+            fetchVideosFromDatabase();
+        };
+
+        // =========================================================================
+        // AMBIL DAFTAR VIDEO ASLI DARI DATABASE SUPABASE (BISA DILIHAT SEMUA ORANG)
+        // =========================================================================
+        async function fetchVideosFromDatabase() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'apikey': SUPABASE_KEY
+                    }
+                });
+                if (!response.ok) throw new Error('Gagal mengambil data dari database.');
+                databaseFiles = await response.json();
+                renderFileList();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // =========================================================================
+        // PROSES UPLOAD VIDEO KE STORAGE & DATABASE
+        // =========================================================================
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const progressBox = document.getElementById('uploadProgressBox');
+            const barFill = document.getElementById('progressBarFill');
+            const percentText = document.getElementById('uploadPercentText');
+            
+            progressBox.style.display = 'block';
+            barFill.style.width = '20%';
+            percentText.innerText = '20%';
+
+            const cleanedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
+            const cloudFilePath = `${Date.now()}_${cleanedFileName}`;
+
+            try {
+                // 1. Upload File Fisik Video ke Storage
+                const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET_NAME}/${cloudFilePath}`;
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'apikey': SUPABASE_KEY,
+                        'Content-Type': file.type
+                    },
+                    body: file
+                });
+
+                if (!uploadResponse.ok) throw new Error('Gagal upload file ke Storage.');
+
+                barFill.style.width = '60%';
+                percentText.innerText = '60%';
+
+                const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${cloudFilePath}`;
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(1) + " MB";
+
+                // 2. Simpan Data Link Video ke Tabel Database agar bisa dilihat semua orang
+                const dbResponse = await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'apikey': SUPABASE_KEY,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({
+                        name: file.name,
+                        size: sizeMB,
+                        cloud_path: cloudFilePath,
+                        url: publicUrl
+                    })
+                });
+
+                if (!dbResponse.ok) throw new Error('Gagal menyimpan data ke database.');
+
+                barFill.style.width = '100%';
+                percentText.innerText = '100%';
+
+                setTimeout(() => {
+                    progressBox.style.display = 'none';
+                    fetchVideosFromDatabase();
+                    input.value = '';
+                }, 600);
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+                progressBox.style.display = 'none';
+                input.value = '';
+            }
+        }
+
+        // =========================================================================
+        // MENAMPILKAN DAFTAR VIDEO
+        // =========================================================================
+        function renderFileList() {
+            const container = document.getElementById('fileListContainer');
+            const badge = document.getElementById('totalFilesBadge');
+            const summary = document.getElementById('paginationSummary');
+            
+            container.innerHTML = '';
+            badge.innerText = databaseFiles.length;
+            summary.innerText = `Total ${databaseFiles.length} item`;
+
+            if (databaseFiles.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#798b9e; font-size:14px;"><i class="fa-solid fa-cloud-arrow-up" style="font-size:32px; margin-bottom:10px; display:block;"></i>Belum ada video di cloud.</div>`;
+                return;
+            }
+
+            databaseFiles.forEach(file => {
+                const shortName = file.name.length > 25 ? file.name.substring(0, 22) + "..." : file.name;
+                const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('id-ID') : 'Baru saja';
+                
+                // Tombol Hapus sampah hanya muncul di layar HP Anda (sebagai admin)
+                const deleteButtonHtml = isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id}, '${file.cloud_path}')"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : '';
+
+                const fileRowHtml = `
+                    <div class="file-row" id="row-${file.id}">
+                        <div class="file-info-container">
+                            <div class="file-left-controls">
+                                <i class="fa-solid fa-file-video file-icon"></i>
+                            </div>
+                            <div class="file-details">
+                                <div class="file-name" data-short="${shortName}" data-full="${file.name}">${file.name}</div>
+                                <div class="file-specs">${dateClean} • ${file.size}</div>
+                            </div>
+                            <div class="action-group top-action-anchor"></div>
+                        </div>
+
+                        <div class="media-display-area">
+                            <div class="preview-box" onclick="handleThumbnailClick(this)">
+                                <div class="click-overlay"></div>
+                                <video preload="metadata" src="${file.url}#t=0.5"></video>
+                            </div>
+
+                            <div class="inline-actions side-action-box">
+                                <div class="action-group action-buttons">
+                                    <button class="btn-action play-trigger" onclick="handlePlay(this)"><i class="fa-solid fa-play"></i></button>
+                                    <button class="btn-action close-trigger" onclick="handleClose(this)"><i class="fa-solid fa-xmark"></i></button>
+                                    ${deleteButtonHtml}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += fileRowHtml;
+            });
+        }
+
+        function getFileRowScope(element) { return element.closest('.file-row'); }
 
         function handleThumbnailClick(previewBox) {
             const fileRow = getFileRowScope(previewBox);
             if (!fileRow.classList.contains('is-playing')) {
-                const playBtn = fileRow.querySelector('.play-trigger');
-                handlePlay(playBtn);
+                handlePlay(fileRow.querySelector('.play-trigger'));
             }
         }
 
         function handlePlay(btnElement) {
             const fileRow = getFileRowScope(btnElement);
-            const videoElement = fileRow.querySelector('video');
-            const previewBox = fileRow.querySelector('.preview-box');
-            const actionButtons = fileRow.querySelector('.action-buttons');
-            const topActionAnchor = fileRow.querySelector('.top-action-anchor');
-            const fileNameText = fileRow.querySelector('.file-name');
-            const originalVideoURL = previewBox.getAttribute('data-video');
+            const video = fileRow.querySelector('video');
+            const topAction = fileRow.querySelector('.top-action-anchor');
+            const actionGroup = fileRow.querySelector('.action-buttons');
+            const nameText = fileRow.querySelector('.file-name');
 
             fileRow.classList.add('is-playing');
-            fileNameText.innerText = fileNameText.getAttribute('data-short');
-
-            videoElement.setAttribute('controls', 'true');
-            videoElement.src = originalVideoURL;
-            videoElement.play();
-
-            topActionAnchor.appendChild(actionButtons);
+            nameText.innerText = nameText.getAttribute('data-short');
+            video.setAttribute('controls', 'true');
+            video.play();
+            topAction.appendChild(actionGroup);
         }
 
         function handleClose(btnElement) {
             const fileRow = getFileRowScope(btnElement);
-            const videoElement = fileRow.querySelector('video');
-            const previewBox = fileRow.querySelector('.preview-box');
-            const actionButtons = fileRow.querySelector('.action-buttons');
-            const sideActionBox = fileRow.querySelector('.side-action-box');
-            const fileNameText = fileRow.querySelector('.file-name');
-            const originalVideoURL = previewBox.getAttribute('data-video');
+            const video = fileRow.querySelector('video');
+            const sideAction = fileRow.querySelector('.side-action-box');
+            const actionGroup = fileRow.querySelector('.action-buttons');
+            const nameText = fileRow.querySelector('.file-name');
 
             fileRow.classList.remove('is-playing');
-            fileNameText.innerText = fileNameText.getAttribute('data-full');
+            nameText.innerText = nameText.getAttribute('data-full');
+            video.pause();
+            video.removeAttribute('controls');
+            sideAction.appendChild(actionGroup);
+        }
 
-            videoElement.pause();
-            videoElement.removeAttribute('controls');
-            videoElement.src = originalVideoURL + "#t=0.5";
-            videoElement.load();
+        // =========================================================================
+        // HAPUS VIDEO DARI CLOUD STORAGE & DATABASE
+        // =========================================================================
+        async function deleteFile(id, cloudPath) {
+            if (!confirm("Apakah Anda yakin ingin menghapus video ini dari server cloud?")) return;
 
-            sideActionBox.appendChild(actionButtons);
+            try {
+                // 1. Hapus data dari tabel database
+                const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?id=eq.${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'apikey': SUPABASE_KEY
+                    }
+                });
+                if (!dbRes.ok) throw new Error('Gagal menghapus data di database.');
+
+                // 2. Hapus file fisik dari Storage
+                const storageUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET_NAME}/${cloudPath}`;
+                await fetch(storageUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'apikey': SUPABASE_KEY
+                    }
+                });
+
+                fetchVideosFromDatabase();
+
+            } catch (error) {
+                alert('Gagal Menghapus: ' + error.message);
+            }
         }
     </script>
 
