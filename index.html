@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gofile Interface - Public Video List</title>
+    <title>Gofile Interface - Unlimited Video Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ==================== CORE RESET & BASE ==================== */
@@ -21,7 +21,6 @@
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
         }
 
         header {
@@ -39,66 +38,6 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-        }
-
-        /* ==================== SIDEBAR MENU ==================== */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background-color: #151f2c;
-            z-index: 1000;
-            transition: left 0.3s ease;
-            padding: 20px 16px;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
-        }
-
-        .sidebar.is-open { left: 0; }
-
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none;
-        }
-
-        .sidebar-overlay.is-visible { display: block; }
-
-        .sidebar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .brand i { color: #f1b418; font-size: 24px; }
-
-        .close-sidebar-btn {
-            background: #23334a;
-            color: #4b8bf4;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         /* ==================== MAIN KONTEN UTAMA ==================== */
@@ -136,29 +75,21 @@
         .folder-meta h2 { font-size: 16px; font-weight: 600; }
         .folder-meta p { font-size: 12px; color: #798b9e; margin-top: 2px; }
 
-        /* Toolbar & Upload Input Hidden */
-        .main-toolbar {
-            display: flex; gap: 8px; align-items: center;
-            border-bottom: 1px solid #23334a; padding-bottom: 16px; margin-bottom: 16px;
-        }
-
-        .btn-tool {
-            color: white; border: none; padding: 8px 12px; border-radius: 4px;
-            cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;
-        }
-        .btn-tool.blue { background-color: #1d68d5; }
-
-        /* Status Loading Bar */
-        .upload-progress-container {
+        /* Panel Input Admin */
+        .admin-panel {
             background-color: #151f2c; border: 1px solid #23334a;
-            border-radius: 6px; padding: 12px; margin-bottom: 16px; display: none;
+            border-radius: 8px; padding: 14px; margin-bottom: 16px;
+            display: flex; flex-direction: column; gap: 10px;
         }
-        .progress-bar-bg {
-            background-color: #23334a; width: 100%; height: 8px;
-            border-radius: 4px; overflow: hidden; margin-top: 8px;
+
+        .admin-panel input {
+            width: 100%; background-color: #0b131e; border: 1px solid #33445c;
+            color: white; padding: 10px; border-radius: 6px; font-size: 14px;
         }
-        .progress-bar-fill {
-            background-color: #24a148; width: 0%; height: 100%; transition: width 0.2s;
+
+        .btn-submit {
+            background-color: #24a148; color: white; border: none;
+            padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;
         }
 
         /* ==================== FILE ROW DATA ==================== */
@@ -211,20 +142,8 @@
 </head>
 <body>
 
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-    <aside class="sidebar" id="sidebarMenu">
-        <div class="sidebar-header">
-            <div class="brand"><i class="fa-solid fa-folder-open"></i> Gofile</div>
-            <button class="close-sidebar-btn" onclick="toggleSidebar()"><i class="fa-solid fa-chevron-left"></i></button>
-        </div>
-        <ul class="sidebar-menu" style="list-style:none; padding-top:20px;">
-            <li><a href="#" style="color:#a2b0c3; text-decoration:none;"><i class="fa-solid fa-house"></i> Home</a></li>
-        </ul>
-    </aside>
-
     <header>
-        <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
     </header>
 
     <main>
@@ -235,25 +154,17 @@
                     <span class="folder-badge" id="totalFilesBadge">0</span>
                 </div>
                 <div class="folder-meta">
-                    <h2>Cloud Storage</h2>
+                    <h2>Cloud Streaming Pool</h2>
                     <p id="folderTime">Mengambil data...</p>
                 </div>
             </div>
         </div>
 
-        <div class="main-toolbar" id="adminToolbar" style="display: none;">
-            <input type="file" id="hiddenFileInput" accept="video/*" style="display: none;" onchange="handleFileUpload(this)">
-            <button class="btn-tool blue" onclick="triggerFileInput()"><i class="fa-solid fa-upload"></i>&nbsp; Upload Video</button>
-        </div>
-
-        <div class="upload-progress-container" id="uploadProgressBox">
-            <div style="display:flex; justify-content:space-between; font-size:12px;">
-                <span id="uploadStatusText">Mengunggah video ke cloud...</span>
-                <span id="uploadPercentText">0%</span>
-            </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progressBarFill"></div>
-            </div>
+        <div class="admin-panel" id="adminFormPanel" style="display: none;">
+            <div style="font-size: 13px; color: #24a148; font-weight: bold;"><i class="fa-solid fa-user-shield"></i> Mode Admin Aktif</div>
+            <input type="text" id="videoNameInput" placeholder="Masukkan Judul Video">
+            <input type="text" id="videoUrlInput" placeholder="Tempel URL Direct Video (Telegram/Gdrive/dll)">
+            <button class="btn-submit" onclick="submitNewVideo()">Tambah Video ke Situs</button>
         </div>
 
         <div class="file-list-container" id="fileListContainer"></div>
@@ -261,7 +172,7 @@
         <div class="pagination-text" id="paginationSummary">Total 0 item</div>
     </main>
 
-    <footer><div>WOJTEK SAS © 2026 , Gofile Automatic System</div></footer>
+    <footer><div>WOJTEK SAS © 2026 , Unlimited System</div></footer>
 
     <script>
         // =========================================================================
@@ -269,37 +180,21 @@
         // =========================================================================
         const SUPABASE_URL = "TEMPEL_PROJECT_URL_DI_SINI"; 
         const SUPABASE_KEY = "TEMPEL_ANON_KEY_DI_SINI";
-        const BUCKET_NAME = "video"; 
 
         let databaseFiles = [];
 
-        // Cek apakah Anda yang membuka sebagai Admin (?admin=1)
         const urlParams = new URLSearchParams(window.location.search);
         const isAdmin = urlParams.get('admin') === '1';
 
-        function toggleSidebar() {
-            document.getElementById('sidebarMenu').classList.toggle('is-open');
-            document.getElementById('sidebarOverlay').classList.toggle('is-visible');
-        }
-
-        function triggerFileInput() {
-            document.getElementById('hiddenFileInput').click();
-        }
-
         window.onload = function() {
             document.getElementById('folderTime').innerText = new Date().toLocaleString('id-ID');
-            
-            // Jika Anda yang buka lewat link khusus admin, tombol upload dimunculkan
             if (isAdmin) {
-                document.getElementById('adminToolbar').style.display = 'flex';
+                document.getElementById('adminFormPanel').style.display = 'flex';
             }
-            
             fetchVideosFromDatabase();
         };
 
-        // =========================================================================
-        // AMBIL DAFTAR VIDEO ASLI DARI DATABASE SUPABASE (BISA DILIHAT SEMUA ORANG)
-        // =========================================================================
+        // AMBIL DAFTAR VIDEO DARI DATABASE
         async function fetchVideosFromDatabase() {
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, {
@@ -309,7 +204,7 @@
                         'apikey': SUPABASE_KEY
                     }
                 });
-                if (!response.ok) throw new Error('Gagal mengambil data dari database.');
+                if (!response.ok) throw new Error('Gagal memuat database.');
                 databaseFiles = await response.json();
                 renderFileList();
             } catch (error) {
@@ -317,83 +212,44 @@
             }
         }
 
-        // =========================================================================
-        // PROSES UPLOAD VIDEO KE STORAGE & DATABASE
-        // =========================================================================
-        async function handleFileUpload(input) {
-            const file = input.files[0];
-            if (!file) return;
+        // SIMPAN DATA LINK VIDEO BARU (TANPA BATAS 50MB KARENA BERUPA DATA LINK)
+        async function submitNewVideo() {
+            const name = document.getElementById('videoNameInput').value;
+            const url = document.getElementById('videoUrlInput').value;
 
-            const progressBox = document.getElementById('uploadProgressBox');
-            const barFill = document.getElementById('progressBarFill');
-            const percentText = document.getElementById('uploadPercentText');
-            
-            progressBox.style.display = 'block';
-            barFill.style.width = '20%';
-            percentText.innerText = '20%';
-
-            const cleanedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-            const cloudFilePath = `${Date.now()}_${cleanedFileName}`;
+            if (!name || !url) {
+                alert('Judul dan URL Video wajib diisi!');
+                return;
+            }
 
             try {
-                // 1. Upload File Fisik Video ke Storage
-                const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET_NAME}/${cloudFilePath}`;
-                const uploadResponse = await fetch(uploadUrl, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                         'apikey': SUPABASE_KEY,
-                        'Content-Type': file.type
-                    },
-                    body: file
-                });
-
-                if (!uploadResponse.ok) throw new Error('Gagal upload file ke Storage.');
-
-                barFill.style.width = '60%';
-                percentText.innerText = '60%';
-
-                const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${cloudFilePath}`;
-                const sizeMB = (file.size / (1024 * 1024)).toFixed(1) + " MB";
-
-                // 2. Simpan Data Link Video ke Tabel Database agar bisa dilihat semua orang
-                const dbResponse = await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'apikey': SUPABASE_KEY,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        name: file.name,
-                        size: sizeMB,
-                        cloud_path: cloudFilePath,
-                        url: publicUrl
+                        name: name,
+                        size: "Unlimited size",
+                        cloud_path: "external_link",
+                        url: url
                     })
                 });
 
-                if (!dbResponse.ok) throw new Error('Gagal menyimpan data ke database.');
+                if (!response.ok) throw new Error('Gagal menyimpan ke database.');
 
-                barFill.style.width = '100%';
-                percentText.innerText = '100%';
-
-                setTimeout(() => {
-                    progressBox.style.display = 'none';
-                    fetchVideosFromDatabase();
-                    input.value = '';
-                }, 600);
+                document.getElementById('videoNameInput').value = '';
+                document.getElementById('videoUrlInput').value = '';
+                fetchVideosFromDatabase();
 
             } catch (error) {
                 alert('Error: ' + error.message);
-                progressBox.style.display = 'none';
-                input.value = '';
             }
         }
 
-        // =========================================================================
-        // MENAMPILKAN DAFTAR VIDEO
-        // =========================================================================
+        // TAMPILKAN FILEROW VIDEO
         function renderFileList() {
             const container = document.getElementById('fileListContainer');
             const badge = document.getElementById('totalFilesBadge');
@@ -404,16 +260,14 @@
             summary.innerText = `Total ${databaseFiles.length} item`;
 
             if (databaseFiles.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#798b9e; font-size:14px;"><i class="fa-solid fa-cloud-arrow-up" style="font-size:32px; margin-bottom:10px; display:block;"></i>Belum ada video di cloud.</div>`;
+                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#798b9e; font-size:14px;">Belum ada video.</div>`;
                 return;
             }
 
             databaseFiles.forEach(file => {
                 const shortName = file.name.length > 25 ? file.name.substring(0, 22) + "..." : file.name;
-                const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('id-ID') : 'Baru saja';
-                
-                // Tombol Hapus sampah hanya muncul di layar HP Anda (sebagai admin)
-                const deleteButtonHtml = isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id}, '${file.cloud_path}')"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : '';
+                const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('id-ID') : 'Baru';
+                const deleteButtonHtml = isAdmin ? `<button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash" style="color:#e11d48;"></i></button>` : '';
 
                 const fileRowHtml = `
                     <div class="file-row" id="row-${file.id}">
@@ -431,7 +285,7 @@
                         <div class="media-display-area">
                             <div class="preview-box" onclick="handleThumbnailClick(this)">
                                 <div class="click-overlay"></div>
-                                <video preload="metadata" src="${file.url}#t=0.5"></video>
+                                <video preload="metadata" src="${file.url}"></video>
                             </div>
 
                             <div class="inline-actions side-action-box">
@@ -485,14 +339,10 @@
             sideAction.appendChild(actionGroup);
         }
 
-        // =========================================================================
-        // HAPUS VIDEO DARI CLOUD STORAGE & DATABASE
-        // =========================================================================
-        async function deleteFile(id, cloudPath) {
-            if (!confirm("Apakah Anda yakin ingin menghapus video ini dari server cloud?")) return;
-
+        // HAPUS DATA LINK DARI DATABASE
+        async function deleteFile(id) {
+            if (!confirm("Hapus video ini dari daftar website?")) return;
             try {
-                // 1. Hapus data dari tabel database
                 const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?id=eq.${id}`, {
                     method: 'DELETE',
                     headers: {
@@ -500,26 +350,13 @@
                         'apikey': SUPABASE_KEY
                     }
                 });
-                if (!dbRes.ok) throw new Error('Gagal menghapus data di database.');
-
-                // 2. Hapus file fisik dari Storage
-                const storageUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET_NAME}/${cloudPath}`;
-                await fetch(storageUrl, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'apikey': SUPABASE_KEY
-                    }
-                });
-
+                if (!dbRes.ok) throw new Error('Gagal menghapus.');
                 fetchVideosFromDatabase();
-
             } catch (error) {
-                alert('Gagal Menghapus: ' + error.message);
+                alert(error.message);
             }
         }
     </script>
-
     <script src="ads.js"></script>
 </body>
 </html>
