@@ -96,6 +96,33 @@
         document.execCommand("copy");
         alert("Link disalin!");
     }
+
+    // Fungsi membuat kode acak
+function generateRandomString(length) {
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
+// Saat fungsi generate() dijalankan:
+async function generate() {
+    const slug = generateRandomString(8); // Kode unik 8 karakter
+    const title = document.getElementById('vidTitle').value;
+    const url = document.getElementById('vidUrl').value;
+    
+    // Kirim 'slug' ke Supabase (Pastikan kolom 'slug' sudah dibuat di tabel Anda)
+    await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
+        method: 'POST',
+        headers: { /* ... header sama seperti sebelumnya ... */ },
+        body: JSON.stringify({ name: title, url: url, slug: slug })
+    });
+
+    const shareLink = `${window.location.origin}/d/${slug}`; // Format baru
+    // ... tampilkan link
+}
 </script>
 </body>
 </html>
