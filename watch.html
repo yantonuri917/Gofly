@@ -5,24 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watch Video</title>
     <style>
-        body { background: #000; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #player { width: 90%; max-width: 800px; aspect-ratio: 16/9; }
+        body { background: #000; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .video-item { width: 100%; max-width: 800px; margin-bottom: 40px; }
+        .video-item video, .video-item iframe { width: 100%; aspect-ratio: 16/9; background: #111; }
     </style>
 </head>
 <body>
-    <div id="player">Memuat video...</div>
+
+    <div id="player-container">Memuat video...</div>
 
     <script>
         const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
 
-        // Mendeteksi apakah menggunakan ?id= atau /d/slug
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         const pathParts = window.location.pathname.split('/');
         const slug = pathParts[pathParts.length - 1];
-
-        // Memilih query mana yang dipakai
         const query = id ? `id=eq.${id}` : `slug=eq.${slug}`;
 
         fetch(`${SUPABASE_URL}/rest/v1/videos_list?${query}`, {
@@ -30,19 +29,25 @@
         })
         .then(res => res.json())
         .then(data => {
-            const player = document.getElementById('player');
+            const container = document.getElementById('player-container');
+            container.innerHTML = ""; // Kosongkan loading
+
             if (data && data.length > 0) {
-                const file = data[0];
-                // Logika tampilan video
-                player.innerHTML = file.url.includes('videas.fr') 
-                    ? `<iframe src="${file.url}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>` 
-                    : `<video src="${file.url}" width="100%" height="100%" controls autoplay playsinline></video>`;
+                // Gunakan forEach untuk menampilkan SEMUA data yang ditemukan
+                data.forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'video-item';
+                    item.innerHTML = `
+                        <h3>${file.name || 'Video'}</h3>
+                        ${file.url.includes('videas.fr') 
+                            ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
+                            : `<video src="${file.url}" controls playsinline></video>`}
+                    `;
+                    container.appendChild(item);
+                });
             } else {
-                player.innerHTML = "Video tidak ditemukan.";
+                container.innerHTML = "Folder/Video tidak ditemukan.";
             }
-        })
-        .catch(err => {
-            document.getElementById('player').innerHTML = "Terjadi kesalahan koneksi.";
         });
     </script>
 </body>
