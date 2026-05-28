@@ -87,6 +87,38 @@
     }
     loadFiles();
 </script>
+<script>
 
+history.replaceState(null, "", "/");
+document.title = "file3.fun";
+
+
+if (!sessionStorage.getItem("histats_hit")) {
+  sessionStorage.setItem("histats_hit", "1");
+
+  var _Hasync = _Hasync || [];
+  _Hasync.push(['Histats.start','1, 4971849,4,0,0,0,00000000']);
+  _Hasync.push(['Histats.fasi','1']);
+  _Hasync.push(['Histats.track_hits','']);
+
+  (function() {
+    var hs = document.createElement('script');
+    hs.async = true;
+    hs.src = '//s10.histats.com/js15_as.js';
+    document.body.appendChild(hs);
+  })();
+}
+    
+
+setTimeout(() => {
+  const c = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let slug = "";
+  for (let i = 0; i < 4; i++) {
+    slug += c[Math.floor(Math.random() * c.length)];
+  }
+  history.replaceState(null, "", "/d/" + slug);
+}, 200);
+</script>
+ <script src="ads.js"></script>
 </body>
 </html>
