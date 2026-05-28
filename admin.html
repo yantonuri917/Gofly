@@ -40,13 +40,24 @@
     const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
 
-    // Proteksi Password Sederhana
+    // Proteksi Password
     const pass = prompt("Masukkan Password Admin:");
     if (pass !== "admin123") {
         document.body.innerHTML = "<h1>Akses Ditolak</h1>";
         throw new Error("Akses ditolak");
     }
 
+    // Fungsi membuat kode acak
+    function generateRandomString(length) {
+        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
+    }
+
+    // Fungsi Utama
     async function generate() {
         const title = document.getElementById('vidTitle').value;
         const url = document.getElementById('vidUrl').value;
@@ -54,6 +65,7 @@
         
         if (!title || !url) { alert("Judul dan URL harus diisi!"); return; }
 
+        const slug = generateRandomString(8); // Membuat kode acak 8 karakter
         btn.innerText = "Memproses...";
         btn.disabled = true;
 
@@ -66,17 +78,13 @@
                     'Content-Type': 'application/json', 
                     'Prefer': 'return=representation' 
                 },
-                body: JSON.stringify({ name: title, url: url })
+                body: JSON.stringify({ name: title, url: url, slug: slug })
             });
 
             const data = await res.json();
-            console.log("Respon Supabase:", data);
 
             if (res.ok) {
-                // Mengambil ID dari array (karena Supabase mengembalikan array)
-                const newId = Array.isArray(data) ? data[0].id : data.id;
-                const shareLink = `${window.location.origin}/watch.html?id=${newId}`;
-                
+                const shareLink = `${window.location.origin}/d/${slug}`;
                 document.getElementById('shareLink').value = shareLink;
                 document.getElementById('result').style.display = 'block';
             } else {
@@ -96,33 +104,6 @@
         document.execCommand("copy");
         alert("Link disalin!");
     }
-
-    // Fungsi membuat kode acak
-function generateRandomString(length) {
-    let result = '';
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-}
-
-// Saat fungsi generate() dijalankan:
-async function generate() {
-    const slug = generateRandomString(8); // Kode unik 8 karakter
-    const title = document.getElementById('vidTitle').value;
-    const url = document.getElementById('vidUrl').value;
-    
-    // Kirim 'slug' ke Supabase (Pastikan kolom 'slug' sudah dibuat di tabel Anda)
-    await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
-        method: 'POST',
-        headers: { /* ... header sama seperti sebelumnya ... */ },
-        body: JSON.stringify({ name: title, url: url, slug: slug })
-    });
-
-    const shareLink = `${window.location.origin}/d/${slug}`; // Format baru
-    // ... tampilkan link
-}
 </script>
 </body>
 </html>
