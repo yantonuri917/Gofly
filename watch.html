@@ -6,41 +6,42 @@
     <title>Gofile - Media Viewer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #141d2a; color: #bdc8d3; font-family: sans-serif; margin: 0; padding: 10px; }
+        body { background-color: #141d2a; color: #bdc8d3; font-family: sans-serif; margin: 0; padding: 15px; }
         .container { max-width: 600px; margin: 0 auto; }
         
-        /* Header Folder */
-        .folder-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .folder-icon { font-size: 32px; color: #f59f00; position: relative; }
-        .badge { position: absolute; bottom: 0; left: -2px; background: #2b3a4a; color: white; font-size: 10px; padding: 1px 5px; border-radius: 10px; border: 2px solid #141d2a; }
-        .folder-title { font-weight: 700; color: white; }
+        .file-item { background: #192330; border: 1px solid #222f3e; border-radius: 6px; padding: 12px; margin-bottom: 12px; }
+        
+        /* Layout Flex untuk Thumbnail Kecil */
+        .file-content { display: flex; align-items: flex-start; gap: 12px; }
+        
+        .preview-box { 
+            width: 100px; /* Ukuran Thumbnail Kecil */
+            height: 60px; 
+            background: #000; 
+            border-radius: 4px; 
+            overflow: hidden; 
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.4s ease;
+        }
 
-        /* File Row */
-        .file-item { background: #192330; border: 1px solid #222f3e; border-radius: 6px; padding: 15px; margin-bottom: 15px; }
-        .file-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .file-name { font-weight: 600; color: white; font-size: 14px; }
-        .file-meta { font-size: 12px; color: #8899a6; }
+        /* Saat diklik, thumbnail membesar */
+        .preview-box.expanded {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+        }
+
+        video { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Video Player */
-        .media-box { width: 100%; background: #000; border-radius: 4px; overflow: hidden; margin-top: 5px; }
-        video, img { width: 100%; display: block; }
-        
-        /* Buttons */
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        .btn { background: #202c3c; border: 1px solid #34495e; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .play-overlay { position: absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:white; font-size: 20px; }
+        .expanded .play-overlay { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="folder-header">
-        <div class="folder-icon"><i class="fa-solid fa-folder"></i><span class="badge" id="countBadge">0</span></div>
-        <div>
-            <div class="folder-title">root</div>
-            <div style="font-size: 12px;">28/5/2026, 10.24.18</div>
-        </div>
-    </div>
-
     <div id="fileList"></div>
 </div>
 
@@ -54,30 +55,30 @@
         });
         const data = await res.json();
         const list = document.getElementById('fileList');
-        document.getElementById('countBadge').innerText = data.length;
         
         list.innerHTML = data.map(item => `
             <div class="file-item">
-                <div class="file-info">
-                    <i class="fa-solid ${item.url.match(/\.(mp4|mkv|webm)$/) ? 'fa-file-video' : 'fa-file-image'}" style="color:#5696d7; font-size:20px;"></i>
-                    <div>
-                        <div class="file-name">${item.name}</div>
-                        <div class="file-meta">${new Date(item.created_at).toLocaleDateString()}</div>
+                <div class="file-content">
+                    <div class="preview-box" onclick="expandVideo(this)">
+                        <video src="${item.url}#t=0.5" muted></video>
+                        <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
                     </div>
-                </div>
-                <div class="media-box">
-                    ${item.url.match(/\.(mp4|mkv|webm)$/) 
-                        ? `<video src="${item.url}" controls></video>` 
-                        : `<img src="${item.url}" alt="image">`}
-                </div>
-                <div class="btn-group">
-                    <button class="btn" onclick="this.parentElement.previousElementSibling.querySelector('video')?.play()">Play</button>
-                    <button class="btn" onclick="window.open('${item.url}')">Download</button>
-                    <button class="btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    <div style="flex:1;">
+                        <div style="color:white; font-weight:600; font-size:14px;">${item.name}</div>
+                        <div style="font-size:11px; margin-top:4px;">${new Date(item.created_at).toLocaleDateString()}</div>
+                    </div>
                 </div>
             </div>
         `).join('');
     }
+
+    function expandVideo(el) {
+        el.classList.add('expanded');
+        const video = el.querySelector('video');
+        video.setAttribute('controls', 'true');
+        video.play();
+    }
+
     loadFiles();
 </script>
 </body>
