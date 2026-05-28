@@ -2,97 +2,86 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="referrer" content="no-referrer">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gofile - Media Viewer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* (Gunakan style CSS dari file admin Anda di sini agar tampilannya sama) */
-        body { background-color: #141d2a; color: #bdc8d3; display: flex; min-height: 100vh; font-family: sans-serif; }
-        .workspace { flex: 1; display: flex; flex-direction: column; background-color: #141d2a; }
-        .top-navbar { height: 60px; background-color: #192330; border-bottom: 1px solid #222f3e; display: flex; align-items: center; padding: 0 24px; }
-        main { padding: 24px; max-width: 1000px; width: 100%; margin: 0 auto; }
+        /* Gaya Visual Gofile */
+        body { background-color: #141d2a; color: #bdc8d3; font-family: -apple-system, sans-serif; margin: 0; }
+        .workspace { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .folder-root-info { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+        .folder-large-icon { font-size: 42px; color: #f59f00; position: relative; }
+        .folder-large-badge { position: absolute; bottom: 0; left: -4px; background: #2b3a4a; color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 10px; }
+        
+        /* Layout File */
         .file-list-container { display: flex; flex-direction: column; gap: 16px; }
-        .file-row { display: flex; flex-direction: row; align-items: flex-start; border-bottom: 1px solid #1e293b; padding-bottom: 16px; gap: 16px; background: transparent; }
-        .preview-card-box { width: 140px; height: 90px; background-color: #000; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid #1e293b; cursor: pointer; }
-        .preview-card-box video, .preview-card-box iframe { width: 100%; height: 100%; object-fit: contain; }
-        .file-top-control-bar { display: flex; align-items: center; flex: 1; gap: 14px; height: 90px; }
-        .file-name { font-size: 15px; font-weight: 600; color: #ffffff; }
-        .btn-gofile-action { background-color: #192330; color: #ffffff; border: 1px solid #2d3d52; padding: 6px 14px; border-radius: 4px; font-size: 13px; cursor: pointer; }
-        .file-row.is-expanded { flex-direction: column; }
-        .file-row.is-expanded .preview-card-box { width: 100%; max-width: 720px; height: auto; aspect-ratio: 16 / 9; cursor: default; }
+        .file-row { background: #192330; border: 1px solid #222f3e; border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 15px; }
+        .media-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 6px; overflow: hidden; }
+        video, iframe { width: 100%; height: 100%; border: none; }
+        
+        /* Kontrol */
+        .file-actions { display: flex; justify-content: space-between; align-items: center; }
+        .btn-action { background: #1877f2; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div class="workspace">
-        <header class="top-navbar">
-            <span style="font-weight: 600;">Folder Viewer</span>
-        </header>
-        <main>
-            <div class="file-list-container" id="fileListContainer">
-                <p>Memuat video...</p>
-            </div>
-        </main>
+<div class="workspace">
+    <div class="folder-root-info">
+        <div class="folder-large-icon">
+            <i class="fa-solid fa-folder"></i>
+            <span class="folder-large-badge" id="countBadge">0</span>
+        </div>
+        <div class="folder-title">
+            <h2 id="folderName">Loading...</h2>
+            <p id="dateStamp"></p>
+        </div>
     </div>
 
-    <script>
-        const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
+    <div class="file-list-container" id="fileListContainer">
+        <p>Memuat media...</p>
+    </div>
+</div>
 
-        const slug = window.location.pathname.split('/').pop();
+<script>
+    const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
 
-        async function loadFolder() {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?slug=eq.${slug}`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            const data = await res.json();
-            const container = document.getElementById('fileListContainer');
-            
-            container.innerHTML = data.map(file => {
-                const isEmbed = file.url.includes('videas.fr');
-                const mediaTag = isEmbed 
-                    ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
-                    : `<video src="${file.url}#t=0.5" muted playsinline></video>`;
+    // Ambil slug dari URL path
+    const slug = window.location.pathname.split('/').pop();
 
-                return `
-                    <div class="file-row">
-                        <div class="file-media-render-zone">
-                            <div class="preview-card-box" onclick="togglePlayer(this)">${mediaTag}</div>
-                        </div>
-                        <div class="file-top-control-bar">
-                            <div class="file-header-info">
-                                <span class="file-name">${file.name}</span>
-                            </div>
-                            <div class="file-actions-right">
-                                <button class="btn-gofile-action" onclick="togglePlayer(this.closest('.file-row').querySelector('.preview-card-box'))">
-                                    <i class="fa-solid fa-play"></i> Play
-                                </button>
-                                <a href="${file.url}" target="_blank" class="btn-gofile-action">Download</a>
-                            </div>
-                        </div>
+    async function loadData() {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?slug=eq.${slug}`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const data = await res.json();
+        const container = document.getElementById('fileListContainer');
+        const countBadge = document.getElementById('countBadge');
+        
+        document.getElementById('dateStamp').innerText = new Date().toLocaleString();
+        document.getElementById('folderName').innerText = slug || "Root";
+        countBadge.innerText = data.length;
+
+        if (data.length > 0) {
+            container.innerHTML = data.map(file => `
+                <div class="file-row">
+                    <div class="media-box">
+                        ${file.url.includes('videas.fr') 
+                            ? `<iframe src="${file.url}" allowfullscreen></iframe>` 
+                            : `<video src="${file.url}" controls playsinline></video>`}
                     </div>
-                `;
-            }).join('');
+                    <div class="file-actions">
+                        <span style="font-weight:600">${file.name}</span>
+                        <a href="${file.url}" download class="btn-action">Download</a>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = `<div style="text-align:center; padding:40px; color:#627d98;"><i class="fa-solid fa-file-lines"></i> No items to display</div>`;
         }
+    }
 
-        function togglePlayer(box) {
-            const row = box.closest('.file-row');
-            row.classList.toggle('is-expanded');
-            const media = box.querySelector('video, iframe');
-            if (media.tagName === 'VIDEO') {
-                if (row.classList.contains('is-expanded')) {
-                    media.setAttribute('controls', 'true');
-                    media.muted = false;
-                    media.play();
-                } else {
-                    media.removeAttribute('controls');
-                    media.pause();
-                }
-            }
-        }
-
-        loadFolder();
-    </script>
+    loadData();
+</script>
 </body>
 </html>
