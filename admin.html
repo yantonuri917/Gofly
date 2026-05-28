@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gofile File Manager - Control Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS DISAMAKAN DENGAN INDEX.HTML AGAR KONSISTEN */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0b1422; color: #ced5e0; display: flex; flex-direction: column; min-height: 100vh; }
+        header { padding: 14px 24px; background-color: #1a2536; border-bottom: 1px solid #243752; display: flex; align-items: center; justify-content: space-between; }
+        .logo-admin { font-weight: bold; color: #2fb344; font-size: 16px; }
+        main { flex: 1; padding: 24px; max-width: 1000px; margin: 0 auto; width: 100%; }
+        
+        /* Panel Form Admin */
+        .admin-panel { background-color: #111c2e; border: 1px solid #206bc4; border-radius: 4px; padding: 20px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px; }
+        .admin-panel input { width: 100%; background-color: #0b1422; border: 1px solid #243752; color: white; padding: 12px; border-radius: 4px; font-size: 14px; outline: none; }
+        .admin-panel input:focus { border-color: #206bc4; }
+        .btn-submit { background-color: #2fb344; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .btn-submit:hover { background-color: #249236; }
+
+        .file-list-container { display: flex; flex-direction: column; background-color: #111c2e; border: 1px solid #1e2d42; border-radius: 4px; overflow: hidden; }
+        .file-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #1e2d42; }
+        .file-row:hover { background-color: #16243a; }
+        .file-info-container { display: flex; gap: 14px; align-items: center; flex: 1; min-width: 0; }
+        .file-icon { font-size: 18px; color: #a8b6cc; }
+        .file-details { display: flex; align-items: center; justify-content: space-between; flex: 1; min-width: 0; padding-right: 20px; }
+        .file-name { font-size: 14px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-specs { font-size: 13px; color: #627288; }
+        .btn-action { background-color: transparent; color: #627288; border: none; width: 34px; height: 34px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .btn-action:hover { background-color: #1e2d42; color: #ffffff; }
+        .pagination-text { text-align: center; font-size: 13px; color: #627288; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-admin"><i class="fa-solid fa-user-shield"></i> Gofile File Manager - Dashboard Admin</div>
+        <a href="index.html" style="color: #206bc4; text-decoration: none; font-size: 14px;"><i class="fa-solid fa-arrow-left"></i> Lihat Situs</a>
+    </header>
+    <main>
+        <div class="admin-panel">
+            <div style="font-size: 14px; color: #2fb344; font-weight: bold;"><i class="fa-solid fa-plus"></i> Unggah/Tambah Link Video Baru</div>
+            <input type="text" id="videoNameInput" placeholder="Masukkan Judul Video">
+            <input type="text" id="videoUrlInput" placeholder="Tempel URL Direct Video (Telegram/Filebin/dll)">
+            <button class="btn-submit" onclick="submitNewVideo()">Simpan ke Database</button>
+        </div>
+
+        <div class="file-list-container" id="fileListContainer"></div>
+        <div class="pagination-text" id="paginationSummary">Total 0 item</div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
+        let databaseFiles = [];
+
+        window.onload = function() { fetchVideosFromDatabase(); };
+
+        async function fetchVideosFromDatabase() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }
+                });
+                databaseFiles = await response.json();
+                renderFileList();
+            } catch (error) { console.error(error); }
+        }
+
+        async function submitNewVideo() {
+            const name = document.getElementById('videoNameInput').value;
+            const url = document.getElementById('videoUrlInput').value;
+            if (!name || !url) return alert('Semua kolom wajib diisi!');
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                    body: JSON.stringify({ name: name, size: "External Storage", cloud_path: "external_link", url: url })
+                });
+                if (!response.ok) throw new Error('Gagal simpan.');
+                document.getElementById('videoNameInput').value = '';
+                document.getElementById('videoUrlInput').value = '';
+                fetchVideosFromDatabase();
+            } catch (error) { alert(error.message); }
+        }
+
+        function renderFileList() {
+            const container = document.getElementById('fileListContainer');
+            const summary = document.getElementById('paginationSummary');
+            container.innerHTML = '';
+            summary.innerText = `Total ${databaseFiles.length} item`;
+
+            if (databaseFiles.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 40px; color:#627288;">Belum ada file.</div>`;
+                return;
+            }
+
+            container.innerHTML = databaseFiles.map(file => {
+                const dateClean = file.created_at ? new Date(file.created_at).toLocaleDateString('id-ID') : 'Baru';
+                return `
+                    <div class="file-row" id="row-${file.id}">
+                        <div class="file-info-container">
+                            <i class="fa-solid fa-file-video file-icon"></i>
+                            <div class="file-details">
+                                <div class="file-name">${file.name}</div>
+                                <div class="file-specs">${dateClean}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn-action" onclick="deleteFile(${file.id})"><i class="fa-solid fa-trash-can" style="color:#d63939;"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function deleteFile(id) {
+            if (!confirm("Hapus file ini dari database website?")) return;
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/videos_list?id=eq.${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }
+                });
+                fetchVideosFromDatabase();
+            } catch (error) { alert(error.message); }
+        }
+    </script>
+</body>
+</html>
