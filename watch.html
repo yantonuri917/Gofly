@@ -431,6 +431,8 @@
     </div>
 <script src="config.js"></script> 
     <script>
+let databaseFiles = [];
+         
 async function fetchVideosFromDatabase() {
    
     if (!window.API_CONFIG) {
@@ -547,6 +549,9 @@ function handleThumbnailClick(box) {
         toggleVideoPlayer(targetBtn);
     }
 }
+         window.onload = function() {
+        fetchVideosFromDatabase();
+    };
     </script>
      <script>
 
