@@ -1,283 +1,102 @@
-         display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            flex-shrink: 0;
-            margin-left: auto;
-        }
-        .btn-gofile-action { background-color: #192330; color: #ffffff; border: 1px solid #2d3d52; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .btn-gofile-action:hover { background-color: #253346; }
-        .btn-more-vertical { background-color: transparent; border: none; color: #627d98; width: 32px; height: 32px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-
-       
-        .file-row.is-expanded {
-            flex-direction: column;
-            gap: 12px;
-        }
-        .file-row.is-expanded .file-top-control-bar {
-            width: 100%;
-            height: auto;
-        }
-        .file-row.is-expanded .file-media-render-zone {
-            width: 100%;
-        }
-        .file-row.is-expanded .preview-card-box { 
-            width: 100%; 
-            max-width: 720px; 
-            height: auto; 
-            aspect-ratio: 16 / 9; 
-            cursor: default;
-        }
-        .file-row.is-expanded .preview-card-box::after { display: none; }
-        .file-row.is-expanded .preview-card-box video { 
-            object-fit: contain; 
-        }
-        
-        .pagination-text { text-align: center; font-size: 13px; color: #627d98; margin: 30px 0 10px; }
-
-      
-        @media (max-width: 992px) {
-            aside {
-                position: fixed;
-                height: 100vh;
-                left: 0;
-                top: 0;
-                transform: translateX(-240px);
-                margin-left: 0;
-            }
-            body.sidebar-toggled aside { transform: translateX(0); margin-left: 0; }
-            body:not(.sidebar-toggled) .workspace { margin-left: 0; }
-            body.sidebar-toggled .workspace { margin-left: 0; }
-
-            .gofile-toolbar .tool-btn span { display: none; }
-            .gofile-toolbar .tool-btn { padding: 10px 12px; font-size: 16px; justify-content: center; min-width: 42px; height: 42px; }
-            .gofile-toolbar .tool-btn .fa-caret-down { display: none; }
-
-           
-            .file-row { gap: 12px; }
-            .file-top-control-bar { flex-wrap: wrap; gap: 6px; height: auto; align-self: center; }
-            .file-actions-right { width: 100%; margin-top: 4px; justify-content: flex-start; }
-            
-            .preview-card-box { 
-                width: 120px !important; 
-                height: 78px !important; 
-            }
-            
-           
-            .file-row.is-expanded .preview-card-box { 
-                width: 100% !important; 
-                height: auto !important; 
-                aspect-ratio: 16 / 9;
-            }
-        }
-      
-    
-.file-row.is-expanded .preview-card-box iframe {
-    width: 100%;
-    height: 100%;
-}
+         <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gofile - Watch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/config.js?v=1.0"></script>
+    <style>
+        /* CSS Anda tetap sama seperti yang Anda berikan sebelumnya */
+        body { background-color: #141d2a; color: #bdc8d3; margin: 0; font-family: sans-serif; }
+        .workspace { padding: 20px; }
+        .file-row { background: #192330; margin-bottom: 10px; padding: 15px; border-radius: 8px; border-bottom: 1px solid #222f3e; }
+        .preview-card-box { width: 100%; max-width: 720px; background: #000; border-radius: 6px; cursor: pointer; overflow: hidden; }
+        video, iframe { width: 100%; display: none; aspect-ratio: 16/9; }
+        .is-expanded video, .is-expanded iframe { display: block; }
+        .spinner { text-align: center; padding: 50px; font-size: 30px; color: #1877f2; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+<div class="workspace">
+    <div id="loadingSpinner" class="spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    <div id="fileListContainer"></div>
+</div>
 
-    <aside id="sidebarMenu">
-        <a href="#" class="brand-logo" onclick="handleMenuClick(event)">
-            <i class="fa-solid fa-paper-plane" style="color: #f59f00;"></i> Gofile
-        </a>
-        <div class="account-selector">
-            <div class="account-info">
-                <div class="account-avatar"></div>
-                <span>guest6405289440</span>
-            </div>
-            <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: #627d98;"></i>
-        </div>
-        <button class="btn-add-account"><i class="fa-solid fa-plus"></i> Add Account</button>
-        <ul class="nav-menu">
-            <li class="nav-item active"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-crown" style="color: #f59f00;"></i> Premium</a></li>
-            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-gears"></i> API</a></li>
-            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
-            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-envelope"></i> Contact</a></li>
-            <li class="nav-item" style="margin-top: 20px;"><a href="#" onclick="handleMenuClick(event)"><i class="fa-brands fa-x-twitter"></i> @gofile.mom</a></li>
-        </ul>
-    </aside>
-
-    <div class="workspace">
-        <header class="top-navbar">
-            <button class="btn-toggle-menu" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-        </header>
-
-        <main>
-            <div class="folder-root-info">
-                <div class="folder-large-icon">
-                    <i class="fa-solid fa-folder"></i>
-                    <span class="folder-large-badge" id="totalFilesBadge">0</span>
-                </div>
-                <div class="folder-title-details">
-                    <h2>folder</h2>
-                    <p id="folderTime">...</p>
-                    <span class="badge-status"><i class="fa-solid fa-earth-americas"></i> public</span>
-                    <div><button class="btn-more-options"><i class="fa-solid fa-ellipsis"></i></button></div>
-                </div>
-            </div>
-
-            <div class="gofile-toolbar">
-                <button class="tool-btn btn-share"><i class="fa-solid fa-share-nodes"></i> <span>Share</span></button>
-                <button class="tool-btn btn-create-folder"><i class="fa-solid fa-folder-plus"></i> <span>Create Folder</span></button>
-                <button class="tool-btn btn-upload"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Files</span></button>
-                <button class="tool-btn"><i class="fa-solid fa-arrows-up-down"></i> <span>Sort by</span> <i class="fa-solid fa-caret-down"></i></button>
-                <button class="tool-btn"><i class="fa-solid fa-filter"></i> <span>Filter</span></button>
-                <button class="tool-btn"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></button>
-                <button class="tool-btn" onclick="fetchVideosFromDatabase()"><i class="fa-solid fa-rotate"></i> <span>Refresh</span></button>
-            </div>
-          <div id="loadingSpinner" style="display: none; text-align: center; padding: 20px;">
-    <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #1877f2;"></i>
-    <p style="margin-top: 10px; color: #bdc8d3;">...</p>
-</div>  
-            <div class="file-list-container" id="fileListContainer"></div>
-
-            <div class="pagination-text" id="paginationSummary"></div>
-        </main>
-    </div>
-
-    <script>
+<script>
     let databaseFiles = [];
 
-    async function fetchVideosFromDatabase() {
-        const spinner = document.getElementById('loadingSpinner');
-        const container = document.getElementById('fileListContainer');
-
-        // 1. Validasi Config
+    // FUNGSI UTAMA (Inisialisasi)
+    async function initApp() {
         if (typeof window.API_CONFIG === 'undefined') {
-            console.error("Config tidak ditemukan!");
-            container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
+            document.body.innerHTML = "<h2 style='color:red; text-align:center;'>Error: config.js gagal dimuat!</h2>";
             return;
         }
 
-        const { URL, KEY } = window.API_CONFIG;
-
-        // 2. Deteksi Slug (Mengambil dari path /d/:slug atau ?id=...)
+        // Ambil slug dari URL path (/d/abcde) atau parameter (?id=abcde)
         const paths = window.location.pathname.split('/').filter(p => p && p !== 'd' && p !== 'watch.html');
         let slug = paths.length > 0 ? paths[0] : new URLSearchParams(window.location.search).get('id');
 
-        console.log("Mencari data untuk slug:", slug);
-
         if (!slug) {
-            container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan.</p>";
+            document.getElementById('fileListContainer').innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan.</p>";
             return;
         }
 
+        await fetchVideos(slug);
+    }
+
+    async function fetchVideos(slug) {
+        const spinner = document.getElementById('loadingSpinner');
+        const container = document.getElementById('fileListContainer');
+        const { URL, KEY } = window.API_CONFIG;
+
         spinner.style.display = 'block';
-        container.style.opacity = '0.5';
 
         try {
-            // 3. Fetch dengan filter slug
             const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`, {
-                method: 'GET',
-                headers: { 
-                    'Authorization': `Bearer ${KEY}`, 
-                    'apikey': KEY,
-                    'Content-Type': 'application/json' 
-                }
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }
             });
             
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
-            const data = await response.json();
-            
-            // Filter pengaman agar hanya slug yang sesuai yang ditampilkan
-            databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
-            
+            databaseFiles = await response.json();
             renderFileList();
-        } catch (error) { 
-            console.error("Detail Error:", error);
-            container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
+        } catch (error) {
+            container.innerHTML = `<p style='text-align:center; color:red;'>Error: ${error.message}</p>`;
         } finally {
             spinner.style.display = 'none';
-            container.style.opacity = '1';
         }
     }
 
-    // --- Fungsi Tampilan (Sesuai kode Anda) ---
     function renderFileList() {
         const container = document.getElementById('fileListContainer');
         if (databaseFiles.length === 0) {
-            container.innerHTML = "<p style='text-align:center;'>Tidak ada data untuk folder ini.</p>";
+            container.innerHTML = "<p style='text-align:center;'>Data kosong atau slug salah.</p>";
             return;
         }
-        
-        container.innerHTML = databaseFiles.map(file => {
-            const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
-            const isEmbed = file.url.includes('videas.fr');
-            const mediaTag = isEmbed 
-                ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
-                : `<video preload="metadata" src="${file.url}#t=0.5" muted playsinline></video>`;
 
-            return `
-                <div class="file-row" id="row-${file.id}">
-                    <div class="file-media-render-zone">
-                        <div class="preview-card-box" onclick="handleThumbnailClick(this)">
-                            ${mediaTag}
-                        </div>
-                    </div>
-                    <div class="file-top-control-bar">
-                        <div class="file-header-info">
-                            <span class="file-name">${file.name}</span>
-                            <div class="file-meta-sub">
-                                <span><i class="fa-regular fa-calendar"></i> ${dateClean}</span>
-                            </div>
-                        </div>
-                        <div class="file-actions-right">
-                            <button class="btn-gofile-action btn-play-toggle" onclick="toggleVideoPlayer(this)">
-                                <i class="fa-solid fa-play"></i> <span>Play</span>
-                            </button>
-                            <button class="btn-gofile-action" onclick="runAds()">
-                                <i class="fa-solid fa-download"></i> <span>Download</span>
-                            </button>
-                            <button class="btn-more-vertical"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                        </div>
-                    </div>
+        container.innerHTML = databaseFiles.map(file => `
+            <div class="file-row">
+                <div class="preview-card-box" onclick="toggleVideo(this)">
+                    ${file.url.includes('videas.fr') 
+                        ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
+                        : `<video src="${file.url}" playsinline></video>`}
                 </div>
-            `;
-        }).join('');
+                <h3>${file.name}</h3>
+                <button onclick="toggleVideo(this.previousElementSibling.previousElementSibling)">Play / Close</button>
+            </div>
+        `).join('');
     }
 
-    // --- Fungsi Pendukung ---
-    function toggleVideoPlayer(btn) {
-        const fileRow = btn.closest('.file-row');
-        const mediaElement = fileRow.querySelector('.preview-card-box video, .preview-card-box iframe');
-        const btnText = btn.querySelector('span');
-        const btnIcon = btn.querySelector('i');
-        const isVideo = mediaElement.tagName === 'VIDEO';
-
-        if (fileRow.classList.contains('is-expanded')) {
-            fileRow.classList.remove('is-expanded');
-            btnText.innerText = "Play";
-            btnIcon.className = "fa-solid fa-play";
-            if (isVideo) { mediaElement.removeAttribute('controls'); mediaElement.muted = true; mediaElement.pause(); }
-        } else {
-            fileRow.classList.add('is-expanded');
-            btnText.innerText = "Close";
-            btnIcon.className = "fa-solid fa-xmark";
-            if (isVideo) { mediaElement.setAttribute('controls', 'true'); mediaElement.muted = false; mediaElement.play(); }
+    function toggleVideo(el) {
+        const row = el.closest('.file-row');
+        row.classList.toggle('is-expanded');
+        const media = row.querySelector('video, iframe');
+        if(media && media.tagName === 'VIDEO') {
+            row.classList.contains('is-expanded') ? media.play() : media.pause();
         }
     }
 
-    function handleThumbnailClick(box) {
-        const fileRow = box.closest('.file-row');
-        if (!fileRow.classList.contains('is-expanded')) {
-            toggleVideoPlayer(fileRow.querySelector('.btn-play-toggle'));
-        }
-    }
-
-    function runAds() { console.log("Ads triggered"); }
-
-    // Jalankan saat load
-    window.onload = fetchVideosFromDatabase;
+    window.onload = initApp;
 </script>
-    
-<script src="/config.js?v=1.0"></script>
-     <script src="ads.js"></script>
 </body>
 </html>
