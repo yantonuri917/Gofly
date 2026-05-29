@@ -487,9 +487,16 @@
 let databaseFiles = [];
          
 async function fetchVideosFromDatabase() {
+    // Tambahkan ini untuk memastikan data config ada
+    if (typeof window.API_CONFIG === 'undefined') {
+        console.error("Config tidak ditemukan!");
+        return;
+    }
+    
+    const { URL, KEY } = window.API_CONFIG; // Ambil dari objek config
     const loader = document.getElementById('gofile-loader');
     const container = document.getElementById('fileListContainer');
-
+    // ... sisa kode Anda
     // Tampilkan loader, sembunyikan list
     loader.style.display = 'flex';
     container.style.display = 'none';
@@ -509,9 +516,13 @@ async function fetchVideosFromDatabase() {
         loader.style.display = 'none';
         container.style.display = 'block';
     }
-}
-     function renderFileList() {
+}function renderFileList() {
     const container = document.getElementById('fileListContainer');
+    container.innerHTML = ''; // Bersihkan dulu
+    databaseFiles.forEach(file => {
+        // Logika pembuatan elemen HTML Anda di sini
+    });
+}
     
     container.innerHTML = databaseFiles.map(file => {
         const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
