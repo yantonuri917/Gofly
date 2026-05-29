@@ -9,9 +9,10 @@
         enableBottomStickyAd: true
     };
 
-    window.openDownload = function() {
-        window.open('https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb', '_blank');
-    };
+ 
+window.runAds = function() {
+    window.open('https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb', '_blank');
+};
 
     function injectAdIsolated(container, adKey, width, height, scriptSrc) {
         const iframe = document.createElement('iframe');
