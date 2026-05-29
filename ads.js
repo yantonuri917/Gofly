@@ -1,18 +1,13 @@
-/**
- * ads.js - Skrip Iklan All-in-One (Iframe Isolation Version)
- * Dengan fitur Close Button pada Bottom Sticky Ad
- */
-
 (function() {
     const CONFIG = {
         enableHeaderAd: true,
         enableBottomStickyAd: true
     };
 
- 
-window.runAds = function() {
-    window.open('https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb', '_blank');
-};
+    // Fungsi Utama Iklan
+    window.runAds = function() {
+        window.open('https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb', '_blank');
+    };
 
     function injectAdIsolated(container, adKey, width, height, scriptSrc) {
         const iframe = document.createElement('iframe');
@@ -27,7 +22,6 @@ window.runAds = function() {
 
         iframeDoc.open();
         iframeDoc.write(`
-            <!DOCTYPE html>
             <html>
             <head><style>html, body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style></head>
             <body>
@@ -41,7 +35,8 @@ window.runAds = function() {
         iframeDoc.close();
     }
 
-    window.addEventListener('DOMContentLoaded', function() {
+    // Fungsi untuk memastikan Header ada sebelum diinject
+    function initAds() {
         // SLOT 1: HEADER
         if (CONFIG.enableHeaderAd) {
             const header = document.querySelector('header');
@@ -53,13 +48,12 @@ window.runAds = function() {
             }
         }
 
-        // SLOT 2: BOTTOM STICKY DENGAN CLOSE BUTTON
-        if (CONFIG.enableBottomStickyAd) {
+        // SLOT 2: STICKY
+        if (CONFIG.enableBottomStickyAd && !document.getElementById('sticky-ad-wrapper')) {
             const bottomAdContainer = document.createElement('div');
             bottomAdContainer.id = 'sticky-ad-wrapper';
-            bottomAdContainer.style.cssText = 'position:fixed; bottom:0; left:50%; transform:translateX(-50%); z-index:9999; width:100%; max-width:728px; height:90px; display:flex; justify-content:center; align-items:center; background-color:rgba(24, 36, 54, 0.9); box-shadow:0 -4px 12px rgba(0,0,0,0.5); overflow:visible;';
+            bottomAdContainer.style.cssText = 'position:fixed; bottom:0; left:50%; transform:translateX(-50%); z-index:999999; width:100%; max-width:728px; height:90px; display:flex; justify-content:center; align-items:center; background:rgba(24, 36, 54, 0.9); box-shadow:0 -4px 12px rgba(0,0,0,0.5);';
             
-            // Tombol Close
             const closeBtn = document.createElement('button');
             closeBtn.innerHTML = '&times;';
             closeBtn.style.cssText = 'position:absolute; top:-25px; right:0; background:rgba(0,0,0,0.6); color:white; border:none; cursor:pointer; font-size:16px; padding:2px 8px; border-radius:4px 4px 0 0;';
@@ -70,5 +64,12 @@ window.runAds = function() {
 
             injectAdIsolated(bottomAdContainer, '64e783bd557c30cbf66293b5c5fda05f', 728, 90, 'https://braverybreezebinding.com/64e783bd557c30cbf66293b5c5fda05f/invoke.js');
         }
-    });
+    }
+
+    // Jalankan saat DOM siap
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAds);
+    } else {
+        initAds();
+    }
 })();
