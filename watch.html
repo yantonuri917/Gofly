@@ -449,7 +449,7 @@ async function fetchVideosFromDatabase() {
 
     // AMBIL SLUG DARI URL
     // Contoh: goflie.top/d/60w0mp -> maka slug = '60w0mp'
-    const slug = window.location.pathname.split('/').pop();
+    const slug = window.location.pathname.split('/d/').pop();
 
     spinner.style.display = 'block';
     container.style.opacity = '0.5';
