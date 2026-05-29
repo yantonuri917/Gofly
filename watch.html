@@ -434,33 +434,36 @@
 let databaseFiles = [];
          
 async function fetchVideosFromDatabase() {
-   
+    console.log("Memulai pengambilan data...");
+    
     if (!window.API_CONFIG) {
-        console.error("Gagal: window.API_CONFIG tidak ditemukan!");
+        alert("Config tidak ditemukan! Periksa file config.js");
         return;
     }
     
     const { URL, KEY } = window.API_CONFIG;
-    console.log("URL yang digunakan:", `${URL}/videos_list?order=id.desc`);
 
     try {
         const response = await fetch(`${URL}/videos_list?order=id.desc`, {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${KEY}`, 'apikey': KEY }
+            headers: { 
+                'Authorization': `Bearer ${KEY}`, 
+                'apikey': KEY,
+                'Content-Type': 'application/json' // Tambahkan header ini
+            }
         });
         
-       
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Gagal dari server:", errorText);
-            return;
-        }
+        const data = await response.json();
+        console.log("Respon dari Supabase:", data); // Lihat ini di Console F12
         
-        databaseFiles = await response.json();
-        console.log("Data berhasil diambil:", databaseFiles);
-        renderFileList();
+        if (response.ok) {
+            databaseFiles = data;
+            renderFileList();
+        } else {
+            console.error("Gagal ambil data:", data);
+        }
     } catch (error) { 
-        console.error("Error pada kode JS:", error); 
+        console.error("Error Koneksi:", error); 
     }
 }
      function renderFileList() {
@@ -552,6 +555,10 @@ function handleThumbnailClick(box) {
          window.onload = function() {
         fetchVideosFromDatabase();
     };
+
+ function runAds() {
+    console.log("Ads triggered");
+}        
     </script>
      <script>
 
