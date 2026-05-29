@@ -435,25 +435,45 @@
 
     <script>
 let databaseFiles = [];
-         
+
 async function fetchVideosFromDatabase() {
     const spinner = document.getElementById('loadingSpinner');
     const container = document.getElementById('fileListContainer');
 
-   
+    // Cek Config
     if (typeof window.API_CONFIG === 'undefined') {
-        console.error("Config tidak ditemukan!");
-        container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
+        container.innerHTML = "<p style='color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
         return;
     }
 
     const { URL, KEY } = window.API_CONFIG;
 
+    // --- LOGIKA DETEKSI SLUG (PENTING) ---
+    // 1. Ambil dari path /d/abcde -> hasil: 'abcde'
+    const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+    let slug = (pathParts[0] === 'd' && pathParts[1]) ? pathParts[1] : null;
+
+    // 2. Jika tidak ada di path, coba ambil dari query ?id=abcde
+    if (!slug) {
+        slug = new URLSearchParams(window.location.search).get('id');
+    }
+
+    console.log("Slug yang dideteksi:", slug);
+
+    if (!slug) {
+        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan (Slug null).</p>";
+        return;
+    }
+
     spinner.style.display = 'block';
     container.style.opacity = '0.5';
 
     try {
-        const response = await fetch(`${URL}/videos_list?order=id.desc`, {
+        // --- FETCH DENGAN FILTER ---
+        // Supabase akan hanya mengambil baris yang slug-nya sama dengan slug di URL
+        const fetchUrl = `${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`;
+        
+        const response = await fetch(fetchUrl, {
             method: 'GET',
             headers: { 
                 'Authorization': `Bearer ${KEY}`, 
@@ -462,21 +482,38 @@ async function fetchVideosFromDatabase() {
             }
         });
         
-        if (!response.ok) {
-          
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
-        databaseFiles = await response.json();
-        renderFileList();
+        let data = await response.json();
+        
+        // --- FILTER PENGAMAN (Double Check) ---
+        // Memastikan data yang masuk benar-benar sesuai slug (mencegah kebocoran data)
+        databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
+        
+        if (databaseFiles.length === 0) {
+            container.innerHTML = `<p style="text-align:center;">Data kosong untuk folder: <b>${slug}</b></p>`;
+        } else {
+            renderFileList();
+        }
     } catch (error) { 
         console.error("Detail Error:", error);
-        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
     } finally {
         spinner.style.display = 'none';
         container.style.opacity = '1';
     }
 }
+
+// ... Fungsi renderFileList, toggleVideoPlayer, handleThumbnailClick tetap sama seperti sebelumnya ...
+
+// Fungsi render, toggle, dll letakkan di sini...
+function renderFileList() { /* ... kode render Anda ... */ }
+function toggleVideoPlayer(btn) { /* ... kode toggle Anda ... */ }
+function handleThumbnailClick(box) { /* ... kode handle Anda ... */ }
+function runAds() { console.log("Ads triggered"); }
+
+window.onload = fetchVideosFromDatabase;
+
      function renderFileList() {
     const container = document.getElementById('fileListContainer');
     
