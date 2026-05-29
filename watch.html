@@ -447,23 +447,36 @@ async function fetchVideosFromDatabase() {
 
     const { URL, KEY } = window.API_CONFIG;
 
-    // 1. Ambil slug dari path (/d/abcde) atau query (?id=abcde)
-    let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
-    let slug = pathParts[pathParts.length - 1];
+    // --- PERBAIKAN PENGAMBILAN SLUG YANG LEBIH CERDAS ---
+    let slug = null;
+
+    // 1. Coba ambil dari path (mengabaikan slash)
+    const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
     
-    if (slug === 'watch.html' || !slug) {
+    // Jika path adalah /d/abcde, maka pathParts[0] = 'd', pathParts[1] = 'abcde'
+    if (pathParts.length >= 2 && pathParts[0] === 'd') {
+        slug = pathParts[1];
+    } 
+    // 2. Jika tidak ketemu, coba dari query parameter ?id=
+    else {
         const urlParams = new URLSearchParams(window.location.search);
         slug = urlParams.get('id');
+    }
+
+    console.log("Debug Slug:", slug, "Path:", window.location.pathname);
+
+    if (!slug) {
+        container.innerHTML = `<p style="text-align:center;">Error: Slug tidak ditemukan di URL.</p>`;
+        return;
     }
 
     spinner.style.display = 'block';
     container.style.opacity = '0.5';
 
     try {
-        // 2. Fetch data dengan filter slug
-        const fetchUrl = `${URL}/videos_list?slug=eq.${slug}&order=id.desc`;
-        console.log("Fetching URL:", fetchUrl);
-
+        // Gunakan URL yang bersih
+        const fetchUrl = `${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`;
+        
         const response = await fetch(fetchUrl, {
             method: 'GET',
             headers: { 
@@ -473,27 +486,25 @@ async function fetchVideosFromDatabase() {
             }
         });
         
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         let data = await response.json();
         
-        // 3. Filter ketat di sisi browser
+        // Filter tetap ada sebagai pengaman tambahan
         databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
         
         if (databaseFiles.length === 0) {
-            container.innerHTML = `<p style="text-align:center;">Data tidak ditemukan untuk slug: <b>${slug}</b></p>`;
+            container.innerHTML = `<p style="text-align:center;">Data kosong untuk slug: <b>${slug}</b></p>`;
         } else {
             renderFileList();
         }
     } catch (error) { 
-        console.error("Detail Error:", error);
-        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal: ${error.message}</p>`;
     } finally {
         spinner.style.display = 'none';
         container.style.opacity = '1';
     }
 }
-
 function renderFileList() {
     const container = document.getElementById('fileListContainer');
     container.innerHTML = databaseFiles.map(file => {
