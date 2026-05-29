@@ -3,52 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goflie - File Sharing</title>
+    <title>Goflie - Play Video</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/config.js"></script>
     <style>
-        body { background-color: #141d2a; color: #bdc8d3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        body { background-color: #141d2a; color: #bdc8d3; font-family: sans-serif; margin: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
         
-        /* Header Folder */
-        .folder-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .folder-icon { font-size: 40px; color: #f59f00; }
+        .file-item { background: #192330; margin-bottom: 10px; padding: 10px; border-radius: 8px; }
+        .file-main { display: flex; align-items: center; gap: 15px; }
+        .thumb { width: 50px; height: 50px; background: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         
-        /* Toolbar */
-        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #222f3e; padding-bottom: 15px; }
-        .btn-tool { background: #202c3c; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
-
-        /* File List */
-        .file-item { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid #1e293b; }
-        .thumb { width: 50px; height: 50px; background: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
-        .file-info { flex: 1; }
-        .file-name { color: #fff; font-size: 14px; font-weight: bold; }
-        .file-meta { font-size: 11px; color: #627d98; }
-        .actions { display: flex; gap: 10px; }
-        .btn-act { background: transparent; border: 1px solid #2d3d52; color: #bdc8d3; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        /* Video Player Area */
+        .video-player-box { width: 100%; margin-top: 15px; display: none; background: #000; border-radius: 6px; overflow: hidden; }
+        .video-player-box.active { display: block; }
+        video { width: 100%; height: auto; display: block; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="folder-header">
-        <div class="folder-icon"><i class="fa-solid fa-folder"></i></div>
-        <div>
-            <h2 id="folderTitle" style="color:white; margin:0;">folder</h2>
-            <div id="folderMeta" style="font-size:12px;">May 27, 2026</div>
-        </div>
-    </div>
-
-    <div class="toolbar">
-        <button class="btn-tool" style="background:#2ecc71;"><i class="fa-solid fa-share-nodes"></i></button>
-        <button class="btn-tool"><i class="fa-solid fa-plus"></i></button>
-        <button class="btn-tool" style="background:#1877f2;"><i class="fa-solid fa-cloud-arrow-up"></i></button>
-        <button class="btn-tool"><i class="fa-solid fa-arrows-up-down"></i></button>
-        <button class="btn-tool"><i class="fa-solid fa-filter"></i></button>
-        <button class="btn-tool"><i class="fa-solid fa-magnifying-glass"></i></button>
-        <button class="btn-tool" onclick="location.reload()"><i class="fa-solid fa-rotate"></i></button>
-    </div>
-
     <div id="fileList"></div>
 </div>
 
@@ -66,21 +40,37 @@
         const container = document.getElementById('fileList');
         container.innerHTML = data.map(f => `
             <div class="file-item">
-                <div class="thumb"><i class="fa-solid fa-play" style="color:white; font-size:12px;"></i></div>
-                <div class="file-info">
-                    <div class="file-name">${f.name}</div>
-                    <div class="file-meta">May 27, 2026 • public</div>
+                <div class="file-main">
+                    <div class="thumb" onclick="playVideo('${f.id}')"><i class="fa-solid fa-play" style="color:white;"></i></div>
+                    <div style="flex:1">
+                        <div style="color:#fff; font-weight:bold;">${f.name}</div>
+                        <div style="font-size:11px;">MP4 Video • Click play to watch</div>
+                    </div>
                 </div>
-                <div class="actions">
-                    <button class="btn-act"><i class="fa-solid fa-play"></i></button>
-                    <button class="btn-act"><i class="fa-solid fa-download"></i></button>
-                    <button class="btn-act"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                <div id="player-${f.id}" class="video-player-box">
+                    <video controls playsinline preload="metadata">
+                        <source src="${f.url}" type="video/mp4">
+                        Browser Anda tidak mendukung pemutar video ini.
+                    </video>
                 </div>
             </div>
         `).join('');
     }
+
+    function playVideo(id) {
+        const box = document.getElementById(`player-${id}`);
+        const video = box.querySelector('video');
+        
+        box.classList.toggle('active');
+        
+        if (box.classList.contains('active')) {
+            video.play().catch(e => console.log("User harus klik play manual karena kebijakan browser"));
+        } else {
+            video.pause();
+        }
+    }
+
     window.onload = init;
 </script>
-
 </body>
 </html>
