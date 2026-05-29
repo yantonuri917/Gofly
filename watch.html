@@ -354,7 +354,7 @@
                 height: 78px !important; 
             }
             
-            /* Ketika video di-play di HP, baru melebar penuh 100% */
+           
             .file-row.is-expanded .preview-card-box { 
                 width: 100% !important; 
                 height: auto !important; 
@@ -425,7 +425,7 @@
             </div>
           <div id="loadingSpinner" style="display: none; text-align: center; padding: 20px;">
     <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #1877f2;"></i>
-    <p style="margin-top: 10px; color: #bdc8d3;">Sedang memuat data...</p>
+    <p style="margin-top: 10px; color: #bdc8d3;">...</p>
 </div>  
             <div class="file-list-container" id="fileListContainer"></div>
 
@@ -440,7 +440,7 @@ async function fetchVideosFromDatabase() {
     const spinner = document.getElementById('loadingSpinner');
     const container = document.getElementById('fileListContainer');
 
-    // Pastikan cek apakah config sudah tersedia
+   
     if (typeof window.API_CONFIG === 'undefined') {
         console.error("Config tidak ditemukan!");
         container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
@@ -463,7 +463,7 @@ async function fetchVideosFromDatabase() {
         });
         
         if (!response.ok) {
-            // Ini akan memberitahu Anda kenapa gagal (misal: 401 Unauthorized)
+          
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
@@ -604,11 +604,6 @@ setTimeout(() => {
 }, 200);
 </script>
 <script src="config.js"></script>
-     
-     
      <script src="ads.js"></script>
-
-   
-     
 </body>
 </html>
