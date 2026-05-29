@@ -6,7 +6,7 @@
 <meta name="referrer" content="no-referrer">    
     <title>Gofile - Free file sharing and storage platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/config.js?v=1.0"></script> 
+      <script src="/config.js?v=1.0"></script> 
      <script src="core-init.js"></script>
     <style>
         
@@ -156,32 +156,6 @@
             display: flex;
             align-items: center;
             padding: 0 24px;
-          position: sticky;
-    top: 0;
-    z-index: 999;
-          
-   
-   
-}
- .sticky-ad-container {
-    margin-left: 15px;
-    display: flex;
-    align-items: center;
-    /* Pastikan tinggi iklan tidak melampaui navbar */
-    height: 100%;
-    overflow: hidden;
-}           
-     main {
-    flex: 1;
-    padding: 24px;
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
-    /* Tambahkan sedikit ruang agar konten tidak tersembunyi di balik navbar */
-    padding-top: 30px; 
-}       
-            
-}
         }
         
         .btn-toggle-menu {
@@ -382,7 +356,7 @@
                 height: 78px !important; 
             }
             
-            /* Ketika video di-play di HP, baru melebar penuh 100% */
+           
             .file-row.is-expanded .preview-card-box { 
                 width: 100% !important; 
                 height: auto !important; 
@@ -426,19 +400,6 @@
     <div class="workspace">
         <header class="top-navbar">
             <button class="btn-toggle-menu" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-            <div class="sticky-ad-container">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : 'baa0afb18e2e70c00e4c1406e4824e4b',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://www.highperformanceformat.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
-    </div>  
-          
         </header>
 
         <main>
@@ -466,7 +427,7 @@
             </div>
           <div id="loadingSpinner" style="display: none; text-align: center; padding: 20px;">
     <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #1877f2;"></i>
-    <p style="margin-top: 10px; color: #bdc8d3;">Sedang memuat data...</p>
+    <p style="margin-top: 10px; color: #bdc8d3;">...</p>
 </div>  
             <div class="file-list-container" id="fileListContainer"></div>
 
@@ -477,34 +438,24 @@
     <script>
 let databaseFiles = [];
          
-// --- GANTI FUNGSI fetchVideosFromDatabase DENGAN INI ---
 async function fetchVideosFromDatabase() {
     const spinner = document.getElementById('loadingSpinner');
     const container = document.getElementById('fileListContainer');
 
+   
     if (typeof window.API_CONFIG === 'undefined') {
+        console.error("Config tidak ditemukan!");
         container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
         return;
     }
 
-    // 1. Ambil slug dari URL (contoh URL: domain.com/d/abc123 atau domain.com?id=abc123)
-    const urlParams = new URLSearchParams(window.location.search);
-    const pathParts = window.location.pathname.split('/').filter(p => p);
-    
-    // Logika: Ambil ID setelah '/d/' atau dari parameter '?id='
-    const slug = pathParts.includes('d') ? pathParts[pathParts.indexOf('d') + 1] : urlParams.get('id');
-
-    if (!slug) {
-        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan (Slug kosong).</p>";
-        return;
-    }
-
     const { URL, KEY } = window.API_CONFIG;
+
     spinner.style.display = 'block';
+    container.style.opacity = '0.5';
 
     try {
-        // 2. Gunakan filter slug di sini agar Supabase hanya ambil data yang sesuai
-        const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`, {
+        const response = await fetch(`${URL}/videos_list?order=id.desc`, {
             method: 'GET',
             headers: { 
                 'Authorization': `Bearer ${KEY}`, 
@@ -513,19 +464,19 @@ async function fetchVideosFromDatabase() {
             }
         });
         
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         databaseFiles = await response.json();
-        
-        // Update jumlah file di badge
-        document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
         renderFileList();
-        
     } catch (error) { 
         console.error("Detail Error:", error);
         container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
     } finally {
         spinner.style.display = 'none';
+        container.style.opacity = '1';
     }
 }
      function renderFileList() {
@@ -622,7 +573,6 @@ function handleThumbnailClick(box) {
     console.log("Ads triggered");
 }        
     </script>
- 
      
 </body>
 </html>
