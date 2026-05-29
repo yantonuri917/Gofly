@@ -7,7 +7,7 @@
     <title>Gofile - Free file sharing and storage platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/config.js?v=1.0"></script> 
-    
+     <script src="core-init.js"></script>
     <style>
         
         * {
@@ -156,6 +156,39 @@
             display: flex;
             align-items: center;
             padding: 0 24px;
+          
+          .top-navbar {
+    height: 60px;
+    background-color: #192330;
+    border-bottom: 1px solid #222f3e;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    
+    /* Tambahkan kode ini agar sticky */
+    position: sticky;
+    top: 0;
+    z-index: 999; /* Agar selalu di atas konten lain saat di-scroll */
+    .sticky-ad-container {
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+    /* Pastikan tinggi iklan tidak melampaui navbar */
+    height: 100%;
+    overflow: hidden;
+}
+            
+     main {
+    flex: 1;
+    padding: 24px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    /* Tambahkan sedikit ruang agar konten tidak tersembunyi di balik navbar */
+    padding-top: 30px; 
+}       
+            
+}
         }
         
         .btn-toggle-menu {
@@ -593,7 +626,7 @@ function handleThumbnailClick(box) {
     };
 
  function runAds() {
-    window.open("https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb", "_blank");
+    console.log("Ads triggered");
 }        
     </script>
  
