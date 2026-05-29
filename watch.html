@@ -367,50 +367,6 @@
     width: 100%;
     height: 100%;
 }
-/* Container Loader */
-.loader-icon {
-    font-size: 50px;
-    color: #f59f00;
-    margin-bottom: 20px;
-    animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.8; }
-}
-
-/* Bar Progres */
-.progress-bar-bg {
-    width: 200px;
-    height: 6px;
-    background: #192330;
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 10px;
-}
-
-.progress-bar-fill {
-    width: 68%; /* Anda bisa buat ini dinamis nanti */
-    height: 100%;
-    background: linear-gradient(90deg, #1877f2, #05dfd7);
-    animation: loading-bar 2s infinite ease-in-out;
-}
-
-@keyframes loading-bar {
-    0% { width: 0%; }
-    50% { width: 80%; }
-    100% { width: 0%; }
-}
-
-.loader-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-top: 10px;
-}
-         
     </style>
 </head>
 <body>
@@ -467,16 +423,10 @@
                 <button class="tool-btn"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></button>
                 <button class="tool-btn" onclick="fetchVideosFromDatabase()"><i class="fa-solid fa-rotate"></i> <span>Refresh</span></button>
             </div>
-         <div id="gofile-loader" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px;">
-    <div class="loader-icon">
-        <i class="fa-solid fa-folder"></i>
-    </div>
-    <div class="progress-bar-bg">
-        <div class="progress-bar-fill"></div>
-    </div>
-    <p class="loader-text">Memuat Database Film...</p>
-    <small style="color: #627d98;">Silakan tunggu, file sedang disiapkan.</small>
-</div>
+          <div id="loadingSpinner" style="display: none; text-align: center; padding: 20px;">
+    <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #1877f2;"></i>
+    <p style="margin-top: 10px; color: #bdc8d3;">Sedang memuat data...</p>
+</div>  
             <div class="file-list-container" id="fileListContainer"></div>
 
             <div class="pagination-text" id="paginationSummary"></div>
@@ -487,42 +437,48 @@
 let databaseFiles = [];
          
 async function fetchVideosFromDatabase() {
-    // Tambahkan ini untuk memastikan data config ada
+    const spinner = document.getElementById('loadingSpinner');
+    const container = document.getElementById('fileListContainer');
+
+    // Pastikan cek apakah config sudah tersedia
     if (typeof window.API_CONFIG === 'undefined') {
         console.error("Config tidak ditemukan!");
+        container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
         return;
     }
-    
-    const { URL, KEY } = window.API_CONFIG; // Ambil dari objek config
-    const loader = document.getElementById('gofile-loader');
-    const container = document.getElementById('fileListContainer');
-    // ... sisa kode Anda
-    // Tampilkan loader, sembunyikan list
-    loader.style.display = 'flex';
-    container.style.display = 'none';
+
+    const { URL, KEY } = window.API_CONFIG;
+
+    spinner.style.display = 'block';
+    container.style.opacity = '0.5';
 
     try {
         const response = await fetch(`${URL}/videos_list?order=id.desc`, {
-            headers: { 'Authorization': `Bearer ${KEY}`, 'apikey': KEY }
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${KEY}`, 
+                'apikey': KEY,
+                'Content-Type': 'application/json' 
+            }
         });
         
-        if (!response.ok) throw new Error('Gagal memuat');
+        if (!response.ok) {
+            // Ini akan memberitahu Anda kenapa gagal (misal: 401 Unauthorized)
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         databaseFiles = await response.json();
         renderFileList();
-    } catch (error) {
-        console.error(error);
+    } catch (error) { 
+        console.error("Detail Error:", error);
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
     } finally {
-        // Sembunyikan loader, tampilkan list
-        loader.style.display = 'none';
-        container.style.display = 'block';
+        spinner.style.display = 'none';
+        container.style.opacity = '1';
     }
-}function renderFileList() {
-    const container = document.getElementById('fileListContainer');
-    container.innerHTML = ''; // Bersihkan dulu
-    databaseFiles.forEach(file => {
-        // Logika pembuatan elemen HTML Anda di sini
-    });
 }
+     function renderFileList() {
+    const container = document.getElementById('fileListContainer');
     
     container.innerHTML = databaseFiles.map(file => {
         const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
