@@ -1,76 +1,587 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goflie - Play Video</title>
+     <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">    
+    <title>Gofile - Free file sharing and storage platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/config.js"></script>
     <style>
-        body { background-color: #141d2a; color: #bdc8d3; font-family: sans-serif; margin: 0; }
-        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+   <script src="/config.js?v=1.0"></script>     
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #141d2a;
+            color: #bdc8d3;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        aside {
+            width: 240px;
+            background-color: #192330;
+            border-right: 1px solid #222f3e;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 14px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease, margin-left 0.3s ease;
+            z-index: 1000;
+            transform: translateX(0);
+            margin-left: 0;
+        }
+
+        body.sidebar-toggled aside {
+            transform: translateX(-240px);
+            margin-left: -240px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 24px;
+            padding-left: 6px;
+        }
+
+        .account-selector {
+            background-color: #202c3c;
+            border: 1px solid #34495e;
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #ffffff;
+        }
+        .account-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background: linear-gradient(45deg, #f35588, #05dfd7);
+        }
+
+        .btn-add-account {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            list-style: none;
+        }
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 12px;
+            color: #bdc8d3;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+        .nav-item.active a, .nav-item a:hover {
+            background-color: #202c3c;
+            color: #ffffff;
+        }
+        .nav-item a i {
+            width: 18px;
+            font-size: 16px;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+        body.sidebar-toggled .sidebar-overlay { display: block; }
+
         
-        .file-item { background: #192330; margin-bottom: 10px; padding: 10px; border-radius: 8px; }
-        .file-main { display: flex; align-items: center; gap: 15px; }
-        .thumb { width: 50px; height: 50px; background: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background-color: #141d2a;
+            transition: all 0.3s ease;
+        }
+
+        .top-navbar {
+            height: 60px;
+            background-color: #192330;
+            border-bottom: 1px solid #222f3e;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
         
-        /* Video Player Area */
-        .video-player-box { width: 100%; margin-top: 15px; display: none; background: #000; border-radius: 6px; overflow: hidden; }
-        .video-player-box.active { display: block; }
-        video { width: 100%; height: auto; display: block; }
+        .btn-toggle-menu {
+            background-color: #1c2838;
+            color: #bdc8d3;
+            border: 1px solid #2d3d52;
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .btn-toggle-menu:hover { background-color: #202c3c; color: #ffffff; border-color: #1877f2; }
+
+        main {
+            flex: 1;
+            padding: 24px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .folder-root-info { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+        .folder-large-icon { position: relative; font-size: 42px; color: #f59f00; }
+        .folder-large-badge { position: absolute; bottom: 0; left: -4px; background-color: #2b3a4a; color: #ffffff; font-size: 10px; font-weight: bold; padding: 1px 5px; border-radius: 10px; border: 2px solid #141d2a; }
+        .folder-title-details h2 { font-size: 18px; font-weight: 700; color: #ffffff; }
+        .folder-title-details p { font-size: 12px; color: #627d98; margin-top: 2px; }
+        .badge-status { display: inline-block; background-color: #2d3748; color: #a0aec0; font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-top: 4px; }
+        .btn-more-options { background-color: #202c3c; border: 1px solid #34495e; color: white; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-top: 6px; }
+
+      
+        .gofile-toolbar { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            margin-bottom: 20px; 
+            border-bottom: 1px solid #222f3e; 
+            padding-bottom: 16px; 
+            align-items: center; 
+        }
+
+        .tool-btn { background-color: #202c3c; color: #ced5e0; border: 1px solid #2d3d52; padding: 7px 14px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; height: 38px; }
+        .tool-btn:hover { background-color: #29394e; color: #fff; }
+        .tool-btn.btn-share { background-color: #2ecc71; color: white; border: none; }
+        .tool-btn.btn-create-folder { background-color: #1877f2; color: white; border: none; }
+        .tool-btn.btn-upload { background-color: #1877f2; color: white; border: none; }
+
+     
+        .file-list-container { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+        
+       
+        .file-row { 
+            display: flex; 
+            flex-direction: row; 
+            align-items: flex-start;
+            background-color: transparent; 
+            position: relative; 
+            border-bottom: 1px solid #1e293b; 
+            padding-bottom: 16px; 
+            gap: 16px;
+        }
+
+       
+        .file-media-render-zone {
+            display: flex;
+            flex-shrink: 0;
+        }
+
+      
+.preview-card-box {
+    width: 140px;
+    height: 90px;
+    background-color: #000000;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 1px solid #1e293b;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.preview-card-box video { 
+    width: 100%; 
+    height: 100%; 
+   
+    object-fit: contain; 
+    background-color: #000000;
+}
+        
+       
+        .preview-card-box::after {
+            content: '\f04b';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            color: white;
+            font-size: 18px;
+            background: rgba(0,0,0,0.4);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .preview-card-box:hover::after { opacity: 1; }
+
+     
+        .file-top-control-bar {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+            gap: 14px;
+            height: 90px;
+        }
+
+        .file-header-info { 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1;
+            min-width: 0;
+        }
+        .file-name { font-size: 15px; font-weight: 600; color: #ffffff; word-break: break-all; line-height: 1.4; }
+        .file-meta-sub { font-size: 12px; color: #627d98; margin-top: 4px; display: flex; flex-direction: row; gap: 12px; }
+
+        .file-actions-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        .btn-gofile-action { background-color: #192330; color: #ffffff; border: 1px solid #2d3d52; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .btn-gofile-action:hover { background-color: #253346; }
+        .btn-more-vertical { background-color: transparent; border: none; color: #627d98; width: 32px; height: 32px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+
+       
+        .file-row.is-expanded {
+            flex-direction: column;
+            gap: 12px;
+        }
+        .file-row.is-expanded .file-top-control-bar {
+            width: 100%;
+            height: auto;
+        }
+        .file-row.is-expanded .file-media-render-zone {
+            width: 100%;
+        }
+        .file-row.is-expanded .preview-card-box { 
+            width: 100%; 
+            max-width: 720px; 
+            height: auto; 
+            aspect-ratio: 16 / 9; 
+            cursor: default;
+        }
+        .file-row.is-expanded .preview-card-box::after { display: none; }
+        .file-row.is-expanded .preview-card-box video { 
+            object-fit: contain; 
+        }
+        
+        .pagination-text { text-align: center; font-size: 13px; color: #627d98; margin: 30px 0 10px; }
+
+      
+        @media (max-width: 992px) {
+            aside {
+                position: fixed;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                transform: translateX(-240px);
+                margin-left: 0;
+            }
+            body.sidebar-toggled aside { transform: translateX(0); margin-left: 0; }
+            body:not(.sidebar-toggled) .workspace { margin-left: 0; }
+            body.sidebar-toggled .workspace { margin-left: 0; }
+
+            .gofile-toolbar .tool-btn span { display: none; }
+            .gofile-toolbar .tool-btn { padding: 10px 12px; font-size: 16px; justify-content: center; min-width: 42px; height: 42px; }
+            .gofile-toolbar .tool-btn .fa-caret-down { display: none; }
+
+           
+            .file-row { gap: 12px; }
+            .file-top-control-bar { flex-wrap: wrap; gap: 6px; height: auto; align-self: center; }
+            .file-actions-right { width: 100%; margin-top: 4px; justify-content: flex-start; }
+            
+            .preview-card-box { 
+                width: 120px !important; 
+                height: 78px !important; 
+            }
+            
+            /* Ketika video di-play di HP, baru melebar penuh 100% */
+            .file-row.is-expanded .preview-card-box { 
+                width: 100% !important; 
+                height: auto !important; 
+                aspect-ratio: 16 / 9;
+            }
+        }
+      
+    
+.file-row.is-expanded .preview-card-box iframe {
+    width: 100%;
+    height: 100%;
+}
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="fileList"></div>
-</div>
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
 
-<script>
-    async function init() {
-        if (typeof window.API_CONFIG === 'undefined') return;
-        const { URL, KEY } = window.API_CONFIG;
-        const slug = new URLSearchParams(window.location.search).get('id') || window.location.pathname.split('/').pop();
+    <aside id="sidebarMenu">
+        <a href="#" class="brand-logo" onclick="handleMenuClick(event)">
+            <i class="fa-solid fa-paper-plane" style="color: #f59f00;"></i> Gofile
+        </a>
+        <div class="account-selector">
+            <div class="account-info">
+                <div class="account-avatar"></div>
+                <span>guest6405289440</span>
+            </div>
+            <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: #627d98;"></i>
+        </div>
+        <button class="btn-add-account"><i class="fa-solid fa-plus"></i> Add Account</button>
+        <ul class="nav-menu">
+            <li class="nav-item active"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-crown" style="color: #f59f00;"></i> Premium</a></li>
+            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-gears"></i> API</a></li>
+            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
+            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+            <li class="nav-item" style="margin-top: 20px;"><a href="#" onclick="handleMenuClick(event)"><i class="fa-brands fa-x-twitter"></i> @gofile.mom</a></li>
+        </ul>
+    </aside>
 
-        const res = await fetch(`${URL}/videos_list?slug=eq.${slug}`, {
-            headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
-        });
-        const data = await res.json();
+    <div class="workspace">
+        <header class="top-navbar">
+            <button class="btn-toggle-menu" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        </header>
 
-        const container = document.getElementById('fileList');
-        container.innerHTML = data.map(f => `
-            <div class="file-item">
-                <div class="file-main">
-                    <div class="thumb" onclick="playVideo('${f.id}')"><i class="fa-solid fa-play" style="color:white;"></i></div>
-                    <div style="flex:1">
-                        <div style="color:#fff; font-weight:bold;">${f.name}</div>
-                        <div style="font-size:11px;">MP4 Video • Click play to watch</div>
-                    </div>
+        <main>
+            <div class="folder-root-info">
+                <div class="folder-large-icon">
+                    <i class="fa-solid fa-folder"></i>
+                    <span class="folder-large-badge" id="totalFilesBadge">0</span>
                 </div>
-                <div id="player-${f.id}" class="video-player-box">
-                    <video controls playsinline preload="metadata">
-                        <source src="${f.url}" type="video/mp4">
-                        Browser Anda tidak mendukung pemutar video ini.
-                    </video>
+                <div class="folder-title-details">
+                    <h2>folder</h2>
+                    <p id="folderTime">...</p>
+                    <span class="badge-status"><i class="fa-solid fa-earth-americas"></i> public</span>
+                    <div><button class="btn-more-options"><i class="fa-solid fa-ellipsis"></i></button></div>
                 </div>
             </div>
-        `).join('');
+
+            <div class="gofile-toolbar">
+                <button class="tool-btn btn-share"><i class="fa-solid fa-share-nodes"></i> <span>Share</span></button>
+                <button class="tool-btn btn-create-folder"><i class="fa-solid fa-folder-plus"></i> <span>Create Folder</span></button>
+                <button class="tool-btn btn-upload"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Files</span></button>
+                <button class="tool-btn"><i class="fa-solid fa-arrows-up-down"></i> <span>Sort by</span> <i class="fa-solid fa-caret-down"></i></button>
+                <button class="tool-btn"><i class="fa-solid fa-filter"></i> <span>Filter</span></button>
+                <button class="tool-btn"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></button>
+                <button class="tool-btn" onclick="fetchVideosFromDatabase()"><i class="fa-solid fa-rotate"></i> <span>Refresh</span></button>
+            </div>
+          <div id="loadingSpinner" style="display: none; text-align: center; padding: 20px;">
+    <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #1877f2;"></i>
+    <p style="margin-top: 10px; color: #bdc8d3;">Sedang memuat data...</p>
+</div>  
+            <div class="file-list-container" id="fileListContainer"></div>
+
+            <div class="pagination-text" id="paginationSummary"></div>
+        </main>
+    </div>
+
+    <script>
+let databaseFiles = [];
+         
+// --- GANTI FUNGSI fetchVideosFromDatabase DENGAN INI ---
+async function fetchVideosFromDatabase() {
+    const spinner = document.getElementById('loadingSpinner');
+    const container = document.getElementById('fileListContainer');
+
+    if (typeof window.API_CONFIG === 'undefined') {
+        container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
+        return;
     }
 
-    function playVideo(id) {
-        const box = document.getElementById(`player-${id}`);
-        const video = box.querySelector('video');
+    // 1. Ambil slug dari URL (contoh URL: domain.com/d/abc123 atau domain.com?id=abc123)
+    const urlParams = new URLSearchParams(window.location.search);
+    const pathParts = window.location.pathname.split('/').filter(p => p);
+    
+    // Logika: Ambil ID setelah '/d/' atau dari parameter '?id='
+    const slug = pathParts.includes('d') ? pathParts[pathParts.indexOf('d') + 1] : urlParams.get('id');
+
+    if (!slug) {
+        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan (Slug kosong).</p>";
+        return;
+    }
+
+    const { URL, KEY } = window.API_CONFIG;
+    spinner.style.display = 'block';
+
+    try {
+        // 2. Gunakan filter slug di sini agar Supabase hanya ambil data yang sesuai
+        const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`, {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${KEY}`, 
+                'apikey': KEY,
+                'Content-Type': 'application/json' 
+            }
+        });
         
-        box.classList.toggle('active');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
-        if (box.classList.contains('active')) {
-            video.play().catch(e => console.log("User harus klik play manual karena kebijakan browser"));
-        } else {
-            video.pause();
+        databaseFiles = await response.json();
+        
+        // Update jumlah file di badge
+        document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
+        renderFileList();
+        
+    } catch (error) { 
+        console.error("Detail Error:", error);
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
+    } finally {
+        spinner.style.display = 'none';
+    }
+}
+     function renderFileList() {
+    const container = document.getElementById('fileListContainer');
+    
+    container.innerHTML = databaseFiles.map(file => {
+        const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
+        
+       
+        const isEmbed = file.url.includes('videas.fr');
+        const mediaTag = isEmbed 
+            ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
+            : `<video preload="metadata" src="${file.url}#t=0.5" muted playsinline></video>`;
+
+        return `
+            <div class="file-row" id="row-${file.id}">
+                <div class="file-media-render-zone">
+                    <div class="preview-card-box" onclick="handleThumbnailClick(this)">
+                        ${mediaTag}
+                    </div>
+                </div>
+
+                <div class="file-top-control-bar">
+                    <div class="file-header-info">
+                        <span class="file-name">${file.name}</span>
+                        <div class="file-meta-sub">
+                            <span><i class="fa-regular fa-calendar"></i> ${dateClean}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="file-actions-right">
+                        <button class="btn-gofile-action btn-play-toggle" onclick="toggleVideoPlayer(this)">
+                            <i class="fa-solid fa-play"></i> <span>Play</span>
+                        </button>
+                        
+                       <button class="btn-gofile-action" onclick="runAds()">
+    <i class="fa-solid fa-download"></i> <span>Download</span>
+</button>
+                        
+                        <button class="btn-more-vertical"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+       function toggleVideoPlayer(btn) {
+    const fileRow = btn.closest('.file-row');
+    const mediaElement = fileRow.querySelector('.preview-card-box video, .preview-card-box iframe');
+    const btnText = btn.querySelector('span');
+    const btnIcon = btn.querySelector('i');
+    
+   
+    const isVideo = mediaElement.tagName === 'VIDEO';
+
+    if (fileRow.classList.contains('is-expanded')) {
+      
+        fileRow.classList.remove('is-expanded');
+        btnText.innerText = "Play";
+        btnIcon.className = "fa-solid fa-play";
+        
+        if (isVideo) {
+            mediaElement.removeAttribute('controls');
+            mediaElement.muted = true;
+            mediaElement.pause();
         }
+    } else {
+      
+        fileRow.classList.add('is-expanded');
+        btnText.innerText = "Close";
+        btnIcon.className = "fa-solid fa-xmark";
+        
+        if (isVideo) {
+            mediaElement.setAttribute('controls', 'true');
+            mediaElement.muted = false;
+            mediaElement.play();
+        }
+       
     }
+}
 
-    window.onload = init;
-</script>
+function handleThumbnailClick(box) {
+    const fileRow = box.closest('.file-row');
+    if (!fileRow.classList.contains('is-expanded')) {
+        const targetBtn = fileRow.querySelector('.btn-play-toggle');
+        toggleVideoPlayer(targetBtn);
+    }
+}
+         window.onload = function() {
+        fetchVideosFromDatabase();
+    };
+
+ function runAds() {
+    console.log("Ads triggered");
+}        
+    </script>
+ 
+     
 </body>
 </html>
