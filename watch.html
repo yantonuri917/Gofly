@@ -447,17 +447,32 @@ async function fetchVideosFromDatabase() {
 
     const { URL, KEY } = window.API_CONFIG;
 
-    // AMBIL SLUG DARI URL
-    // Contoh: goflie.top/d/60w0mp -> maka slug = '60w0mp'
-    const slug = window.location.pathname.split('/d/').pop();
+    // --- CARA LEBIH AMAN MENGAMBIL SLUG ---
+    // 1. Coba ambil dari path (contoh: /d/60w0mp)
+    let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+    let slug = pathParts[pathParts.length - 1];
+    
+    // 2. Jika slug masih terbaca sebagai 'watch.html' atau kosong, 
+    //    coba ambil dari ?id=60w0mp
+    if (slug === 'watch.html' || !slug) {
+        const urlParams = new URLSearchParams(window.location.search);
+        slug = urlParams.get('id');
+    }
+
+    console.log("Mencoba fetch dengan slug:", slug); // Buka Inspect (F12) > Console untuk lihat ini
 
     spinner.style.display = 'block';
     container.style.opacity = '0.5';
 
     try {
-        // FILTER BERDASARKAN SLUG
-        // Tambahkan filter ?slug=eq.${slug} agar data unik per folder
-        const response = await fetch(`${URL}/videos_list?slug=eq.${slug}&order=id.desc`, {
+        // PERHATIAN: Jika slug tetap null, fetch akan error. 
+        // Kita beri pengecekan agar tidak error saat slug tidak ditemukan.
+        let fetchUrl = `${URL}/videos_list?order=id.desc`;
+        if (slug && slug !== 'undefined') {
+            fetchUrl = `${URL}/videos_list?slug=eq.${slug}&order=id.desc`;
+        }
+
+        const response = await fetch(fetchUrl, {
             method: 'GET',
             headers: { 
                 'Authorization': `Bearer ${KEY}`, 
@@ -470,21 +485,19 @@ async function fetchVideosFromDatabase() {
         
         databaseFiles = await response.json();
         
-        // Tambahkan pengecekan jika folder kosong
         if (databaseFiles.length === 0) {
-            container.innerHTML = `<p style="text-align:center;">Folder ini kosong atau slug salah.</p>`;
+            container.innerHTML = `<p style="text-align:center;">Data tidak ditemukan untuk slug: <b>${slug}</b></p>`;
         } else {
             renderFileList();
         }
     } catch (error) { 
         console.error("Detail Error:", error);
-        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
     } finally {
         spinner.style.display = 'none';
         container.style.opacity = '1';
     }
 }
-
 // Fungsi renderFileList, toggleVideoPlayer, dan handleThumbnailClick 
 // milik Anda sudah sangat bagus, silakan tetap gunakan yang lama.
 
