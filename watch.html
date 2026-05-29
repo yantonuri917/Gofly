@@ -423,7 +423,10 @@
                 <button class="tool-btn"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></button>
                 <button class="tool-btn" onclick="fetchVideosFromDatabase()"><i class="fa-solid fa-rotate"></i> <span>Refresh</span></button>
             </div>
-            
+          <div id="loadingSpinner" style="display: none; text-align: center; padding: 20px;">
+    <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #1877f2;"></i>
+    <p style="margin-top: 10px; color: #bdc8d3;">Sedang memuat data...</p>
+</div>  
             <div class="file-list-container" id="fileListContainer"></div>
 
             <div class="pagination-text" id="paginationSummary"></div>
@@ -434,36 +437,30 @@
 let databaseFiles = [];
          
 async function fetchVideosFromDatabase() {
-    console.log("Memulai pengambilan data...");
-    
-    if (!window.API_CONFIG) {
-        alert("Config tidak ditemukan! Periksa file config.js");
-        return;
-    }
-    
-    const { URL, KEY } = window.API_CONFIG;
+    const spinner = document.getElementById('loadingSpinner');
+    const container = document.getElementById('fileListContainer');
+
+    // Tampilkan spinner, sembunyikan container
+    spinner.style.display = 'block';
+    container.style.opacity = '0.5'; // Opsional: buat list lama jadi agak redup
 
     try {
         const response = await fetch(`${URL}/videos_list?order=id.desc`, {
             method: 'GET',
-            headers: { 
-                'Authorization': `Bearer ${KEY}`, 
-                'apikey': KEY,
-                'Content-Type': 'application/json' // Tambahkan header ini
-            }
+            headers: { 'Authorization': `Bearer ${KEY}`, 'apikey': KEY }
         });
         
-        const data = await response.json();
-        console.log("Respon dari Supabase:", data); // Lihat ini di Console F12
+        if (!response.ok) throw new Error('Gagal memuat data');
         
-        if (response.ok) {
-            databaseFiles = data;
-            renderFileList();
-        } else {
-            console.error("Gagal ambil data:", data);
-        }
+        databaseFiles = await response.json();
+        renderFileList();
     } catch (error) { 
-        console.error("Error Koneksi:", error); 
+        console.error("Error:", error);
+        container.innerHTML = "<p style='text-align:center; color:red;'>Gagal memuat data. Silakan refresh.</p>";
+    } finally {
+        // Matikan spinner apa pun hasilnya
+        spinner.style.display = 'none';
+        container.style.opacity = '1';
     }
 }
      function renderFileList() {
