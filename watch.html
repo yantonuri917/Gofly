@@ -440,7 +440,6 @@ async function fetchVideosFromDatabase() {
     const spinner = document.getElementById('loadingSpinner');
     const container = document.getElementById('fileListContainer');
 
-    // Cek Config
     if (typeof window.API_CONFIG === 'undefined') {
         container.innerHTML = "<p style='color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
         return;
@@ -448,20 +447,16 @@ async function fetchVideosFromDatabase() {
 
     const { URL, KEY } = window.API_CONFIG;
 
-    // --- LOGIKA DETEKSI SLUG (PENTING) ---
-    // 1. Ambil dari path /d/abcde -> hasil: 'abcde'
-    const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
-    let slug = (pathParts[0] === 'd' && pathParts[1]) ? pathParts[1] : null;
+    // --- PERBAIKAN LOGIKA DETEKSI SLUG ---
+    // Kita cek semua bagian path untuk mencari string yang bukan 'd' dan bukan 'watch.html'
+    const paths = window.location.pathname.split('/').filter(p => p && p !== 'd' && p !== 'watch.html');
+    let slug = paths.length > 0 ? paths[0] : new URLSearchParams(window.location.search).get('id');
 
-    // 2. Jika tidak ada di path, coba ambil dari query ?id=abcde
-    if (!slug) {
-        slug = new URLSearchParams(window.location.search).get('id');
-    }
-
-    console.log("Slug yang dideteksi:", slug);
+    console.log("Slug yang terdeteksi:", slug);
+    console.log("Full Path:", window.location.pathname);
 
     if (!slug) {
-        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan (Slug null).</p>";
+        container.innerHTML = "<p style='text-align:center;'>Slug tidak ditemukan di URL.</p>";
         return;
     }
 
@@ -469,8 +464,8 @@ async function fetchVideosFromDatabase() {
     container.style.opacity = '0.5';
 
     try {
-        // --- FETCH DENGAN FILTER ---
-        // Supabase akan hanya mengambil baris yang slug-nya sama dengan slug di URL
+        // Gunakan filter yang lebih fleksibel: 'in' atau 'eq'
+        // Jika kolom slug di database adalah teks, 'eq' sudah benar.
         const fetchUrl = `${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`;
         
         const response = await fetch(fetchUrl, {
@@ -482,28 +477,26 @@ async function fetchVideosFromDatabase() {
             }
         });
         
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(`Status: ${response.status}`);
         
         let data = await response.json();
         
-        // --- FILTER PENGAMAN (Double Check) ---
-        // Memastikan data yang masuk benar-benar sesuai slug (mencegah kebocoran data)
+        // Filter di client untuk jaga-jaga
         databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
         
         if (databaseFiles.length === 0) {
-            container.innerHTML = `<p style="text-align:center;">Data kosong untuk folder: <b>${slug}</b></p>`;
+            container.innerHTML = `<p style="text-align:center;">Tidak ada file untuk slug: <b>${slug}</b></p>`;
         } else {
             renderFileList();
         }
     } catch (error) { 
-        console.error("Detail Error:", error);
+        console.error("Error Detail:", error);
         container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
     } finally {
         spinner.style.display = 'none';
         container.style.opacity = '1';
     }
 }
-
 // ... Fungsi renderFileList, toggleVideoPlayer, handleThumbnailClick tetap sama seperti sebelumnya ...
 
 // Fungsi render, toggle, dll letakkan di sini...
