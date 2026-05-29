@@ -483,7 +483,18 @@ async function fetchVideosFromDatabase() {
         
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
-        databaseFiles = await response.json();
+       databaseFiles = await response.json();
+        
+        // --- DOUBLE PROTECTION (Filter di sisi Browser) ---
+        // Kita paksa filter lagi di sini agar slug yang tidak sesuai dibuang
+        if (slug && slug !== 'undefined') {
+            databaseFiles = databaseFiles.filter(item => {
+                // Pastikan slug di database dan slug di URL dicocokkan
+                // Kita gunakan .trim() untuk menghilangkan spasi tak terlihat
+                return String(item.slug).trim() === String(slug).trim();
+            });
+        }
+        // ---------------------------------------------------
         
         if (databaseFiles.length === 0) {
             container.innerHTML = `<p style="text-align:center;">Data tidak ditemukan untuk slug: <b>${slug}</b></p>`;
