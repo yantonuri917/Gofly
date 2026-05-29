@@ -2,8 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Goflie - Watch</title>
-    <script src="config.js"></script>
+    
+    <script src="/config.js?v=1.0"></script>
     
     <style>
         body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
@@ -20,63 +22,83 @@
     <div id="fileListContainer"></div>
 
     <script>
-        async function fetchVideos() {
+        async function initApp() {
             const container = document.getElementById('fileListContainer');
-            
-            // 2. Tunggu sampai API_CONFIG benar-benar terbaca
-            let attempts = 0;
-            while (typeof window.API_CONFIG === 'undefined' && attempts < 10) {
-                await new Promise(r => setTimeout(r, 100));
-                attempts++;
-            }
+            const spinner = document.getElementById('loadingSpinner');
 
+            // 1. Verifikasi API_CONFIG sudah dimuat
             if (typeof window.API_CONFIG === 'undefined') {
-                container.innerHTML = "<p style='color:red;'>Error: config.js gagal dimuat.</p>";
+                container.innerHTML = "<p style='color:red;'>Error: config.js gagal dimuat. Cek console!</p>";
+                console.error("API_CONFIG tidak ditemukan di window.");
                 return;
             }
 
             const { URL, KEY } = window.API_CONFIG;
-            
-            // 3. Deteksi Slug
+
+            // 2. Deteksi Slug
             const paths = window.location.pathname.split('/').filter(p => p && p !== 'd' && p !== 'watch.html');
             let slug = paths.length > 0 ? paths[0] : new URLSearchParams(window.location.search).get('id');
 
+            console.log("Mencari data untuk slug:", slug);
+
             if (!slug) {
-                container.innerHTML = "<p>Slug tidak ditemukan.</p>";
+                container.innerHTML = "<p style='text-align:center;'>Slug tidak ditemukan.</p>";
                 return;
             }
 
+            spinner.style.display = 'block';
+
             try {
+                // 3. Fetch ke Supabase
                 const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}`, {
-                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }
+                    headers: { 
+                        'apikey': KEY, 
+                        'Authorization': `Bearer ${KEY}`, 
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    }
                 });
+                
+                if (!response.ok) throw new Error("Gagal mengambil data dari database");
                 
                 const data = await response.json();
                 
                 if (data.length === 0) {
-                    container.innerHTML = `<p>Tidak ada data untuk slug: ${slug}</p>`;
+                    container.innerHTML = `<p style='text-align:center;'>Tidak ada file untuk slug: <b>${slug}</b></p>`;
                 } else {
-                    renderUI(data);
+                    renderFileList(data);
                 }
             } catch (error) {
-                container.innerHTML = `<p style='color:red;'>Error: ${error.message}</p>`;
+                container.innerHTML = `<p style='text-align:center; color:red;'>Error: ${error.message}</p>`;
+            } finally {
+                spinner.style.display = 'none';
             }
         }
 
-        function renderUI(files) {
-            document.getElementById('fileListContainer').innerHTML = files.map(file => `
+        function renderFileList(files) {
+            const container = document.getElementById('fileListContainer');
+            container.innerHTML = files.map(file => `
                 <div class="file-row">
                     <h3>${file.name}</h3>
-                    <div class="preview-card-box" onclick="this.parentElement.classList.toggle('is-expanded')">
+                    <div class="preview-card-box" onclick="toggleVideo(this)">
                         ${file.url.includes('videas.fr') 
                             ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
                             : `<video src="${file.url}" playsinline></video>`}
                     </div>
+                    <button onclick="toggleVideo(this.previousElementSibling)">Play / Close</button>
                 </div>
             `).join('');
         }
 
-        window.onload = fetchVideos;
+        function toggleVideo(el) {
+            const row = el.closest('.file-row');
+            row.classList.toggle('is-expanded');
+            const media = row.querySelector('video, iframe');
+            if(media && media.tagName === 'VIDEO') media.play();
+        }
+
+        // Jalankan saat halaman selesai dimuat
+        window.onload = initApp;
     </script>
 </body>
 </html>
