@@ -1,102 +1,86 @@
-         <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gofile - Watch</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goflie - File Sharing</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/config.js?v=1.0"></script>
+    <script src="/config.js"></script>
     <style>
-        /* CSS Anda tetap sama seperti yang Anda berikan sebelumnya */
-        body { background-color: #141d2a; color: #bdc8d3; margin: 0; font-family: sans-serif; }
-        .workspace { padding: 20px; }
-        .file-row { background: #192330; margin-bottom: 10px; padding: 15px; border-radius: 8px; border-bottom: 1px solid #222f3e; }
-        .preview-card-box { width: 100%; max-width: 720px; background: #000; border-radius: 6px; cursor: pointer; overflow: hidden; }
-        video, iframe { width: 100%; display: none; aspect-ratio: 16/9; }
-        .is-expanded video, .is-expanded iframe { display: block; }
-        .spinner { text-align: center; padding: 50px; font-size: 30px; color: #1877f2; }
+        body { background-color: #141d2a; color: #bdc8d3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        
+        /* Header Folder */
+        .folder-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .folder-icon { font-size: 40px; color: #f59f00; }
+        
+        /* Toolbar */
+        .toolbar { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #222f3e; padding-bottom: 15px; }
+        .btn-tool { background: #202c3c; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+
+        /* File List */
+        .file-item { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid #1e293b; }
+        .thumb { width: 50px; height: 50px; background: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+        .file-info { flex: 1; }
+        .file-name { color: #fff; font-size: 14px; font-weight: bold; }
+        .file-meta { font-size: 11px; color: #627d98; }
+        .actions { display: flex; gap: 10px; }
+        .btn-act { background: transparent; border: 1px solid #2d3d52; color: #bdc8d3; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="workspace">
-    <div id="loadingSpinner" class="spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin"></i></div>
-    <div id="fileListContainer"></div>
+<div class="container">
+    <div class="folder-header">
+        <div class="folder-icon"><i class="fa-solid fa-folder"></i></div>
+        <div>
+            <h2 id="folderTitle" style="color:white; margin:0;">folder</h2>
+            <div id="folderMeta" style="font-size:12px;">May 27, 2026</div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn-tool" style="background:#2ecc71;"><i class="fa-solid fa-share-nodes"></i></button>
+        <button class="btn-tool"><i class="fa-solid fa-plus"></i></button>
+        <button class="btn-tool" style="background:#1877f2;"><i class="fa-solid fa-cloud-arrow-up"></i></button>
+        <button class="btn-tool"><i class="fa-solid fa-arrows-up-down"></i></button>
+        <button class="btn-tool"><i class="fa-solid fa-filter"></i></button>
+        <button class="btn-tool"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="btn-tool" onclick="location.reload()"><i class="fa-solid fa-rotate"></i></button>
+    </div>
+
+    <div id="fileList"></div>
 </div>
 
 <script>
-    let databaseFiles = [];
-
-    // FUNGSI UTAMA (Inisialisasi)
-    async function initApp() {
-        if (typeof window.API_CONFIG === 'undefined') {
-            document.body.innerHTML = "<h2 style='color:red; text-align:center;'>Error: config.js gagal dimuat!</h2>";
-            return;
-        }
-
-        // Ambil slug dari URL path (/d/abcde) atau parameter (?id=abcde)
-        const paths = window.location.pathname.split('/').filter(p => p && p !== 'd' && p !== 'watch.html');
-        let slug = paths.length > 0 ? paths[0] : new URLSearchParams(window.location.search).get('id');
-
-        if (!slug) {
-            document.getElementById('fileListContainer').innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan.</p>";
-            return;
-        }
-
-        await fetchVideos(slug);
-    }
-
-    async function fetchVideos(slug) {
-        const spinner = document.getElementById('loadingSpinner');
-        const container = document.getElementById('fileListContainer');
+    async function init() {
+        if (typeof window.API_CONFIG === 'undefined') return;
         const { URL, KEY } = window.API_CONFIG;
+        const slug = new URLSearchParams(window.location.search).get('id') || window.location.pathname.split('/').pop();
 
-        spinner.style.display = 'block';
+        const res = await fetch(`${URL}/videos_list?slug=eq.${slug}`, {
+            headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+        });
+        const data = await res.json();
 
-        try {
-            const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`, {
-                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }
-            });
-            
-            databaseFiles = await response.json();
-            renderFileList();
-        } catch (error) {
-            container.innerHTML = `<p style='text-align:center; color:red;'>Error: ${error.message}</p>`;
-        } finally {
-            spinner.style.display = 'none';
-        }
-    }
-
-    function renderFileList() {
-        const container = document.getElementById('fileListContainer');
-        if (databaseFiles.length === 0) {
-            container.innerHTML = "<p style='text-align:center;'>Data kosong atau slug salah.</p>";
-            return;
-        }
-
-        container.innerHTML = databaseFiles.map(file => `
-            <div class="file-row">
-                <div class="preview-card-box" onclick="toggleVideo(this)">
-                    ${file.url.includes('videas.fr') 
-                        ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
-                        : `<video src="${file.url}" playsinline></video>`}
+        const container = document.getElementById('fileList');
+        container.innerHTML = data.map(f => `
+            <div class="file-item">
+                <div class="thumb"><i class="fa-solid fa-play" style="color:white; font-size:12px;"></i></div>
+                <div class="file-info">
+                    <div class="file-name">${f.name}</div>
+                    <div class="file-meta">May 27, 2026 • public</div>
                 </div>
-                <h3>${file.name}</h3>
-                <button onclick="toggleVideo(this.previousElementSibling.previousElementSibling)">Play / Close</button>
+                <div class="actions">
+                    <button class="btn-act"><i class="fa-solid fa-play"></i></button>
+                    <button class="btn-act"><i class="fa-solid fa-download"></i></button>
+                    <button class="btn-act"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                </div>
             </div>
         `).join('');
     }
-
-    function toggleVideo(el) {
-        const row = el.closest('.file-row');
-        row.classList.toggle('is-expanded');
-        const media = row.querySelector('video, iframe');
-        if(media && media.tagName === 'VIDEO') {
-            row.classList.contains('is-expanded') ? media.play() : media.pause();
-        }
-    }
-
-    window.onload = initApp;
+    window.onload = init;
 </script>
+
 </body>
 </html>
