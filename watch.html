@@ -2,8 +2,9 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Goflie - Watch</title>
+    <script src="config.js"></script>
+    
     <style>
         body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
@@ -19,72 +20,63 @@
     <div id="fileListContainer"></div>
 
     <script>
-        // --- KONFIGURASI LANGSUNG (Tanpa file eksternal) ---
-        const API_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co/rest/v1";
-        const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE"; // GANTI INI DENGAN KEY ANDA
-
-        async function init() {
+        async function fetchVideos() {
             const container = document.getElementById('fileListContainer');
-            const spinner = document.getElementById('loadingSpinner');
+            
+            // 2. Tunggu sampai API_CONFIG benar-benar terbaca
+            let attempts = 0;
+            while (typeof window.API_CONFIG === 'undefined' && attempts < 10) {
+                await new Promise(r => setTimeout(r, 100));
+                attempts++;
+            }
 
-            // 1. Deteksi Slug
-            const paths = window.location.pathname.split('/').filter(p => p && p !== 'd' && p !== 'watch.html');
-            let slug = paths.length > 0 ? paths[0] : new URLSearchParams(window.location.search).get('id');
-
-            console.log("Mencari slug:", slug);
-
-            if (!slug) {
-                container.innerHTML = "<p style='text-align:center;'>Slug tidak ditemukan di URL.</p>";
+            if (typeof window.API_CONFIG === 'undefined') {
+                container.innerHTML = "<p style='color:red;'>Error: config.js gagal dimuat.</p>";
                 return;
             }
 
-            spinner.style.display = 'block';
+            const { URL, KEY } = window.API_CONFIG;
+            
+            // 3. Deteksi Slug
+            const paths = window.location.pathname.split('/').filter(p => p && p !== 'd' && p !== 'watch.html');
+            let slug = paths.length > 0 ? paths[0] : new URLSearchParams(window.location.search).get('id');
+
+            if (!slug) {
+                container.innerHTML = "<p>Slug tidak ditemukan.</p>";
+                return;
+            }
 
             try {
-                // 2. Fetch data
-                const response = await fetch(`${API_URL}/videos_list?slug=eq.${encodeURIComponent(slug)}`, {
-                    headers: { 'apikey': API_KEY, 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' }
+                const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}`, {
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }
                 });
-                
-                if (!response.ok) throw new Error("Gagal mengambil data");
                 
                 const data = await response.json();
                 
                 if (data.length === 0) {
-                    container.innerHTML = `<p style='text-align:center;'>Tidak ada data untuk slug: <b>${slug}</b></p>`;
+                    container.innerHTML = `<p>Tidak ada data untuk slug: ${slug}</p>`;
                 } else {
-                    renderFileList(data);
+                    renderUI(data);
                 }
             } catch (error) {
-                container.innerHTML = `<p style='text-align:center; color:red;'>Error: ${error.message}</p>`;
-            } finally {
-                spinner.style.display = 'none';
+                container.innerHTML = `<p style='color:red;'>Error: ${error.message}</p>`;
             }
         }
 
-        function renderFileList(files) {
-            const container = document.getElementById('fileListContainer');
-            container.innerHTML = files.map(file => `
+        function renderUI(files) {
+            document.getElementById('fileListContainer').innerHTML = files.map(file => `
                 <div class="file-row">
                     <h3>${file.name}</h3>
-                    <div class="preview-card-box" onclick="toggleVideo(this)">
+                    <div class="preview-card-box" onclick="this.parentElement.classList.toggle('is-expanded')">
                         ${file.url.includes('videas.fr') 
                             ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
                             : `<video src="${file.url}" playsinline></video>`}
                     </div>
-                    <button onclick="toggleVideo(this.previousElementSibling)">Play / Close</button>
                 </div>
             `).join('');
         }
 
-        function toggleVideo(el) {
-            const row = el.closest('.file-row');
-            row.classList.toggle('is-expanded');
-            const media = row.querySelector('video, iframe');
-            if(media && media.tagName === 'VIDEO') media.play();
-        }
-
-        window.onload = init;
+        window.onload = fetchVideos;
     </script>
 </body>
 </html>
