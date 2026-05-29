@@ -440,20 +440,24 @@ async function fetchVideosFromDatabase() {
     const spinner = document.getElementById('loadingSpinner');
     const container = document.getElementById('fileListContainer');
 
-   
     if (typeof window.API_CONFIG === 'undefined') {
-        console.error("Config tidak ditemukan!");
         container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
         return;
     }
 
     const { URL, KEY } = window.API_CONFIG;
 
+    // AMBIL SLUG DARI URL
+    // Contoh: goflie.top/d/60w0mp -> maka slug = '60w0mp'
+    const slug = window.location.pathname.split('/').pop();
+
     spinner.style.display = 'block';
     container.style.opacity = '0.5';
 
     try {
-        const response = await fetch(`${URL}/videos_list?order=id.desc`, {
+        // FILTER BERDASARKAN SLUG
+        // Tambahkan filter ?slug=eq.${slug} agar data unik per folder
+        const response = await fetch(`${URL}/videos_list?slug=eq.${slug}&order=id.desc`, {
             method: 'GET',
             headers: { 
                 'Authorization': `Bearer ${KEY}`, 
@@ -462,21 +466,30 @@ async function fetchVideosFromDatabase() {
             }
         });
         
-        if (!response.ok) {
-          
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         databaseFiles = await response.json();
-        renderFileList();
+        
+        // Tambahkan pengecekan jika folder kosong
+        if (databaseFiles.length === 0) {
+            container.innerHTML = `<p style="text-align:center;">Folder ini kosong atau slug salah.</p>`;
+        } else {
+            renderFileList();
+        }
     } catch (error) { 
         console.error("Detail Error:", error);
-        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
     } finally {
         spinner.style.display = 'none';
         container.style.opacity = '1';
     }
 }
+
+// Fungsi renderFileList, toggleVideoPlayer, dan handleThumbnailClick 
+// milik Anda sudah sangat bagus, silakan tetap gunakan yang lama.
+
+
+
      function renderFileList() {
     const container = document.getElementById('fileListContainer');
     
