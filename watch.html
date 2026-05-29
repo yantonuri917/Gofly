@@ -1,96 +1,554 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+     <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="referrer" content="no-referrer">    <title>Gofile - Media Viewer</title>
+<meta name="referrer" content="no-referrer">    
+    <title>Gofile - Free file sharing and storage platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #141d2a; color: #bdc8d3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 10px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        
-        /* Animasi Spinner */
-        .spinner-wrapper { display: flex; justify-content: center; padding: 50px; }
-        .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: #1877f2; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* ==================== CORE RESET & VARIABEL KORPORAT ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-        /* Gaya yang ada sebelumnya */
-        .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .folder-icon { font-size: 32px; color: #f59f00; position: relative; }
-        .badge { position: absolute; bottom: 0; left: -2px; background: #2b3a4a; color: white; font-size: 10px; padding: 1px 5px; border-radius: 10px; border: 2px solid #141d2a; }
-        .folder-title { font-weight: 700; color: white; font-size: 18px; }
-        .file-item { background: #192330; border: 1px solid #222f3e; border-radius: 6px; padding: 15px; margin-bottom: 15px; }
-        .file-header { display: flex; gap: 10px; margin-bottom: 10px; }
-        .file-info { flex: 1; }
-        .file-name { color: white; font-weight: 600; font-size: 14px; word-break: break-all; }
-        .file-meta { font-size: 12px; color: #8899x6; }
-        .media-container { width: 100%; margin-top: 10px; background: #000; border-radius: 4px; overflow: hidden; display: flex; justify-content: center; }
-        video { width: 100%; max-height: 50vh; outline: none; }
-        .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        .btn { background: #202c3c; color: #cbd5e0; border: 1px solid #34495e; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-        .action-btn { background: #202c3c; border: 1px solid #34495e; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        body {
+            background-color: #141d2a;
+            color: #bdc8d3;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ==================== SIDEBAR NAVIGASI KIRI ==================== */
+        aside {
+            width: 240px;
+            background-color: #192330;
+            border-right: 1px solid #222f3e;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 14px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease, margin-left 0.3s ease;
+            z-index: 1000;
+            transform: translateX(0);
+            margin-left: 0;
+        }
+
+        body.sidebar-toggled aside {
+            transform: translateX(-240px);
+            margin-left: -240px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 24px;
+            padding-left: 6px;
+        }
+
+        .account-selector {
+            background-color: #202c3c;
+            border: 1px solid #34495e;
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #ffffff;
+        }
+        .account-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background: linear-gradient(45deg, #f35588, #05dfd7);
+        }
+
+        .btn-add-account {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            list-style: none;
+        }
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 12px;
+            color: #bdc8d3;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+        .nav-item.active a, .nav-item a:hover {
+            background-color: #202c3c;
+            color: #ffffff;
+        }
+        .nav-item a i {
+            width: 18px;
+            font-size: 16px;
+            text-align: center;
+            color: #94a3b8;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+        body.sidebar-toggled .sidebar-overlay { display: block; }
+
+        /* ==================== WORKSPACE KANAN ==================== */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background-color: #141d2a;
+            transition: all 0.3s ease;
+        }
+
+        .top-navbar {
+            height: 60px;
+            background-color: #192330;
+            border-bottom: 1px solid #222f3e;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
+        
+        .btn-toggle-menu {
+            background-color: #1c2838;
+            color: #bdc8d3;
+            border: 1px solid #2d3d52;
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        .btn-toggle-menu:hover { background-color: #202c3c; color: #ffffff; border-color: #1877f2; }
+
+        main {
+            flex: 1;
+            padding: 24px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .folder-root-info { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+        .folder-large-icon { position: relative; font-size: 42px; color: #f59f00; }
+        .folder-large-badge { position: absolute; bottom: 0; left: -4px; background-color: #2b3a4a; color: #ffffff; font-size: 10px; font-weight: bold; padding: 1px 5px; border-radius: 10px; border: 2px solid #141d2a; }
+        .folder-title-details h2 { font-size: 18px; font-weight: 700; color: #ffffff; }
+        .folder-title-details p { font-size: 12px; color: #627d98; margin-top: 2px; }
+        .badge-status { display: inline-block; background-color: #2d3748; color: #a0aec0; font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-top: 4px; }
+        .btn-more-options { background-color: #202c3c; border: 1px solid #34495e; color: white; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-top: 6px; }
+
+        /* Toolbar Fitur Atas */
+        .gofile-toolbar { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+            margin-bottom: 20px; 
+            border-bottom: 1px solid #222f3e; 
+            padding-bottom: 16px; 
+            align-items: center; 
+        }
+
+        .tool-btn { background-color: #202c3c; color: #ced5e0; border: 1px solid #2d3d52; padding: 7px 14px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; height: 38px; }
+        .tool-btn:hover { background-color: #29394e; color: #fff; }
+        .tool-btn.btn-share { background-color: #2ecc71; color: white; border: none; }
+        .tool-btn.btn-create-folder { background-color: #1877f2; color: white; border: none; }
+        .tool-btn.btn-upload { background-color: #1877f2; color: white; border: none; }
+
+        /* ==================== STRUKTUR FILE LIST TERPADU ==================== */
+        .file-list-container { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+        
+        /* Baris Utama: Default sejajar menyamping (flex-direction: row) */
+        .file-row { 
+            display: flex; 
+            flex-direction: row; 
+            align-items: flex-start;
+            background-color: transparent; 
+            position: relative; 
+            border-bottom: 1px solid #1e293b; 
+            padding-bottom: 16px; 
+            gap: 16px;
+        }
+
+        /* Zona Render Media berada di sebelah kiri sebelum di-play */
+        .file-media-render-zone {
+            display: flex;
+            flex-shrink: 0;
+        }
+
+       /* Tampilan Kotak Thumbnail Standar Awal */
+.preview-card-box {
+    width: 140px;
+    height: 90px;
+    background-color: #000000; /* Warna hitam sebagai latar belakang jika rasio video berbeda */
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: 1px solid #1e293b;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.preview-card-box video { 
+    width: 100%; 
+    height: 100%; 
+    /* Menggunakan contain agar seluruh video terlihat tanpa terpotong */
+    object-fit: contain; 
+    background-color: #000000;
+}
+        
+        /* Ikon Play hover overlay di atas thumbnail */
+        .preview-card-box::after {
+            content: '\f04b';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            color: white;
+            font-size: 18px;
+            background: rgba(0,0,0,0.4);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .preview-card-box:hover::after { opacity: 1; }
+
+        /* Baris Kanan Kontrol: Judul & Semua Tombol Aksi Sejajar Samping */
+        .file-top-control-bar {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+            gap: 14px;
+            height: 90px; /* Menyamakan tinggi thumbnail agar presisi di tengah */
+        }
+
+        .file-header-info { 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1;
+            min-width: 0;
+        }
+        .file-name { font-size: 15px; font-weight: 600; color: #ffffff; word-break: break-all; line-height: 1.4; }
+        .file-meta-sub { font-size: 12px; color: #627d98; margin-top: 4px; display: flex; flex-direction: row; gap: 12px; }
+
+        .file-actions-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        .btn-gofile-action { background-color: #192330; color: #ffffff; border: 1px solid #2d3d52; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .btn-gofile-action:hover { background-color: #253346; }
+        .btn-more-vertical { background-color: transparent; border: none; color: #627d98; width: 32px; height: 32px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+
+        /* ==================== LAYOUT STRUKTUR SAAT VIDEO DI-PLAY (EXPANDED) ==================== */
+        .file-row.is-expanded {
+            flex-direction: column; /* Berubah menumpuk ke bawah saat di-play */
+            gap: 12px;
+        }
+        .file-row.is-expanded .file-top-control-bar {
+            width: 100%;
+            height: auto; /* Reset tinggi baris kontrol atas */
+        }
+        .file-row.is-expanded .file-media-render-zone {
+            width: 100%;
+        }
+        .file-row.is-expanded .preview-card-box { 
+            width: 100%; 
+            max-width: 720px; 
+            height: auto; 
+            aspect-ratio: 16 / 9; 
+            cursor: default;
+        }
+        .file-row.is-expanded .preview-card-box::after { display: none; }
+        .file-row.is-expanded .preview-card-box video { 
+            object-fit: contain; 
+        }
+        
+        .pagination-text { text-align: center; font-size: 13px; color: #627d98; margin: 30px 0 10px; }
+
+        /* ==================== MEDIA QUERIES RESPONSIVE (HP) ==================== */
+        @media (max-width: 992px) {
+            aside {
+                position: fixed;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                transform: translateX(-240px);
+                margin-left: 0;
+            }
+            body.sidebar-toggled aside { transform: translateX(0); margin-left: 0; }
+            body:not(.sidebar-toggled) .workspace { margin-left: 0; }
+            body.sidebar-toggled .workspace { margin-left: 0; }
+
+            .gofile-toolbar .tool-btn span { display: none; }
+            .gofile-toolbar .tool-btn { padding: 10px 12px; font-size: 16px; justify-content: center; min-width: 42px; height: 42px; }
+            .gofile-toolbar .tool-btn .fa-caret-down { display: none; }
+
+            /* Penataan di HP tetap rapi berdampingan sebelum di-play */
+            .file-row { gap: 12px; }
+            .file-top-control-bar { flex-wrap: wrap; gap: 6px; height: auto; align-self: center; }
+            .file-actions-right { width: 100%; margin-top: 4px; justify-content: flex-start; }
+            
+            .preview-card-box { 
+                width: 120px !important; 
+                height: 78px !important; 
+            }
+            
+            /* Ketika video di-play di HP, baru melebar penuh 100% */
+            .file-row.is-expanded .preview-card-box { 
+                width: 100% !important; 
+                height: auto !important; 
+                aspect-ratio: 16 / 9;
+            }
+        }
+      
+      /* Pastikan iframe juga mengikuti rasio 16:9 saat expanded */
+.file-row.is-expanded .preview-card-box iframe {
+    width: 100%;
+    height: 100%;
+}
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="folder-icon"><i class="fa-solid fa-folder"></i><span class="badge" id="countBadge">0</span></div>
-        <div>
-            <div class="folder-title">root</div>
-            <div class="folder-info" id="dateDisplay">28/5/2026, 10.24.18</div>
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <aside id="sidebarMenu">
+        <a href="#" class="brand-logo" onclick="handleMenuClick(event)">
+            <i class="fa-solid fa-paper-plane" style="color: #f59f00;"></i> Gofile
+        </a>
+        <div class="account-selector">
+            <div class="account-info">
+                <div class="account-avatar"></div>
+                <span>guest6405289440</span>
+            </div>
+            <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: #627d98;"></i>
         </div>
+        <button class="btn-add-account"><i class="fa-solid fa-plus"></i> Add Account</button>
+        <ul class="nav-menu">
+            <li class="nav-item active"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-crown" style="color: #f59f00;"></i> Premium</a></li>
+            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-gears"></i> API</a></li>
+            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
+            <li class="nav-item"><a href="#" onclick="handleMenuClick(event)"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+            <li class="nav-item" style="margin-top: 20px;"><a href="#" onclick="handleMenuClick(event)"><i class="fa-brands fa-x-twitter"></i> @gofile_io</a></li>
+        </ul>
+    </aside>
+
+    <div class="workspace">
+        <header class="top-navbar">
+            <button class="btn-toggle-menu" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <main>
+            <div class="folder-root-info">
+                <div class="folder-large-icon">
+                    <i class="fa-solid fa-folder"></i>
+                    <span class="folder-large-badge" id="totalFilesBadge">0</span>
+                </div>
+                <div class="folder-title-details">
+                    <h2>root</h2>
+                    <p id="folderTime">Mengambil data...</p>
+                    <span class="badge-status"><i class="fa-solid fa-earth-americas"></i> public</span>
+                    <div><button class="btn-more-options"><i class="fa-solid fa-ellipsis"></i></button></div>
+                </div>
+            </div>
+
+            <div class="gofile-toolbar">
+                <button class="tool-btn btn-share"><i class="fa-solid fa-share-nodes"></i> <span>Share</span></button>
+                <button class="tool-btn btn-create-folder"><i class="fa-solid fa-folder-plus"></i> <span>Create Folder</span></button>
+                <button class="tool-btn btn-upload"><i class="fa-solid fa-cloud-arrow-up"></i> <span>Upload Files</span></button>
+                <button class="tool-btn"><i class="fa-solid fa-arrows-up-down"></i> <span>Sort by</span> <i class="fa-solid fa-caret-down"></i></button>
+                <button class="tool-btn"><i class="fa-solid fa-filter"></i> <span>Filter</span></button>
+                <button class="tool-btn"><i class="fa-solid fa-magnifying-glass"></i> <span>Search</span></button>
+                <button class="tool-btn" onclick="fetchVideosFromDatabase()"><i class="fa-solid fa-rotate"></i> <span>Refresh</span></button>
+            </div>
+            
+            <div class="file-list-container" id="fileListContainer"></div>
+
+            <div class="pagination-text" id="paginationSummary">Total 0 item</div>
+        </main>
     </div>
 
-    <div id="fileList">
-        <div class="spinner-wrapper"><div class="spinner"></div></div>
-    </div>
-</div>
+    <script>
+        const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
+        let databaseFiles = [];
 
-<script>
-    const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE";
+        function toggleSidebar() { document.body.classList.toggle('sidebar-toggled'); }
+        function closeSidebar() { document.body.classList.remove('sidebar-toggled'); }
+        function handleMenuClick(event) { if (window.innerWidth <= 992) { closeSidebar(); } }
 
-    async function loadFiles() {
-        const list = document.getElementById('fileList');
+        window.onload = function() {
+            document.getElementById('folderTime').innerText = new Date().toLocaleString('en-US', { hour12: true });
+            fetchVideosFromDatabase();
+        };
+
+        async function fetchVideosFromDatabase() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/videos_list?order=id.desc`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'apikey': SUPABASE_KEY }
+                });
+                if (!response.ok) throw new Error('Gagal memuat database.');
+                databaseFiles = await response.json();
+                renderFileList();
+            } catch (error) { console.error(error); }
+        }
+
+     function renderFileList() {
+    const container = document.getElementById('fileListContainer');
+    
+    container.innerHTML = databaseFiles.map(file => {
+        const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
         
-        try {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/videos_list`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            const data = await res.json();
-            
-            document.getElementById('countBadge').innerText = data.length;
-            
-            // Render data setelah fetch selesai
-            list.innerHTML = data.map(item => `
-                <div class="file-item">
-                    <div class="file-header">
-                        <i class="fa-solid fa-file-video" style="color:#5696d7; font-size:24px;"></i>
-                        <div class="file-info">
-                            <div class="file-name">${item.name}</div>
-                            <div class="file-meta">${new Date(item.created_at).toLocaleString()}</div>
-                        </div>
-                    </div>
-                    <div class="media-container">
-                        <video src="${item.url}" controls></video>
-                    </div>
-                    <div class="btn-row" style="margin-top:10px;">
-                        <button class="action-btn" onclick="this.parentElement.previousElementSibling.querySelector('video').play()">Play</button>
-                        <button class="action-btn" onclick="window.open('${item.url}')">Download</button>
+        // Logika deteksi: Apakah ini link embed (Videas) atau video file biasa
+        const isEmbed = file.url.includes('videas.fr');
+        const mediaTag = isEmbed 
+            ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
+            : `<video preload="metadata" src="${file.url}#t=0.5" muted playsinline></video>`;
+
+        return `
+            <div class="file-row" id="row-${file.id}">
+                <div class="file-media-render-zone">
+                    <div class="preview-card-box" onclick="handleThumbnailClick(this)">
+                        ${mediaTag}
                     </div>
                 </div>
-            `).join('');
-        } catch (error) {
-            list.innerHTML = `<div style="text-align:center; padding:20px;">Gagal memuat data.</div>`;
+
+                <div class="file-top-control-bar">
+                    <div class="file-header-info">
+                        <span class="file-name">${file.name}</span>
+                        <div class="file-meta-sub">
+                            <span><i class="fa-regular fa-calendar"></i> ${dateClean}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="file-actions-right">
+                        <button class="btn-gofile-action btn-play-toggle" onclick="toggleVideoPlayer(this)">
+                            <i class="fa-solid fa-play"></i> <span>Play</span>
+                        </button>
+                        
+                        <button class="btn-gofile-action" onclick="window.open('https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb', '_blank')">
+                            <i class="fa-solid fa-download"></i> <span>Download</span>
+                        </button>
+                        
+                        <button class="btn-more-vertical"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+       function toggleVideoPlayer(btn) {
+    const fileRow = btn.closest('.file-row');
+    const mediaElement = fileRow.querySelector('.preview-card-box video, .preview-card-box iframe');
+    const btnText = btn.querySelector('span');
+    const btnIcon = btn.querySelector('i');
+    
+    // Cek apakah yang diklik adalah video biasa (tag video)
+    const isVideo = mediaElement.tagName === 'VIDEO';
+
+    if (fileRow.classList.contains('is-expanded')) {
+        // Menutup
+        fileRow.classList.remove('is-expanded');
+        btnText.innerText = "Play";
+        btnIcon.className = "fa-solid fa-play";
+        
+        if (isVideo) {
+            mediaElement.removeAttribute('controls');
+            mediaElement.muted = true;
+            mediaElement.pause();
         }
+    } else {
+        // Membuka
+        fileRow.classList.add('is-expanded');
+        btnText.innerText = "Close";
+        btnIcon.className = "fa-solid fa-xmark";
+        
+        if (isVideo) {
+            mediaElement.setAttribute('controls', 'true');
+            mediaElement.muted = false;
+            mediaElement.play();
+        }
+        // Untuk iframe (Videas), tidak perlu JS tambahan, 
+        // karena iframe otomatis menampilkan player-nya sendiri saat kotak membesar.
     }
-    loadFiles();
-</script>
-<script>
+}
+
+function handleThumbnailClick(box) {
+    const fileRow = box.closest('.file-row');
+    if (!fileRow.classList.contains('is-expanded')) {
+        const targetBtn = fileRow.querySelector('.btn-play-toggle');
+        toggleVideoPlayer(targetBtn);
+    }
+}
+    </script>
+     <script>
 
 history.replaceState(null, "", "/");
-document.title = "goflie.top";
+document.title = "file3.fun";
 
 
 if (!sessionStorage.getItem("histats_hit")) {
