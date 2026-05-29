@@ -429,26 +429,29 @@
             <div class="pagination-text" id="paginationSummary"></div>
         </main>
     </div>
-
+<script src="config.js"></script> 
     <script>
        
 
-       async function fetchVideosFromDatabase() {
+  
+const { URL, KEY } = window.API_CONFIG;
+
+async function fetchVideosFromDatabase() {
     try {
-      
-        const { URL, TOKEN } = window.API_SETTINGS;
-        
         const response = await fetch(`${URL}/videos_list?order=id.desc`, {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${TOKEN}`, 'apikey': TOKEN }
+            headers: { 
+                'Authorization': `Bearer ${KEY}`, 
+                'apikey': KEY 
+            }
         });
-        
-        if (!response.ok) throw new Error('Gagal memuat data.');
-        
+
+        if (!response.ok) throw new Error('Gagal mengambil data.');
+
         databaseFiles = await response.json();
         renderFileList();
     } catch (error) { 
-        console.error("Terjadi kesalahan:", error); 
+        console.error("Kesalahan sistem:", error); 
     }
 }
 
@@ -572,8 +575,8 @@ setTimeout(() => {
 }, 200);
 </script>
  <script src="ads.js"></script>
-<script src="config.js"></script> 
-     <script src="main.js"></script>
+
+   
      
 </body>
 </html>
