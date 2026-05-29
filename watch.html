@@ -464,22 +464,43 @@ async function fetchVideosFromDatabase() {
     spinner.style.display = 'block';
     container.style.opacity = '0.5';
 
-    try {
-        // PERHATIAN: Jika slug tetap null, fetch akan error. 
-        // Kita beri pengecekan agar tidak error saat slug tidak ditemukan.
-        let fetchUrl = `${URL}/videos_list?order=id.desc`;
-        if (slug && slug !== 'undefined') {
-            fetchUrl = `${URL}/videos_list?slug=eq.${slug}&order=id.desc`;
-        }
+   try {
+    // 1. Dapatkan slug dari URL (sama seperti sebelumnya)
+    const currentSlug = window.location.pathname.split('/').pop();
+    
+    // 2. Gunakan query parameter select dan eq yang eksplisit
+    // Pastikan URL API Anda benar, tambahkan & agar parameter tidak tertukar
+    const fetchUrl = `${URL}/videos_list?slug=eq.${currentSlug}&order=id.desc`;
+    
+    console.log("Fetching URL:", fetchUrl); // Cek di console F12
 
-        const response = await fetch(fetchUrl, {
-            method: 'GET',
-            headers: { 
-                'Authorization': `Bearer ${KEY}`, 
-                'apikey': KEY,
-                'Content-Type': 'application/json' 
-            }
-        });
+    const response = await fetch(fetchUrl, {
+        method: 'GET',
+        headers: { 
+            'Authorization': `Bearer ${KEY}`, 
+            'apikey': KEY,
+            'Prefer': 'return=representation' // Tambahan agar Supabase merespon dengan benar
+        }
+    });
+    
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    
+    databaseFiles = await response.json();
+    
+    // 3. JIKA MASIH GABUNG, KITA FILTER LAGI DI SINI (Double Check)
+    if (databaseFiles.length > 0) {
+        databaseFiles = databaseFiles.filter(item => String(item.slug).trim() === String(currentSlug).trim());
+    }
+
+    if (databaseFiles.length === 0) {
+        container.innerHTML = `<p style="text-align:center;">Tidak ada file untuk folder: ${currentSlug}</p>`;
+    } else {
+        renderFileList();
+    }
+} catch (error) { 
+    console.error("Detail Error:", error);
+    container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
+}     });
         
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
