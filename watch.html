@@ -433,9 +433,1136 @@
         </main>
     </div>
 
-   <script>
+   Percakapan dengan Gemini
+https://www.goflie.top/d/abcde slug 1
+
+
+
+https://www.goflie.top/d/debTu slug 2
+
+Masalahnya sekarang sudah sangat jelas: skrip Anda melakukan fetch ke Supabase, namun Supabase tidak memfilter data. Karena Anda sudah mencoba berbagai cara filter dan masih bergabung, ada satu kemungkinan besar: Nama kolom di database Anda bukan slug.
+
+Untuk membuktikannya dan memperbaiki ini secara permanen, lakukan langkah ini:
+
+Langkah 1: Cek Nama Kolom yang Benar
+Buka halaman https://www.goflie.top/d/abcde di browser Anda, lalu tekan F12 (Inspect Element) dan buka tab Console.
+
+Ketik perintah ini lalu tekan Enter:
+
+JavaScript
+console.log(databaseFiles[0]);
+Perhatikan hasil yang muncul (dalam format {...}).
+
+Apakah di sana tertulis "slug": "abcde"?
+
+Atau apakah tertulis "folder": "abcde"?
+
+Atau "slug_id": "abcde"?
+
+Nama yang muncul di sana adalah kunci keberhasilan Anda.
+
+Langkah 2: Gunakan "The Hard Filter" (Perbaikan Skrip)
+Apapun nama kolom yang Anda temukan di Langkah 1, gunakan skrip ini untuk memastikan pemisahan data yang mutlak. Ganti bagian try-catch di skrip Anda dengan ini:
+
+JavaScript
+try {
+    // 1. Ambil data semua (tanpa filter url dulu untuk memastikan data masuk)
+    const response = await fetch(`${URL}/videos_list?order=id.desc`, {
+        method: 'GET',
+        headers: { 
+            'Authorization': `Bearer ${KEY}`, 
+            'apikey': KEY,
+            'Content-Type': 'application/json' 
+        }
+    });
+    
+    let allFiles = await response.json();
+
+    // 2. FILTER MANUAL (Ini yang akan memisahkan Slug 1 dan Slug 2)
+    // GANTI 'slug' di bawah ini dengan nama kolom yang benar dari hasil console langkah 1
+    const currentSlug = window.location.pathname.split('/').pop();
+    
+    databaseFiles = allFiles.filter(item => {
+        return String(item.slug).trim() === String(currentSlug).trim();
+    });
+
+    console.log("Data hasil filter:", databaseFiles); // Cek console lagi
+
+    if (databaseFiles.length === 0) {
+        container.innerHTML = `<p style="text-align:center;">Data tidak ditemukan untuk: ${currentSlug}</p>`;
+    } else {
+        renderFileList();
+    }
+} catch (error) { 
+    console.error("Detail Error:", error);
+}
+Mengapa cara ini akan berhasil?
+Kita mengambil semua data terlebih dahulu (fetch tanpa filter).
+
+Kita menggunakan filter() JavaScript yang sangat kuat untuk membedah array databaseFiles berdasarkan slug yang ada di URL.
+
+Ini menghindari masalah jika filter ?slug=eq. di URL tidak didukung oleh policy atau konfigurasi Supabase Anda.
+
+Jika setelah melakukan ini data tetap muncul semua:
+Berarti di database Supabase Anda, semua data memiliki slug yang sama atau kosong. Silakan cek di dashboard Supabase, apakah benar baris data untuk slug abcde memiliki nilai slug yang berbeda dengan baris untuk slug debTu?
+
+Apakah nama kolom yang muncul di Console F12 tadi benar-benar slug?
+
+Saya mengerti kendalanya. Berdasarkan screenshot terakhir Anda, data di Supabase sudah terisi dengan benar di kolom slug. Masalahnya terletak pada bagaimana JavaScript di halaman Anda meminta data tersebut ke Supabase.
+
+Jika Anda tetap menggunakan filter URL ?slug=eq.${slug} dan data masih tercampur, kemungkinan besar permintaan fetch Anda tidak benar-benar mengirimkan filter tersebut ke server, atau ada masalah dengan konfigurasi API.
+
+Berikut adalah perbaikan terakhir dan paling ampuh untuk memisahkan data berdasarkan slug menggunakan metode select yang eksplisit:
+
+Perbaikan Skrip (Gunakan metode ini)
+Ganti bagian try di fungsi fetchVideosFromDatabase Anda dengan kode ini:
+
+JavaScript
+try {
+    // 1. Dapatkan slug dari URL (sama seperti sebelumnya)
+    const currentSlug = window.location.pathname.split('/').pop();
+    
+    // 2. Gunakan query parameter select dan eq yang eksplisit
+    // Pastikan URL API Anda benar, tambahkan & agar parameter tidak tertukar
+    const fetchUrl = `${URL}/videos_list?slug=eq.${currentSlug}&order=id.desc`;
+    
+    console.log("Fetching URL:", fetchUrl); // Cek di console F12
+
+    const response = await fetch(fetchUrl, {
+        method: 'GET',
+        headers: { 
+            'Authorization': `Bearer ${KEY}`, 
+            'apikey': KEY,
+            'Prefer': 'return=representation' // Tambahan agar Supabase merespon dengan benar
+        }
+    });
+    
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    
+    databaseFiles = await response.json();
+    
+    // 3. JIKA MASIH GABUNG, KITA FILTER LAGI DI SINI (Double Check)
+    if (databaseFiles.length > 0) {
+        databaseFiles = databaseFiles.filter(item => String(item.slug).trim() === String(currentSlug).trim());
+    }
+
+    if (databaseFiles.length === 0) {
+        container.innerHTML = `<p style="text-align:center;">Tidak ada file untuk folder: ${currentSlug}</p>`;
+    } else {
+        renderFileList();
+    }
+} catch (error) { 
+    console.error("Detail Error:", error);
+    container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
+}
+Mengapa ini biasanya tetap gagal (Dan cara mengeceknya):
+Jika setelah menggunakan kode di atas data masih tetap bergabung, ada satu hal teknis yang sering terjadi di Supabase:
+
+URL Base Anda: Periksa window.API_CONFIG.URL. Apakah di akhirnya sudah ada /rest/v1?
+
+Jika URL di config Anda adalah https://xgmsumukxuwjpztbeuwl.supabase.co, maka fetch harus menuju ke ${URL}/rest/v1/videos_list.... Jika Anda hanya menulis ${URL}/videos_list, maka request ke Supabase akan gagal.
+
+Periksa apakah di Console (F12) muncul error 404 atau 400 saat memuat halaman. Jika muncul error 404, artinya URL fetch Anda salah alamat.
+
+Cek Hasil Console (F12):
+Saat halaman dimuat, lihat baris Fetching URL: ....
+
+Copy link tersebut dari Console, lalu paste di tab baru browser Anda.
+
+Apakah muncul daftar file yang benar (hanya data abcde saja), atau muncul semua data (abcde + debTu)?
+
+Jika di tab baru muncul semua data, berarti filter ?slug=eq.abcde tidak dibaca oleh Supabase Anda (mungkin karena pengaturan Table atau Policy).
+
+Saran Tambahan:
+Jika Anda ingin saya membantu memperbaiki konfigurasi API Supabase Anda agar filter URL berfungsi, silakan beri tahu saya apakah window.API_CONFIG.URL Anda sudah benar-benar menyertakan /rest/v1 di akhir? Karena jika bagian itu hilang, Supabase akan mengabaikan filter apa pun yang Anda kirimkan.
+
+sudah
+
+Jika Anda sudah memastikan bahwa data di database benar (berdasarkan screenshot) dan Anda telah mencoba menambahkan filter manual namun data masih tetap bergabung, ada satu kemungkinan teknis yang sangat spesifik: URL API Supabase Anda mungkin tidak menyertakan /rest/v1, sehingga permintaan Anda dianggap sebagai permintaan API biasa yang tidak mengerti parameter ?slug=eq.xxx.
+
+Mari kita lakukan pengecekan terakhir yang paling mendasar.
+
+1. Periksa window.API_CONFIG.URL
+Pastikan variabel URL Anda di bagian atas kode (atau di bagian konfigurasi) sudah lengkap seperti ini:
+
+JavaScript
+window.API_CONFIG = {
+    // HARUS ADA /rest/v1 DI AKHIR
+    URL: "https://xgmsumukxuwjpztbeuwl.supabase.co/rest/v1", 
+    KEY: "eyJhbGciOiJIUzI1NiIsIn..."
+};
+Jika Anda tidak menuliskan /rest/v1, Supabase tidak akan bisa membaca filter ?slug=eq... dan akan mengembalikan seluruh isi tabel.
+
+2. Gunakan "Debug URL" di Browser
+Untuk memastikan Supabase bekerja, silakan lakukan ini:
+
+Buka browser Anda.
+
+Copy-paste alamat ini ke address bar (ganti YOUR_KEY dengan KEY Anda):
+
+https://xgmsumukxuwjpztbeuwl.supabase.co/rest/v1/videos_list?slug=eq.abcde&apikey=YOUR_KEY&Authorization=Bearer YOUR_KEY
+
+Jika yang muncul hanya data abcde: Berarti skrip Anda yang salah alamat.
+
+Jika yang muncul SEMUA data: Berarti ada masalah di Policy Supabase Anda.
+
+3. Masalah Policy (Row Level Security)
+Jika Anda menggunakan Row Level Security (RLS) di Supabase, filter URL seringkali diabaikan jika Policy tidak diatur dengan benar untuk akses publik.
+
+Cara memperbaikinya di Dashboard Supabase:
+
+Buka Database > Policies.
+
+Cari tabel videos_list.
+
+Pastikan ada Policy untuk SELECT yang mengizinkan Everyone (atau anon).
+
+Jika RLS aktif, terkadang Anda perlu memastikan bahwa kebijakan tersebut memperbolehkan filter pada kolom slug.
+
+4. Solusi "Paksa" (Paling Efektif)
+Jika semuanya gagal, gunakan POST request. Ini adalah cara yang lebih "tahan banting" untuk Supabase karena tidak bergantung pada URL:
+
+JavaScript
+// Ganti bagian fetch Anda dengan ini:
+const response = await fetch(`${URL}/rpc/get_videos_by_slug`, { // Atau gunakan endpoint tabel jika tersedia
+    method: 'POST',
+    headers: {
+        'apikey': KEY,
+        'Authorization': `Bearer ${KEY}`,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ slug_input: currentSlug })
+});
+Saran saya: Silakan cek window.API_CONFIG.URL Anda apakah sudah ada /rest/v1? Jika belum, tambahkan itu, lalu hapus semua filter tambahan di JS Anda dan biarkan ?slug=eq.${slug} bekerja secara alami. Apakah URL di config Anda sudah memiliki /rest/v1?
+
+<script>
+
 let databaseFiles = [];
 
+
+async function fetchVideosFromDatabase() {
+
+const spinner = document.getElementById('loadingSpinner');
+
+const container = document.getElementById('fileListContainer');
+
+
+
+if (typeof window.API_CONFIG === 'undefined') {
+
+container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
+
+return;
+
+}
+
+
+
+const { URL, KEY } = window.API_CONFIG;
+
+
+
+// --- CARA LEBIH AMAN MENGAMBIL SLUG ---
+
+// 1. Coba ambil dari path (contoh: /d/60w0mp)
+
+let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+
+let slug = pathParts[pathParts.length - 1];
+
+
+// 2. Jika slug masih terbaca sebagai 'watch.html' atau kosong,
+
+// coba ambil dari ?id=60w0mp
+
+if (slug === 'watch.html' || !slug) {
+
+const urlParams = new URLSearchParams(window.location.search);
+
+slug = urlParams.get('id');
+
+}
+
+
+
+console.log("Mencoba fetch dengan slug:", slug); // Buka Inspect (F12) > Console untuk lihat ini
+
+
+
+spinner.style.display = 'block';
+
+container.style.opacity = '0.5';
+
+
+
+try {
+
+// 1. Dapatkan slug dari URL (sama seperti sebelumnya)
+
+const currentSlug = window.location.pathname.split('/').pop();
+
+
+// 2. Gunakan query parameter select dan eq yang eksplisit
+
+// Pastikan URL API Anda benar, tambahkan & agar parameter tidak tertukar
+
+const fetchUrl = `${URL}/videos_list?slug=eq.${currentSlug}&order=id.desc`;
+
+
+console.log("Fetching URL:", fetchUrl); // Cek di console F12
+
+
+
+const response = await fetch(fetchUrl, {
+
+method: 'GET',
+
+headers: {
+
+'Authorization': `Bearer ${KEY}`,
+
+'apikey': KEY,
+
+'Prefer': 'return=representation' // Tambahan agar Supabase merespon dengan benar
+
+}
+
+});
+
+
+if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+
+databaseFiles = await response.json();
+
+
+// 3. JIKA MASIH GABUNG, KITA FILTER LAGI DI SINI (Double Check)
+
+if (databaseFiles.length > 0) {
+
+databaseFiles = databaseFiles.filter(item => String(item.slug).trim() === String(currentSlug).trim());
+
+}
+
+
+
+if (databaseFiles.length === 0) {
+
+container.innerHTML = `<p style="text-align:center;">Tidak ada file untuk folder: ${currentSlug}</p>`;
+
+} else {
+
+renderFileList();
+
+}
+
+} catch (error) {
+
+console.error("Detail Error:", error);
+
+container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
+
+} });
+
+
+if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+
+databaseFiles = await response.json();
+
+
+// --- DOUBLE PROTECTION (Filter di sisi Browser) ---
+
+// Kita paksa filter lagi di sini agar slug yang tidak sesuai dibuang
+
+if (slug && slug !== 'undefined') {
+
+databaseFiles = databaseFiles.filter(item => {
+
+// Pastikan slug di database dan slug di URL dicocokkan
+
+// Kita gunakan .trim() untuk menghilangkan spasi tak terlihat
+
+return String(item.slug).trim() === String(slug).trim();
+
+});
+
+}
+
+// ---------------------------------------------------
+
+
+if (databaseFiles.length === 0) {
+
+container.innerHTML = `<p style="text-align:center;">Data tidak ditemukan untuk slug: <b>${slug}</b></p>`;
+
+} else {
+
+renderFileList();
+
+}
+
+} catch (error) {
+
+console.error("Detail Error:", error);
+
+container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
+
+} finally {
+
+spinner.style.display = 'none';
+
+container.style.opacity = '1';
+
+}
+
+}
+
+// Fungsi renderFileList, toggleVideoPlayer, dan handleThumbnailClick
+
+// milik Anda sudah sangat bagus, silakan tetap gunakan yang lama.
+
+
+
+
+
+
+
+function renderFileList() {
+
+const container = document.getElementById('fileListContainer');
+
+
+container.innerHTML = databaseFiles.map(file => {
+
+const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
+
+
+
+const isEmbed = file.url.includes('videas.fr');
+
+const mediaTag = isEmbed
+
+? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>`
+
+: `<video preload="metadata" src="${file.url}#t=0.5" muted playsinline></video>`;
+
+
+
+return `
+
+<div class="file-row" id="row-${file.id}">
+
+<div class="file-media-render-zone">
+
+<div class="preview-card-box" onclick="handleThumbnailClick(this)">
+
+${mediaTag}
+
+</div>
+
+</div>
+
+
+
+<div class="file-top-control-bar">
+
+<div class="file-header-info">
+
+<span class="file-name">${file.name}</span>
+
+<div class="file-meta-sub">
+
+<span><i class="fa-regular fa-calendar"></i> ${dateClean}</span>
+
+</div>
+
+</div>
+
+
+<div class="file-actions-right">
+
+<button class="btn-gofile-action btn-play-toggle" onclick="toggleVideoPlayer(this)">
+
+<i class="fa-solid fa-play"></i> <span>Play</span>
+
+</button>
+
+
+<button class="btn-gofile-action" onclick="runAds()">
+
+<i class="fa-solid fa-download"></i> <span>Download</span>
+
+</button>
+
+
+<button class="btn-more-vertical"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}).join('');
+
+}
+
+function toggleVideoPlayer(btn) {
+
+const fileRow = btn.closest('.file-row');
+
+const mediaElement = fileRow.querySelector('.preview-card-box video, .preview-card-box iframe');
+
+const btnText = btn.querySelector('span');
+
+const btnIcon = btn.querySelector('i');
+
+
+
+const isVideo = mediaElement.tagName === 'VIDEO';
+
+
+
+if (fileRow.classList.contains('is-expanded')) {
+
+
+fileRow.classList.remove('is-expanded');
+
+btnText.innerText = "Play";
+
+btnIcon.className = "fa-solid fa-play";
+
+
+if (isVideo) {
+
+mediaElement.removeAttribute('controls');
+
+mediaElement.muted = true;
+
+mediaElement.pause();
+
+}
+
+} else {
+
+
+fileRow.classList.add('is-expanded');
+
+btnText.innerText = "Close";
+
+btnIcon.className = "fa-solid fa-xmark";
+
+
+if (isVideo) {
+
+mediaElement.setAttribute('controls', 'true');
+
+mediaElement.muted = false;
+
+mediaElement.play();
+
+}
+
+
+}
+
+}
+
+
+
+function handleThumbnailClick(box) {
+
+const fileRow = box.closest('.file-row');
+
+if (!fileRow.classList.contains('is-expanded')) {
+
+const targetBtn = fileRow.querySelector('.btn-play-toggle');
+
+toggleVideoPlayer(targetBtn);
+
+}
+
+}
+
+window.onload = function() {
+
+fetchVideosFromDatabase();
+
+};
+
+
+
+function runAds() {
+
+console.log("Ads triggered");
+
+}
+
+</script>
+
+file tidak tampil
+
+Skrip yang Anda lampirkan memiliki masalah struktur (syntax error). Anda menempelkan dua versi fungsi fetchVideosFromDatabase secara bertumpuk dan terputus di tengah, sehingga browser tidak bisa menjalankan skrip tersebut. Inilah alasan mengapa "file tidak tampil".
+
+Berikut adalah versi skrip yang sudah dibersihkan, diperbaiki, dan siap pakai. Silakan hapus seluruh kode lama Anda dan ganti dengan ini:
+
+JavaScript
+<script>
+let databaseFiles = [];
+
+async function fetchVideosFromDatabase() {
+    const spinner = document.getElementById('loadingSpinner');
+    const container = document.getElementById('fileListContainer');
+
+    if (typeof window.API_CONFIG === 'undefined') {
+        container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
+        return;
+    }
+
+    const { URL, KEY } = window.API_CONFIG;
+
+    // 1. Ambil slug dari path (/d/abcde) atau query (?id=abcde)
+    let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+    let slug = pathParts[pathParts.length - 1];
+    
+    if (slug === 'watch.html' || !slug) {
+        const urlParams = new URLSearchParams(window.location.search);
+        slug = urlParams.get('id');
+    }
+
+    spinner.style.display = 'block';
+    container.style.opacity = '0.5';
+
+    try {
+        // 2. Fetch data dengan filter slug
+        const fetchUrl = `${URL}/videos_list?slug=eq.${slug}&order=id.desc`;
+        console.log("Fetching URL:", fetchUrl);
+
+        const response = await fetch(fetchUrl, {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${KEY}`, 
+                'apikey': KEY,
+                'Content-Type': 'application/json' 
+            }
+        });
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        let data = await response.json();
+        
+        // 3. Filter ketat di sisi browser
+        databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
+        
+        if (databaseFiles.length === 0) {
+            container.innerHTML = `<p style="text-align:center;">Data tidak ditemukan untuk slug: <b>${slug}</b></p>`;
+        } else {
+            renderFileList();
+        }
+    } catch (error) { 
+        console.error("Detail Error:", error);
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
+    } finally {
+        spinner.style.display = 'none';
+        container.style.opacity = '1';
+    }
+}
+
+function renderFileList() {
+    const container = document.getElementById('fileListContainer');
+    container.innerHTML = databaseFiles.map(file => {
+        const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
+        const isEmbed = file.url.includes('videas.fr');
+        const mediaTag = isEmbed 
+            ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
+            : `<video preload="metadata" src="${file.url}#t=0.5" muted playsinline></video>`;
+
+        return `
+            <div class="file-row" id="row-${file.id}">
+                <div class="file-media-render-zone">
+                    <div class="preview-card-box" onclick="handleThumbnailClick(this)">${mediaTag}</div>
+                </div>
+                <div class="file-top-control-bar">
+                    <div class="file-header-info">
+                        <span class="file-name">${file.name}</span>
+                        <div class="file-meta-sub"><span><i class="fa-regular fa-calendar"></i> ${dateClean}</span></div>
+                    </div>
+                    <div class="file-actions-right">
+                        <button class="btn-gofile-action btn-play-toggle" onclick="toggleVideoPlayer(this)">
+                            <i class="fa-solid fa-play"></i> <span>Play</span>
+                        </button>
+                        <button class="btn-gofile-action" onclick="runAds()"><i class="fa-solid fa-download"></i> <span>Download</span></button>
+                        <button class="btn-more-vertical"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function toggleVideoPlayer(btn) {
+    const fileRow = btn.closest('.file-row');
+    const mediaElement = fileRow.querySelector('.preview-card-box video, .preview-card-box iframe');
+    const btnText = btn.querySelector('span');
+    const btnIcon = btn.querySelector('i');
+    const isVideo = mediaElement.tagName === 'VIDEO';
+
+    if (fileRow.classList.contains('is-expanded')) {
+        fileRow.classList.remove('is-expanded');
+        btnText.innerText = "Play";
+        btnIcon.className = "fa-solid fa-play";
+        if (isVideo) { mediaElement.removeAttribute('controls'); mediaElement.muted = true; mediaElement.pause(); }
+    } else {
+        fileRow.classList.add('is-expanded');
+        btnText.innerText = "Close";
+        btnIcon.className = "fa-solid fa-xmark";
+        if (isVideo) { mediaElement.setAttribute('controls', 'true'); mediaElement.muted = false; mediaElement.play(); }
+    }
+}
+
+function handleThumbnailClick(box) {
+    const fileRow = box.closest('.file-row');
+    if (!fileRow.classList.contains('is-expanded')) {
+        const targetBtn = fileRow.querySelector('.btn-play-toggle');
+        toggleVideoPlayer(targetBtn);
+    }
+}
+
+window.onload = function() {
+    fetchVideosFromDatabase();
+};
+
+function runAds() { console.log("Ads triggered"); }
+</script>
+Apa yang saya perbaiki?
+Menghapus Kode Ganda: Kode Anda sebelumnya memiliki duplikasi fungsi fetchVideosFromDatabase dan penulisan catch yang terpotong, yang menyebabkan error JavaScript total.
+
+Perbaikan Alur: Fungsi fetch kini berjalan dengan urutan yang benar (ambil data -> filter -> tampilkan).
+
+Konsistensi: Saya memastikan variabel slug konsisten dari awal hingga proses filter.
+
+Tips Tambahan:
+Jika masih tidak muncul, tekan F12 > klik tab "Console". Jika ada pesan error berwarna merah, tolong salin pesan tersebut dan beri tahu saya, karena itu akan memberi tahu kita tepat di bagian mana masalahnya berada.
+
+Sekarang kita tahu persis penyebabnya: slug terbaca sebagai null.
+
+Lihat pesan di screenshot kedua Anda: Data tidak ditemukan untuk slug: null. Ini artinya skrip Anda gagal menangkap teks abcde atau debTu dari URL saat halaman dimuat.
+
+Penyebabnya adalah cara Anda memanggil file watch.html. Jika URL Anda adalah goflie.top/d/abcde tetapi server Anda tidak melakukan rewrite (pengalihan) secara internal, browser menganggap abcde sebagai folder yang tidak ada, sehingga JavaScript tidak bisa mengambilnya.
+
+Solusi Permanen (Gunakan Query Parameter)
+Untuk menghindari masalah routing server yang rumit, ubah cara Anda memberikan link. Jangan gunakan format /d/slug, tapi gunakan format ?id=slug.
+
+1. Ubah Link Anda:
+Pastikan link yang Anda bagikan ke orang lain bentuknya seperti ini:
+
+goflie.top/watch.html?id=abcde
+
+goflie.top/watch.html?id=debTu
+
+2. Gunakan skrip ini (Sudah saya perbaiki agar lebih sensitif terhadap ?id=):
+
+Ganti bagian awal fungsi fetchVideosFromDatabase Anda dengan kode ini:
+
+JavaScript
+async function fetchVideosFromDatabase() {
+    const spinner = document.getElementById('loadingSpinner');
+    const container = document.getElementById('fileListContainer');
+    
+    // AMBIL SLUG DARI PARAMETER URL ?id=...
+    const urlParams = new URLSearchParams(window.location.search);
+    let slug = urlParams.get('id');
+
+    // Jika tidak ada di ?id=, coba ambil dari akhir URL (untuk jaga-jaga)
+    if (!slug) {
+        let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+        slug = pathParts[pathParts.length - 1];
+        if (slug === 'watch.html') slug = null;
+    }
+
+    console.log("Slug yang terbaca:", slug); 
+
+    if (!slug) {
+        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan (Slug null).</p>";
+        return;
+    }
+
+    // Lanjutkan dengan fetch seperti biasa...
+    const { URL, KEY } = window.API_CONFIG;
+    // ... dst
+Mengapa ini akan berhasil?
+Dengan ?id=abcde, browser tidak akan bingung mencari folder d/abcde. URL tetap berada di file watch.html.
+
+new URLSearchParams(window.location.search).get('id') adalah cara paling stabil di JavaScript untuk mengambil data dari URL tanpa tergantung konfigurasi server (Vercel/Netlify).
+
+Langkah yang harus Anda lakukan sekarang:
+
+Update skrip di watch.html dengan kode di atas.
+
+Coba akses browser Anda dengan mengetik manual: https://www.goflie.top/watch.html?id=abcde
+
+Lihat console (F12). Apakah Slug yang terbaca: sekarang sudah muncul abcde? Jika ya, data pasti akan tampil.
+
+Apakah setelah menggunakan link dengan ?id=abcde, filenya sekarang muncul?
+
+tapi link jadi kelihatan panjang
+
+Saya mengerti. Anda ingin URL yang pendek dan cantik seperti /d/abcde, tetapi skrip Anda saat ini hanya bisa membaca jika ada /d/.
+
+Masalahnya adalah server hosting Anda tidak tahu bahwa /d/abcde harus diarahkan ke watch.html. Untuk memperbaikinya tanpa mengubah skrip JavaScript Anda, Anda perlu membuat file konfigurasi kecil di root hosting Anda agar URL pendek tersebut "berbohong" kepada browser.
+
+Jika Anda menggunakan Vercel
+Buat file bernama vercel.json di root direktori (sejajar dengan index.html), lalu masukkan kode ini:
+
+JSON
+{
+  "rewrites": [
+    { "source": "/d/:slug", "destination": "/watch.html" }
+  ]
+}
+Jika Anda menggunakan Netlify
+Buat file bernama _redirects di root direktori, lalu tulis satu baris ini:
+
+Plaintext
+/d/:slug  /watch.html  200
+Mengapa ini menyelesaikan masalah?
+Tanpa file ini: Saat Anda membuka goflie.top/d/abcde, server mencari folder fisik bernama d dan file abcde. Karena tidak ada, muncul error 404.
+
+Dengan file ini: Server tetap menampilkan goflie.top/d/abcde di address bar (jadi tetap terlihat pendek dan rapi), namun secara internal ia memuat isi watch.html.
+
+Karena watch.html dimuat di dalam alamat /d/abcde, maka skrip Anda:
+let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+akan secara otomatis mengambil "abcde" sebagai slug tanpa perlu menggunakan ?id=.
+
+Tips Tambahan agar skrip lebih "Kuat"
+Pastikan di watch.html, Anda menggunakan skrip yang mengambil slug dari pathname (bukan search):
+
+JavaScript
+// Gunakan ini saja untuk mengambil slug dari /d/:slug
+const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+const slug = pathParts[pathParts.length - 1]; // Hasilnya akan selalu "abcde"
+Dengan cara ini, link Anda tetap pendek dan profesional (goflie.top/d/abcde), dan data Anda tidak akan tercampur karena filter slug akan bekerja dengan sempurna.
+
+Apakah Anda bisa membuat file vercel.json atau _redirects di hosting Anda?
+
+sudah saya buat vercel json
+
+Bagus! Jika Anda sudah membuat vercel.json, seharusnya sistem routing sudah aktif. Namun, agar skrip JavaScript Anda tidak lagi mendapatkan nilai null, kita perlu memastikan skrip Anda membaca slug dengan cara yang benar di dalam lingkungan rewriting Vercel.
+
+Berikut adalah langkah terakhir untuk memastikan sistem berjalan:
+
+1. Pastikan vercel.json Anda Benar
+Pastikan isi file vercel.json di root direktori Anda seperti ini:
+
+JSON
+{
+  "rewrites": [
+    { "source": "/d/:slug", "destination": "/watch.html" }
+  ]
+}
+Catatan: Jika file watch.html Anda berada di dalam folder lain (misalnya /public/watch.html), sesuaikan destination-nya.
+
+2. Update Skrip watch.html
+Karena Vercel sekarang akan mengarahkan semua akses ke /d/abcde menjadi /watch.html, maka window.location.pathname akan tetap /d/abcde.
+
+Gunakan potongan kode ini untuk mengambil slug secara akurat:
+
+JavaScript
+async function fetchVideosFromDatabase() {
+    // ... konfigurasi URL dan KEY ...
+
+    // Ambil slug dari path (contoh: /d/abcde)
+    const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+    // Jika aksesnya /d/abcde, maka pathParts = ["d", "abcde"]
+    // Maka slug adalah elemen terakhir: "abcde"
+    const slug = pathParts[pathParts.length - 1];
+
+    console.log("Slug yang terbaca dari Vercel:", slug);
+
+    if (!slug || slug === 'watch.html') {
+        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan.</p>";
+        return;
+    }
+    
+    // ... lanjutkan fetch dengan slug ini
+}
+3. Cara Menguji (PENTING)
+Setelah melakukan perubahan, jangan membuka watch.html secara langsung.
+
+Lakukan deploy ulang ke Vercel.
+
+Buka browser dan ketik: https://goflie.top/d/abcde
+
+Lihat console (F12).
+
+Jika muncul Slug yang terbaca dari Vercel: abcde, maka masalah sudah 100% selesai.
+
+Jika masih muncul null atau watch.html, berarti Vercel belum membaca file vercel.json Anda.
+
+Jika masih tidak muncul:
+Coba cek dashboard Vercel Anda, apakah saat Anda melakukan push kode, ada pesan error terkait konfigurasi vercel.json? Terkadang jika ada kesalahan penulisan (kurang koma, dll), Vercel akan mengabaikan file tersebut.
+
+Apakah sekarang saat Anda membuka /d/abcde console-nya sudah menunjukkan slug yang benar?
+
+<script>
+
+let databaseFiles = [];
+
+
+
+async function fetchVideosFromDatabase() {
+
+const spinner = document.getElementById('loadingSpinner');
+
+const container = document.getElementById('fileListContainer');
+
+
+
+if (typeof window.API_CONFIG === 'undefined') {
+
+container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
+
+return;
+
+}
+
+
+
+const { URL, KEY } = window.API_CONFIG;
+
+
+
+// 1. Ambil slug dari path (/d/abcde) atau query (?id=abcde)
+
+let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+
+let slug = pathParts[pathParts.length - 1];
+
+
+if (slug === 'watch.html' || !slug) {
+
+const urlParams = new URLSearchParams(window.location.search);
+
+slug = urlParams.get('id');
+
+}
+
+
+
+spinner.style.display = 'block';
+
+container.style.opacity = '0.5';
+
+
+
+try {
+
+// 2. Fetch data dengan filter slug
+
+const fetchUrl = `${URL}/videos_list?slug=eq.${slug}&order=id.desc`;
+
+console.log("Fetching URL:", fetchUrl);
+
+
+
+const response = await fetch(fetchUrl, {
+
+method: 'GET',
+
+headers: {
+
+'Authorization': `Bearer ${KEY}`,
+
+'apikey': KEY,
+
+'Content-Type': 'application/json'
+
+}
+
+});
+
+
+if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+
+let data = await response.json();
+
+
+// 3. Filter ketat di sisi browser
+
+databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
+
+
+if (databaseFiles.length === 0) {
+
+container.innerHTML = `<p style="text-align:center;">Data tidak ditemukan untuk slug: <b>${slug}</b></p>`;
+
+} else {
+
+renderFileList();
+
+}
+
+} catch (error) {
+
+console.error("Detail Error:", error);
+
+container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
+
+} finally {
+
+spinner.style.display = 'none';
+
+container.style.opacity = '1';
+
+}
+
+}
+
+
+
+function renderFileList() {
+
+const container = document.getElementById('fileListContainer');
+
+container.innerHTML = databaseFiles.map(file => {
+
+const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
+
+const isEmbed = file.url.includes('videas.fr');
+
+const mediaTag = isEmbed
+
+? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>`
+
+: `<video preload="metadata" src="${file.url}#t=0.5" muted playsinline></video>`;
+
+
+
+return `
+
+<div class="file-row" id="row-${file.id}">
+
+<div class="file-media-render-zone">
+
+<div class="preview-card-box" onclick="handleThumbnailClick(this)">${mediaTag}</div>
+
+</div>
+
+<div class="file-top-control-bar">
+
+<div class="file-header-info">
+
+<span class="file-name">${file.name}</span>
+
+<div class="file-meta-sub"><span><i class="fa-regular fa-calendar"></i> ${dateClean}</span></div>
+
+</div>
+
+<div class="file-actions-right">
+
+<button class="btn-gofile-action btn-play-toggle" onclick="toggleVideoPlayer(this)">
+
+<i class="fa-solid fa-play"></i> <span>Play</span>
+
+</button>
+
+<button class="btn-gofile-action" onclick="runAds()"><i class="fa-solid fa-download"></i> <span>Download</span></button>
+
+<button class="btn-more-vertical"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}).join('');
+
+}
+
+
+
+function toggleVideoPlayer(btn) {
+
+const fileRow = btn.closest('.file-row');
+
+const mediaElement = fileRow.querySelector('.preview-card-box video, .preview-card-box iframe');
+
+const btnText = btn.querySelector('span');
+
+const btnIcon = btn.querySelector('i');
+
+const isVideo = mediaElement.tagName === 'VIDEO';
+
+
+
+if (fileRow.classList.contains('is-expanded')) {
+
+fileRow.classList.remove('is-expanded');
+
+btnText.innerText = "Play";
+
+btnIcon.className = "fa-solid fa-play";
+
+if (isVideo) { mediaElement.removeAttribute('controls'); mediaElement.muted = true; mediaElement.pause(); }
+
+} else {
+
+fileRow.classList.add('is-expanded');
+
+btnText.innerText = "Close";
+
+btnIcon.className = "fa-solid fa-xmark";
+
+if (isVideo) { mediaElement.setAttribute('controls', 'true'); mediaElement.muted = false; mediaElement.play(); }
+
+}
+
+}
+
+
+
+function handleThumbnailClick(box) {
+
+const fileRow = box.closest('.file-row');
+
+if (!fileRow.classList.contains('is-expanded')) {
+
+const targetBtn = fileRow.querySelector('.btn-play-toggle');
+
+toggleVideoPlayer(targetBtn);
+
+}
+
+}
+
+
+
+window.onload = function() {
+
+fetchVideosFromDatabase();
+
+};
+
+
+
+function runAds() { console.log("Ads triggered"); }
+
+</script> coba perbaiki lagi
+
+Jika slug terbaca null, itu artinya URL yang dibaca oleh JavaScript tidak sesuai dengan apa yang Anda lihat di browser. Saat menggunakan vercel.json atau _redirects, window.location.pathname tetap menampilkan path asli, jadi kodenya harus benar.
+
+Mari kita buat skrip ini lebih tangguh dengan menambahkan fallback (cadangan) agar jika slug gagal terdeteksi dari path, ia akan mencoba cara lain secara otomatis.
+
+Berikut adalah perbaikan pada bagian pengambilan slug:
+
+JavaScript
 async function fetchVideosFromDatabase() {
     const spinner = document.getElementById('loadingSpinner');
     const container = document.getElementById('fileListContainer');
@@ -503,6 +1630,431 @@ async function fetchVideosFromDatabase() {
     } finally {
         spinner.style.display = 'none';
         container.style.opacity = '1';
+    }
+}
+Mengapa ini akan memperbaiki masalah Anda?
+encodeURIComponent(slug): Jika slug Anda mengandung karakter aneh atau spasi yang tidak terlihat, ini akan mengubahnya menjadi format URL yang aman.
+
+Log Debugging Baru: Saya menambahkan console.log("Debug Slug:", slug, "Path:", window.location.pathname);.
+
+Pengecekan Array: Kode sekarang secara eksplisit mengecek apakah path-nya diawali /d/. Ini adalah cara paling aman untuk memastikan skrip Anda tidak bingung antara halaman utama dengan halaman watch.
+
+Langkah Debugging Terakhir:
+Simpan perubahan ini.
+
+Buka https://www.goflie.top/d/abcde (atau debTu).
+
+Tekan F12, lihat di tab Console.
+
+Lihat baris "Debug Slug: ...".
+
+Jika muncul "Debug Slug: abcde", tapi data tetap tidak tampil, maka masalahnya 100% ada pada database Supabase (mungkin kolom slug di baris tersebut berisi abcde  (dengan spasi) atau tidak ada data yang cocok sama sekali).
+
+Jika muncul "Debug Slug: null", berarti vercel.json Anda tidak berjalan.
+
+Apakah pesan di Console F12 sekarang sudah menunjukkan slug yang benar?
+
+Masalah utamanya sekarang sudah terlihat jelas dari tangkapan layar Anda: vercel.json Anda tidak bekerja (atau tidak terdeteksi).
+
+Jika vercel.json bekerja, saat Anda membuka goflie.top/d/abcde, skrip Anda seharusnya bisa mendeteksi /d/abcde. Namun, karena di layar muncul Error: Slug tidak ditemukan di URL, itu berarti sistem menganggap Anda sedang berada di halaman utama atau root, bukan di dalam /d/abcde.
+
+Mari kita selesaikan dengan cara yang paling pasti berhasil tanpa bergantung pada vercel.json atau struktur folder. Kita akan menggunakan URL Parameter dengan format ?id=. Ini adalah cara yang digunakan oleh hampir semua situs untuk menangani sistem ID dinamis.
+
+1. Gunakan Link Format Ini
+Mulai sekarang, bagikan link Anda dalam format ini:
+https://goflie.top/watch.html?id=abcde
+
+2. Gunakan Skrip "Sangat Tangguh" Ini
+Ganti seluruh bagian fungsi fetchVideosFromDatabase Anda dengan kode di bawah ini. Kode ini dirancang untuk membaca slug dari dua tempat sekaligus (Path atau Query Parameter), sehingga Anda tidak akan lagi mendapatkan null:
+
+JavaScript
+async function fetchVideosFromDatabase() {
+    const spinner = document.getElementById('loadingSpinner');
+    const container = document.getElementById('fileListContainer');
+
+    if (typeof window.API_CONFIG === 'undefined') {
+        container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
+        return;
+    }
+
+    const { URL, KEY } = window.API_CONFIG;
+
+    // --- CARA MENDETEKSI SLUG YANG PALING PASTI ---
+    // 1. Coba dari ?id=abcde
+    const urlParams = new URLSearchParams(window.location.search);
+    let slug = urlParams.get('id');
+
+    // 2. Jika tidak ada, coba dari path (jika vercel.json berhasil)
+    if (!slug) {
+        const paths = window.location.pathname.split('/').filter(p => p);
+        if (paths.length >= 2) slug = paths[1]; // Mengambil 'abcde' dari /d/abcde
+    }
+
+    console.log("Slug yang terdeteksi:", slug);
+
+    if (!slug) {
+        container.innerHTML = `<p style="text-align:center;">Slug tidak ditemukan. Gunakan link: <b>goflie.top/watch.html?id=abcde</b></p>`;
+        return;
+    }
+
+    spinner.style.display = 'block';
+    container.style.opacity = '0.5';
+
+    try {
+        // Fetch menggunakan slug yang sudah pasti terdeteksi
+        const fetchUrl = `${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`;
+        
+        const response = await fetch(fetchUrl, {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${KEY}`, 
+                'apikey': KEY,
+                'Content-Type': 'application/json' 
+            }
+        });
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        let data = await response.json();
+        
+        // Filter di browser untuk memastikan 100% akurat
+        databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
+        
+        if (databaseFiles.length === 0) {
+            container.innerHTML = `<p style="text-align:center;">Data kosong untuk slug: <b>${slug}</b></p>`;
+        } else {
+            renderFileList();
+        }
+    } catch (error) { 
+        console.error("Error:", error);
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
+    } finally {
+        spinner.style.display = 'none';
+        container.style.opacity = '1';
+    }
+}
+Mengapa ini yang terakhir?
+Jika Anda menggunakan ?id=abcde: Ini dijamin 100% bekerja karena URLSearchParams tidak memerlukan konfigurasi server apa pun.
+
+Jika Anda menggunakan /d/abcde: Skrip ini tetap akan mencoba membacanya lewat window.location.pathname.
+
+Apa yang harus Anda lakukan sekarang?
+Silakan update skrip tersebut, lalu buka browser dan akses https://goflie.top/watch.html?id=abcde. Jika data muncul, berarti masalah selesai. Jika masih muncul "Data kosong", maka masalahnya hanya satu: Isi database Anda untuk slug tersebut mungkin kosong atau namanya bukan abcde (cek kembali di screenshot Supabase Anda, pastikan teksnya persis, tidak ada spasi).
+
+Apakah setelah menggunakan link dengan ?id=, data akhirnya muncul?
+
+{
+
+"rewrites": [
+
+{ "source": "/d/:slug", "destination": "/watch.html" }
+
+]
+
+}
+
+Konfigurasi vercel.json yang Anda tulis di atas sudah benar secara sintaksis. Jika file tersebut sudah Anda unggah ke root direktori proyek Anda di Vercel, maka secara teknis URL goflie.top/d/abcde sekarang seharusnya sudah mengarah ke watch.html.
+
+Jika data masih belum muncul setelah menggunakan konfigurasi ini, kemungkinan besar masalahnya bukan lagi pada rewrite-nya, melainkan pada tahap sinkronisasi data antara Vercel dan Supabase.
+
+Langkah Verifikasi Terakhir (Untuk Memastikan)
+Untuk mendiagnosis apakah vercel.json sudah benar-benar berjalan, lakukan ini:
+
+Cek Deployment: Di dashboard Vercel, pastikan deployment terakhir Anda sudah sukses dan tidak ada error konfigurasi.
+
+Tes "Static Path": Buka browser dan akses goflie.top/d/abcde.
+
+Jika halaman terbuka (menampilkan tampilan watch.html Anda), berarti vercel.json berhasil.
+
+Jika muncul error 404, berarti Vercel tidak membaca file vercel.json tersebut (pastikan file tersebut benar-benar berada di folder paling luar/root).
+
+Cek Console (F12): Jika halaman terbuka tapi datanya "tidak ditemukan" atau "kosong", lihat baris "Slug yang terdeteksi:" di Console F12.
+
+Jika di sana tertulis abcde, maka masalahnya murni di database Supabase (filter tidak cocok dengan data).
+
+Jika di sana tertulis null, maka skrip JavaScript Anda belum bisa mengambil slug dari jalur yang di-rewrite oleh Vercel.
+
+Jika masih "Slug: null"
+Jika Anda sudah memastikan vercel.json ada di root dan URL-nya /d/abcde, namun slug tetap null, tambahkan baris ini di paling atas fungsi fetchVideosFromDatabase untuk menangkap slug secara paksa dari jalur yang di-rewrite:
+
+JavaScript
+// Tambahkan ini sebagai baris pertama di dalam fungsi fetch
+const pathSegments = window.location.pathname.split('/').filter(Boolean);
+if (pathSegments.length > 1 && pathSegments[0] === 'd') {
+    window.history.replaceState({}, '', `/watch.html?id=${pathSegments[1]}`);
+    window.location.reload(); // Paksa reload agar skrip membaca dari ?id=
+}
+Penjelasan:
+Kode ini mendeteksi jika user membuka /d/abcde. Jika ya, dia akan mengubah URL secara diam-diam menjadi /watch.html?id=abcde lalu me-reload halaman. Ini adalah cara "curang" tapi sangat efektif agar skrip Anda yang sudah berjalan dengan parameter ?id= bisa langsung mendeteksi slug-nya tanpa error.
+
+Apakah setelah menambahkan kode fallback di atas, datanya muncul di browser?
+
+bisa buatkan full html
+
+Tentu, ini adalah kode Full HTML yang sudah saya satukan dengan logika JavaScript terbaru yang "tahan banting". Saya menggunakan metode ?id= sebagai fallback agar tetap berjalan meski vercel.json Anda sedang bermasalah.
+
+Silakan ganti seluruh isi file watch.html Anda dengan kode di bawah ini:
+
+HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goflie - Watch</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .file-row { background: white; margin-bottom: 10px; padding: 15px; border-radius: 8px; }
+        iframe, video { width: 100%; max-height: 400px; display: none; }
+        .is-expanded iframe, .is-expanded video { display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="loadingSpinner" style="display:none;"><div class="spinner"></div></div>
+    <div id="fileListContainer"></div>
+
+    <script>
+        // --- KONFIGURASI API (Ganti dengan milik Anda) ---
+        window.API_CONFIG = {
+            URL: "https://xgmsumukxuwjpztbeuwl.supabase.co/rest/v1",
+            KEY: "YOUR_SUPABASE_ANON_KEY" 
+        };
+
+        let databaseFiles = [];
+
+        async function fetchVideosFromDatabase() {
+            const spinner = document.getElementById('loadingSpinner');
+            const container = document.getElementById('fileListContainer');
+            const { URL, KEY } = window.API_CONFIG;
+
+            // 1. Deteksi Slug
+            const urlParams = new URLSearchParams(window.location.search);
+            let slug = urlParams.get('id');
+
+            if (!slug) {
+                const paths = window.location.pathname.split('/').filter(p => p);
+                if (paths.length >= 2) slug = paths[1];
+            }
+
+            if (!slug) {
+                container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan.</p>";
+                return;
+            }
+
+            spinner.style.display = 'block';
+
+            try {
+                const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`, {
+                    headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' }
+                });
+                
+                if (!response.ok) throw new Error("Gagal ambil data");
+                
+                const data = await response.json();
+                databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
+                
+                if (databaseFiles.length === 0) {
+                    container.innerHTML = `<p style='text-align:center;'>Folder kosong atau slug salah: ${slug}</p>`;
+                } else {
+                    renderFileList();
+                }
+            } catch (error) {
+                container.innerHTML = `<p style='text-align:center; color:red;'>Error: ${error.message}</p>`;
+            } finally {
+                spinner.style.display = 'none';
+            }
+        }
+
+        function renderFileList() {
+            const container = document.getElementById('fileListContainer');
+            container.innerHTML = databaseFiles.map(file => `
+                <div class="file-row">
+                    <div class="preview-card-box" onclick="handleThumbnailClick(this)">
+                        ${file.url.includes('videas.fr') 
+                            ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
+                            : `<video src="${file.url}" playsinline></video>`}
+                    </div>
+                    <p>${file.name}</p>
+                    <button class="btn-play-toggle" onclick="toggleVideoPlayer(this)">Play</button>
+                </div>
+            `).join('');
+        }
+
+        function toggleVideoPlayer(btn) {
+            const fileRow = btn.closest('.file-row');
+            fileRow.classList.toggle('is-expanded');
+            btn.innerText = fileRow.classList.contains('is-expanded') ? "Close" : "Play";
+        }
+
+        function handleThumbnailClick(box) {
+            toggleVideoPlayer(box.parentElement.querySelector('.btn-play-toggle'));
+        }
+
+        window.onload = fetchVideosFromDatabase;
+    </script>
+</body>
+</html>
+Yang harus Anda lakukan:
+Ganti YOUR_SUPABASE_ANON_KEY dengan API Key asli Anda dari Supabase.
+
+Jika Anda masih mendapatkan pesan "Folder kosong" atau "Slug tidak ditemukan", silakan buka Console (F12) di browser dan beri tahu saya apa pesan error yang muncul di sana.
+
+Apakah kodenya sudah berhasil menampilkan daftar video saat Anda buka link tersebut?
+
+buatkan java scripnya
+
+Tentu. Karena Anda sebelumnya sudah membuat vercel.json dan ingin URL yang pendek (seperti /d/abcde), kuncinya adalah skrip harus bisa mendeteksi slug dari URL pathname dengan sangat teliti.
+
+Berikut adalah JavaScript yang sudah saya optimalkan khusus untuk menangani rewrite dari Vercel/Netlify agar slug tidak lagi terbaca null.
+
+JavaScript (Sematkan di dalam watch.html)
+JavaScript
+<script>
+// 1. Pastikan CONFIG sudah benar
+window.API_CONFIG = {
+    URL: "https://xgmsumukxuwjpztbeuwl.supabase.co/rest/v1",
+    KEY: "ISI_KEY_SUPABASE_ANDA_DI_SINI"
+};
+
+async function fetchVideosFromDatabase() {
+    const container = document.getElementById('fileListContainer');
+    const { URL, KEY } = window.API_CONFIG;
+
+    // 2. Deteksi Slug yang super akurat
+    // Jika URL = goflie.top/d/abcde, maka pathParts = ["d", "abcde"]
+    let slug = null;
+    const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+    
+    // Cek apakah ada slug di path setelah "/d/"
+    if (pathParts[0] === 'd' && pathParts[1]) {
+        slug = pathParts[1];
+    } else {
+        // Fallback ke ?id= jika path gagal
+        const urlParams = new URLSearchParams(window.location.search);
+        slug = urlParams.get('id');
+    }
+
+    console.log("Slug yang dideteksi sistem:", slug);
+
+    if (!slug) {
+        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan (Slug null).</p>";
+        return;
+    }
+
+    try {
+        // 3. Fetch ke Supabase dengan filter slug
+        const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}`, {
+            headers: { 
+                'apikey': KEY, 
+                'Authorization': `Bearer ${KEY}`,
+                'Content-Type': 'application/json' 
+            }
+        });
+
+        if (!response.ok) throw new Error("Gagal akses API");
+
+        let data = await response.json();
+        
+        // 4. Double filter di sisi browser (Mencegah data tercampur)
+        const finalData = data.filter(item => String(item.slug).trim() === String(slug).trim());
+
+        if (finalData.length === 0) {
+            container.innerHTML = `<p style='text-align:center;'>Data kosong untuk folder ini.</p>`;
+        } else {
+            // Panggil fungsi render Anda di sini
+            renderData(finalData);
+        }
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = "<p style='text-align:center; color:red;'>Terjadi kesalahan.</p>";
+    }
+}
+
+// Jalankan saat halaman dimuat
+window.onload = fetchVideosFromDatabase;
+</script>
+Mengapa skrip ini lebih baik?
+pathParts[0] === 'd': Skrip ini secara spesifik mencari pola /d/ yang sudah Anda atur di vercel.json. Ini jauh lebih akurat daripada sekadar menebak-nebak bagian akhir URL.
+
+encodeURIComponent(slug): Ini memastikan bahwa jika slug mengandung karakter unik (seperti simbol atau spasi yang tidak disengaja), permintaan tetap terkirim dengan benar ke Supabase.
+
+Filter Ganda: Meskipun Supabase sudah memfilter, saya tetap menyertakan data.filter(...) sebagai pengaman terakhir agar data dari folder lain tidak mungkin masuk ke layar Anda.
+
+Checklist Terakhir:
+Cek Supabase: Pastikan nama kolom di tabel Anda benar-benar slug (huruf kecil semua, tidak ada spasi di awal/akhir nama kolom).
+
+Cek Deployment: Setelah menempelkan kode ini, lakukan deploy ulang ke Vercel agar perubahan tersimpan.
+
+Cek Console: Buka browser, akses goflie.top/d/abcde, lalu tekan F12. Jika di sana tertulis "Slug yang dideteksi sistem: abcde" dan data tetap tidak muncul, berarti isi kolom slug di baris tersebut di Supabase memang kosong/null.
+
+Apakah Anda bisa melihat tulisan "Slug yang dideteksi sistem: [nama folder]" di Console browser Anda sekarang?
+
+saya juga pakai config.js supabase
+
+Jika Anda menggunakan file terpisah bernama config.js untuk menyimpan konfigurasi Supabase (yang biasanya dipanggil di bagian <head> sebelum skrip utama), maka sangat penting untuk memastikan bahwa skrip fetch Anda menunggu file konfigurasi tersebut dimuat.
+
+Berikut adalah cara mengatur agar config.js dan skrip watch.html Anda bekerja sama dengan sempurna.
+
+1. Pastikan config.js Anda benar
+Pastikan file config.js Anda isinya seperti ini (simpan di root direktori):
+
+JavaScript
+window.API_CONFIG = {
+    URL: "https://xgmsumukxuwjpztbeuwl.supabase.co/rest/v1",
+    KEY: "ISI_ANON_KEY_ANDA_DISINI"
+};
+2. Update Skrip watch.html agar "Menunggu" Config
+Masalah sering terjadi karena skrip watch.html dijalankan sebelum config.js selesai dimuat. Kita akan menambahkan pengecekan agar skrip Anda lebih stabil:
+
+HTML
+<script src="config.js"></script>
+
+<script>
+async function fetchVideosFromDatabase() {
+    // Tambahkan pengecekan apakah config sudah ada
+    let attempts = 0;
+    while (typeof window.API_CONFIG === 'undefined' && attempts < 10) {
+        await new Promise(r => setTimeout(r, 100)); // Tunggu 100ms
+        attempts++;
+    }
+
+    if (typeof window.API_CONFIG === 'undefined') {
+        console.error("Config API tidak ditemukan!");
+        return;
+    }
+
+    const { URL, KEY } = window.API_CONFIG;
+    
+    // Ambil slug dari path /d/:slug atau ?id=
+    let slug = null;
+    const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+    if (pathParts[0] === 'd' && pathParts[1]) {
+        slug = pathParts[1];
+    } else {
+        slug = new URLSearchParams(window.location.search).get('id');
+    }
+
+    console.log("Fetching untuk slug:", slug);
+
+    try {
+        const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}`, {
+            headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+        });
+        
+        const data = await response.json();
+        const finalData = data.filter(item => String(item.slug).trim() === String(slug).trim());
+
+        if (finalData.length === 0) {
+            document.getElementById('fileListContainer').innerHTML = "<p>Data kosong untuk slug ini.</p>";
+        } else {
+            // Panggil fungsi render Anda
+            renderFileList(finalData);
+        }
+    } catch (e) {
+        console.error("Error Fetch:", e);
     }
 }
 function renderFileList() {
