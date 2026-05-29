@@ -433,9 +433,9 @@
         </main>
     </div>
 
-    <script>
+   <script>
 let databaseFiles = [];
-         
+
 async function fetchVideosFromDatabase() {
     const spinner = document.getElementById('loadingSpinner');
     const container = document.getElementById('fileListContainer');
@@ -447,75 +447,38 @@ async function fetchVideosFromDatabase() {
 
     const { URL, KEY } = window.API_CONFIG;
 
-    // --- CARA LEBIH AMAN MENGAMBIL SLUG ---
-    // 1. Coba ambil dari path (contoh: /d/60w0mp)
+    // 1. Ambil slug dari path (/d/abcde) atau query (?id=abcde)
     let pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
     let slug = pathParts[pathParts.length - 1];
     
-    // 2. Jika slug masih terbaca sebagai 'watch.html' atau kosong, 
-    //    coba ambil dari ?id=60w0mp
     if (slug === 'watch.html' || !slug) {
         const urlParams = new URLSearchParams(window.location.search);
         slug = urlParams.get('id');
     }
 
-    console.log("Mencoba fetch dengan slug:", slug); // Buka Inspect (F12) > Console untuk lihat ini
-
     spinner.style.display = 'block';
     container.style.opacity = '0.5';
 
-   try {
-    // 1. Dapatkan slug dari URL (sama seperti sebelumnya)
-    const currentSlug = window.location.pathname.split('/').pop();
-    
-    // 2. Gunakan query parameter select dan eq yang eksplisit
-    // Pastikan URL API Anda benar, tambahkan & agar parameter tidak tertukar
-    const fetchUrl = `${URL}/videos_list?slug=eq.${currentSlug}&order=id.desc`;
-    
-    console.log("Fetching URL:", fetchUrl); // Cek di console F12
+    try {
+        // 2. Fetch data dengan filter slug
+        const fetchUrl = `${URL}/videos_list?slug=eq.${slug}&order=id.desc`;
+        console.log("Fetching URL:", fetchUrl);
 
-    const response = await fetch(fetchUrl, {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${KEY}`, 
-            'apikey': KEY,
-            'Prefer': 'return=representation' // Tambahan agar Supabase merespon dengan benar
-        }
-    });
-    
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    
-    databaseFiles = await response.json();
-    
-    // 3. JIKA MASIH GABUNG, KITA FILTER LAGI DI SINI (Double Check)
-    if (databaseFiles.length > 0) {
-        databaseFiles = databaseFiles.filter(item => String(item.slug).trim() === String(currentSlug).trim());
-    }
-
-    if (databaseFiles.length === 0) {
-        container.innerHTML = `<p style="text-align:center;">Tidak ada file untuk folder: ${currentSlug}</p>`;
-    } else {
-        renderFileList();
-    }
-} catch (error) { 
-    console.error("Detail Error:", error);
-    container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
-}     });
+        const response = await fetch(fetchUrl, {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${KEY}`, 
+                'apikey': KEY,
+                'Content-Type': 'application/json' 
+            }
+        });
         
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
-       databaseFiles = await response.json();
+        let data = await response.json();
         
-        // --- DOUBLE PROTECTION (Filter di sisi Browser) ---
-        // Kita paksa filter lagi di sini agar slug yang tidak sesuai dibuang
-        if (slug && slug !== 'undefined') {
-            databaseFiles = databaseFiles.filter(item => {
-                // Pastikan slug di database dan slug di URL dicocokkan
-                // Kita gunakan .trim() untuk menghilangkan spasi tak terlihat
-                return String(item.slug).trim() === String(slug).trim();
-            });
-        }
-        // ---------------------------------------------------
+        // 3. Filter ketat di sisi browser
+        databaseFiles = data.filter(item => String(item.slug).trim() === String(slug).trim());
         
         if (databaseFiles.length === 0) {
             container.innerHTML = `<p style="text-align:center;">Data tidak ditemukan untuk slug: <b>${slug}</b></p>`;
@@ -524,24 +487,17 @@ async function fetchVideosFromDatabase() {
         }
     } catch (error) { 
         console.error("Detail Error:", error);
-        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
+        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat data.</p>`;
     } finally {
         spinner.style.display = 'none';
         container.style.opacity = '1';
     }
 }
-// Fungsi renderFileList, toggleVideoPlayer, dan handleThumbnailClick 
-// milik Anda sudah sangat bagus, silakan tetap gunakan yang lama.
 
-
-
-     function renderFileList() {
+function renderFileList() {
     const container = document.getElementById('fileListContainer');
-    
     container.innerHTML = databaseFiles.map(file => {
         const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
-        
-       
         const isEmbed = file.url.includes('videas.fr');
         const mediaTag = isEmbed 
             ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
@@ -550,28 +506,18 @@ async function fetchVideosFromDatabase() {
         return `
             <div class="file-row" id="row-${file.id}">
                 <div class="file-media-render-zone">
-                    <div class="preview-card-box" onclick="handleThumbnailClick(this)">
-                        ${mediaTag}
-                    </div>
+                    <div class="preview-card-box" onclick="handleThumbnailClick(this)">${mediaTag}</div>
                 </div>
-
                 <div class="file-top-control-bar">
                     <div class="file-header-info">
                         <span class="file-name">${file.name}</span>
-                        <div class="file-meta-sub">
-                            <span><i class="fa-regular fa-calendar"></i> ${dateClean}</span>
-                        </div>
+                        <div class="file-meta-sub"><span><i class="fa-regular fa-calendar"></i> ${dateClean}</span></div>
                     </div>
-                    
                     <div class="file-actions-right">
                         <button class="btn-gofile-action btn-play-toggle" onclick="toggleVideoPlayer(this)">
                             <i class="fa-solid fa-play"></i> <span>Play</span>
                         </button>
-                        
-                       <button class="btn-gofile-action" onclick="runAds()">
-    <i class="fa-solid fa-download"></i> <span>Download</span>
-</button>
-                        
+                        <button class="btn-gofile-action" onclick="runAds()"><i class="fa-solid fa-download"></i> <span>Download</span></button>
                         <button class="btn-more-vertical"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                     </div>
                 </div>
@@ -579,38 +525,24 @@ async function fetchVideosFromDatabase() {
         `;
     }).join('');
 }
-       function toggleVideoPlayer(btn) {
+
+function toggleVideoPlayer(btn) {
     const fileRow = btn.closest('.file-row');
     const mediaElement = fileRow.querySelector('.preview-card-box video, .preview-card-box iframe');
     const btnText = btn.querySelector('span');
     const btnIcon = btn.querySelector('i');
-    
-   
     const isVideo = mediaElement.tagName === 'VIDEO';
 
     if (fileRow.classList.contains('is-expanded')) {
-      
         fileRow.classList.remove('is-expanded');
         btnText.innerText = "Play";
         btnIcon.className = "fa-solid fa-play";
-        
-        if (isVideo) {
-            mediaElement.removeAttribute('controls');
-            mediaElement.muted = true;
-            mediaElement.pause();
-        }
+        if (isVideo) { mediaElement.removeAttribute('controls'); mediaElement.muted = true; mediaElement.pause(); }
     } else {
-      
         fileRow.classList.add('is-expanded');
         btnText.innerText = "Close";
         btnIcon.className = "fa-solid fa-xmark";
-        
-        if (isVideo) {
-            mediaElement.setAttribute('controls', 'true');
-            mediaElement.muted = false;
-            mediaElement.play();
-        }
-       
+        if (isVideo) { mediaElement.setAttribute('controls', 'true'); mediaElement.muted = false; mediaElement.play(); }
     }
 }
 
@@ -621,14 +553,13 @@ function handleThumbnailClick(box) {
         toggleVideoPlayer(targetBtn);
     }
 }
-         window.onload = function() {
-        fetchVideosFromDatabase();
-    };
 
- function runAds() {
-    console.log("Ads triggered");
-}        
-    </script>
+window.onload = function() {
+    fetchVideosFromDatabase();
+};
+
+function runAds() { console.log("Ads triggered"); }
+</script>
      <script>
 
 history.replaceState(null, "", "/");
