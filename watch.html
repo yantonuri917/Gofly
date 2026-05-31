@@ -584,10 +584,17 @@
                 transform: scale(0.7);
             }
         }
+   
+  
     </style>
 </head>
 <body>
-
+ <main>
+    <div id="loadingSpinner" style="display:none; text-align:center;">Loading...</div>
+    <div id="fileListContainer"></div>
+    
+    ...
+</main>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
    <aside class="sidebar" id="sidebarMenu">
@@ -683,104 +690,68 @@
 
     
    
-    <script>
-      
-      let databaseFiles = [];
-         
-// --- GANTI FUNGSI fetchVideosFromDatabase DENGAN INI ---
-async function fetchVideosFromDatabase() {
-    const spinner = document.getElementById('loadingSpinner');
+  <script>
+    let databaseFiles = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchVideosFromDatabase();
+    });
+
+    async function fetchVideosFromDatabase() {
+        const container = document.getElementById('fileListContainer');
+        const spinner = document.getElementById('loadingSpinner');
+
+        if (typeof window.API_CONFIG === 'undefined') {
+            container.innerHTML = "<p style='text-align:center; color:red;'>Konfigurasi API tidak ditemukan.</p>";
+            return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('id') || "default-slug"; // Sesuaikan logika slug Anda
+
+        if (spinner) spinner.style.display = 'block';
+
+        try {
+            const { URL, KEY } = window.API_CONFIG;
+            const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`, {
+                headers: { 'Authorization': `Bearer ${KEY}`, 'apikey': KEY }
+            });
+            
+            databaseFiles = await response.json();
+            renderFileList();
+        } catch (error) {
+            console.error("Gagal memuat:", error);
+        } finally {
+            if (spinner) spinner.style.display = 'none';
+        }
+    }
+
+  function renderFileList() {
     const container = document.getElementById('fileListContainer');
-
-    if (typeof window.API_CONFIG === 'undefined') {
-        container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
-        return;
-    }
-
-    // 1. Ambil slug dari URL (contoh URL: domain.com/d/abc123 atau domain.com?id=abc123)
-    const urlParams = new URLSearchParams(window.location.search);
-    const pathParts = window.location.pathname.split('/').filter(p => p);
+    if (!container) return;
     
-    // Logika: Ambil ID setelah '/d/' atau dari parameter '?id='
-    const slug = pathParts.includes('d') ? pathParts[pathParts.indexOf('d') + 1] : urlParams.get('id');
-
-    if (!slug) {
-        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan (Slug kosong).</p>";
-        return;
-    }
-
-    const { URL, KEY } = window.API_CONFIG;
-    spinner.style.display = 'block';
-
-    try {
-        // 2. Gunakan filter slug di sini agar Supabase hanya ambil data yang sesuai
-        const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`, {
-            method: 'GET',
-            headers: { 
-                'Authorization': `Bearer ${KEY}`, 
-                'apikey': KEY,
-                'Content-Type': 'application/json' 
-            }
-        });
-        
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        databaseFiles = await response.json();
-        
-        // Update jumlah file di badge
-        document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
-        renderFileList();
-        
-    } catch (error) { 
-        console.error("Detail Error:", error);
-        container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
-    } finally {
-        spinner.style.display = 'none';
-    }
-}
-     function renderFileList() {
-    const container = document.getElementById('fileListContainer');
-    
-    container.innerHTML = databaseFiles.map(file => {
-        const dateClean = file.created_at ? new Date(file.created_at).toLocaleString('en-US', { hour12: true }) : '5/27/2026, 11:41:34 PM';
-        
-       
-        const isEmbed = file.url.includes('videas.fr');
-        const mediaTag = isEmbed 
-            ? `<iframe src="${file.url}" frameborder="0" allowfullscreen></iframe>` 
-            : `<video preload="metadata" src="${file.url}#t=0.5" muted playsinline></video>`;
-
-        return `
-            <div class="file-row" id="row-${file.id}">
-                <div class="file-media-render-zone">
-                    <div class="preview-card-box" onclick="handleThumbnailClick(this)">
-                        ${mediaTag}
+    container.innerHTML = databaseFiles.map(file => `
+        <div class="file-row" id="row-${file.id}">
+            <div class="top-action-anchor"></div> <div class="media-display-area">
+                <div class="preview-box" data-video="${file.url}" onclick="handleThumbnailClick(this)">
+                    <video src="${file.url}#t=0.5" muted playsinline></video>
+                </div>
+            </div>
+            <div class="file-info-container">
+                <div class="file-details">
+                    <div class="file-name" data-full="${file.name}" data-short="${file.name.substring(0, 15)}...">
+                        ${file.name}
                     </div>
                 </div>
-
-                <div class="file-top-control-bar">
-                    <div class="file-header-info">
-                        <span class="file-name">${file.name}</span>
-                        <div class="file-meta-sub">
-                            <span><i class="fa-regular fa-calendar"></i> ${dateClean}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="file-actions-right">
-                        <button class="btn-gofile-action btn-play-toggle" onclick="toggleVideoPlayer(this)">
-                            <i class="fa-solid fa-play"></i> <span>Play</span>
-                        </button>
-                        
-                       <button class="btn-gofile-action" onclick="runAds()">
-    <i class="fa-solid fa-download"></i> <span>Download</span>
-</button>
-                        
-                        <button class="btn-more-vertical"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                <div class="side-action-box">
+                    <div class="action-buttons">
+                        <button class="btn-action play-trigger" onclick="handlePlay(this)">Play</button>
+                        <button class="btn-action close-trigger" onclick="handleClose(this)">Close</button>
                     </div>
                 </div>
             </div>
-        `;
-    }).join('');
+        </div>
+    `).join('');
 }
        function toggleVideoPlayer(btn) {
     const fileRow = btn.closest('.file-row');
@@ -921,6 +892,6 @@ function handleThumbnailClick(box) {
         }
     </script>
     
-    
+   
 </body>
 </html>
