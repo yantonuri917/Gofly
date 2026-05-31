@@ -1,135 +1,699 @@
-<!DOCTYPE html>
-<html lang="id">
+ <!DOCTYPE html>
+<html lang="ja">
 <head>
      <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="referrer" content="no-referrer">    
-    <title>Gofile - Free file sharing and storage platform</title>
+<meta name="referrer" content="no-referrer">  
+    <title>fcpv2</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <script src="config.js"></script> 
-     <script src="core-init.js"></script>
+    <script src="/config.js?v=1.0"></script> 
+ <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    <style>
-
-        body { background-color: #141d2a; color: #bdc8d3; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; padding: 10px; }
-
-        .container { max-width: 600px; margin: 0 auto; }
+        body {
+            background-color: #182436;
+            color: #f4f6f8;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+           
+            padding-bottom: 65px; 
+            transition: padding-left 0.3s ease;
+        }
 
         
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 990;
+            background-color: #182436;
+            padding: 8px 12px;
+            border-bottom: 1px solid #23334a;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            flex-wrap: nowrap !important;
+            overflow-x: hidden; 
+            transition: left 0.3s ease;
+        }
 
-        /* Header Folder */
+        .menu-btn {
+            background-color: #1d68d5;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
 
-        .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .header-ad-container {
+            width: 320px;
+            height: 50px;
+            background-color: #0b131e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
 
-        .folder-icon { font-size: 32px; color: #f59f00; position: relative; }
+       
+        .bottom-sticky-ad {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: rgba(11, 19, 30, 0.95);
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 995;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: padding-left 0.3s ease;
+        }
 
-        .badge { position: absolute; bottom: 0; left: -2px; background: #2b3a4a; color: white; font-size: 10px; padding: 1px 5px; border-radius: 10px; border: 2px solid #141d2a; }
+        .bottom-ad-wrapper {
+            width: 728px;
+            height: 90px;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            
+           
+            transform: scale(0.5); 
+            transform-origin: center center;
+        }
 
-        .folder-title { font-weight: 700; color: white; font-size: 18px; }
+       
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background-color: #151f2c;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            padding: 20px 16px;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
 
-        .folder-info { font-size: 12px; color: #8899a6; }
+        .sidebar.is-open {
+            left: 0;
+        }
 
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
 
+        .sidebar-overlay.is-visible {
+            display: block;
+        }
 
-        /* File Item */
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
 
-        .file-item { background: #192330; border: 1px solid #222f3e; border-radius: 6px; padding: 15px; margin-bottom: 15px; }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+        }
 
-        .file-header { display: flex; gap: 10px; margin-bottom: 10px; }
+        .brand i {
+            color: #f1b418;
+            font-size: 24px;
+        }
 
-        .file-info { flex: 1; }
+        .close-sidebar-btn {
+            background: #23334a;
+            color: #4b8bf4;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
 
-        .file-name { color: white; font-weight: 600; font-size: 14px; word-break: break-all; }
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+        }
 
-        .file-meta { font-size: 12px; color: #8899a6; }
+        .user-box {
+            background-color: #1e293b;
+            border: 1px solid #3b82f6;
+            border-radius: 6px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #f4f6f8;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            background: #e11d48;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .btn-add-account {
+            width: 100%;
+            background-color: #1d68d5;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #a2b0c3;
+            text-decoration: none;
+            padding: 12px 8px;
+            font-size: 15px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: #1e293b;
+            color: white;
+        }
+
+        .sidebar-menu li a i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background-color: #23334a;
+            margin: 16px 0;
+        }
+
+        .sidebar-ad-anchor {
+            margin-top: auto;
+            padding-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .sidebar .header-ad-container {
+            background-color: transparent;
+        }
 
         
+        main {
+            flex: 1;
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
 
-        /* Media Player */
+        .folder-section {
+            margin-bottom: 16px;
+        }
 
-        .media-container { width: 100%; margin-top: 10px; background: #000; border-radius: 4px; overflow: hidden; display: flex; justify-content: center; }
+        .folder-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
 
-        video { width: 100%; max-height: 50vh; outline: none; }
+        .folder-icon-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
 
+        .folder-icon-container .fa-folder {
+            font-size: 46px;
+            color: #f3b007;
+            position: relative;
+        }
 
+        .folder-icon-container::after {
+            content: "";
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 10px solid #182436;
+            pointer-events: none;
+        }
 
-        /* Action Buttons */
+        .folder-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -4px;
+            background-color: #475971;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 1px 6px;
+            border-radius: 10px;
+            border: 2px solid #182436;
+            z-index: 2;
+        }
 
-        .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .folder-meta h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
 
-        .btn { background: #202c3c; color: #cbd5e0; border: 1px solid #34495e; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        .folder-meta p {
+            font-size: 12px;
+            color: #798b9e;
+            margin-top: 2px;
+        }
 
-        .action-btn { background: #202c3c; border: 1px solid #34495e; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .btn-ellipsis-small {
+            background: #23334a;
+            border: none;
+            color: #a2b0c3;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 6px;
+        }
 
+       
+        .main-toolbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-bottom: 1px solid #23334a;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .main-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #1d68d5;
+            margin-right: 8px;
+        }
+
+        .btn-tool {
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-tool.green { background-color: #24a148; }
+        .btn-tool.blue { background-color: #1d68d5; }
+        .btn-tool.gray { background-color: #2b3a4e; color: #a2b0c3; }
+
+        .toolbar-split {
+            display: flex;
+            background-color: #2b3a4e;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .toolbar-split button {
+            background: transparent;
+            color: #a2b0c3;
+            border: none;
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+
+       
+        .file-row {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #23334a;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .file-info-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .file-left-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding-top: 4px;
+        }
+
+        .file-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #1d68d5;
+        }
+
+        .file-icon {
+            font-size: 20px;
+            color: #4b8bf4;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f4f6f8;
+            margin-bottom: 4px;
+        }
+
+        .file-specs {
+            font-size: 12px;
+            color: #798b9e;
+            line-height: 1.4;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 6px;
+            align-self: flex-start;
+        }
+
+        .btn-action {
+            background-color: transparent;
+            color: #a2b0c3;
+            border: 1px solid #33445c;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .btn-action:hover {
+            background-color: #23334a;
+        }
+
+        .btn-action.close-trigger { display: none; }
+
+        .media-display-area {
+            margin-top: 12px;
+            margin-left: 28px;
+            display: flex;
+        }
+
+        .preview-box {
+            width: 180px;
+            max-height: 240px;
+            background-color: #0b131e;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .preview-box video {
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            object-fit: contain;
+            background-color: #050a12;
+        }
+
+        .inline-actions {
+            display: flex;
+            align-items: flex-start;
+            margin-left: 12px;
+        }
+
+       
+        .file-row.is-playing .inline-actions { display: none; }
+        .file-row.is-playing .btn-action.play-trigger { display: none; }
+        .file-row.is-playing .btn-action.close-trigger { display: flex; }
+        .file-row.is-playing .media-display-area { margin-left: 0; width: 100%; }
+        .file-row.is-playing .preview-box { width: 100%; max-height: 500px; cursor: default; }
+        .file-row.is-playing .preview-box video { max-height: 500px; }
+
+        /* Footer & Pagination */
+        .pagination-text {
+            text-align: center;
+            font-size: 12px;
+            color: #798b9e;
+            line-height: 1.5;
+            margin: 24px 0;
+        }
+
+        footer {
+            border-top: 1px solid #23334a;
+            padding: 24px 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #58697d;
+            transition: padding-left 0.3s ease;
+        }
+
+        footer nav {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        footer nav a {
+            color: #798b9e;
+            text-decoration: none;
+        }
+
+        .heart { color: #e14d4d; }
+
+       
+        @media (min-width: 992px) {
+            body {
+                padding-left: 280px;
+                padding-bottom: 75px; 
+            }
+
+            .sidebar {
+                left: 0 !important;
+                box-shadow: 1px 0 0px rgba(255,255,255,0.05);
+            }
+
+            .sidebar-overlay, 
+            .close-sidebar-btn, 
+            .menu-btn {
+                display: none !important;
+            }
+
+            header {
+                left: 280px;
+                padding-left: 24px;
+            }
+
+            .bottom-sticky-ad {
+                padding-left: 280px;
+                height: 65px;
+            }
+
+            .bottom-ad-wrapper {
+                transform: scale(0.7);
+            }
+        }
     </style>
-
 </head>
-
 <body>
 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-
-<div class="container">
-
-    <div class="header">
-
-        <div class="folder-icon"><i class="fa-solid fa-folder"></i><span class="badge" id="countBadge">1</span></div>
-
-        <div>
-
-            <div class="folder-title">root</div>
-
-            <div class="folder-info" id="dateDisplay">28/5/2026, 10.24.18</div>
-
+   <aside class="sidebar" id="sidebarMenu">
+        <div class="sidebar-header">
+            <div class="brand">
+                <i class="fa-solid fa-folder-open"></i> file
+            </div>
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
         </div>
 
-    </div>
+        <div class="sidebar-content">
+            <div class="user-box">
+                <div class="user-info">
+                    <div class="user-avatar">G</div>
+                    <span>guest0818209611</span>
+                </div>
+                <i class="fa-solid fa-chevron-down" style="color: #a2b0c3; font-size: 12px;"></i>
+            </div>
 
+            <button class="btn-add-account">
+                <i class="fa-solid fa-plus"></i> Add Account
+            </button>
 
-
-    <div class="btn-row">
-
-        <button class="btn" style="background:#2ecc71; color:white; border:none;"><i class="fa-solid fa-share-nodes"></i></button>
-
-        <button class="btn" style="background:#1877f2; color:white; border:none;"><i class="fa-solid fa-folder-plus"></i></button>
-
-        <button class="btn" style="background:#1877f2; color:white; border:none;"><i class="fa-solid fa-upload"></i></button>
-
-        <button class="btn"><i class="fa-solid fa-rotate"></i></button>
-
-    </div>
-
-
-
-    <div id="fileList">
-
+            <ul class="sidebar-menu">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="#"><i class="fa-solid fa-crown" style="color: #f1b418;"></i> Premium</a></li>
+                <li><a href="#"><i class="fa-solid fa-gear"></i> API</a></li>
+                <li><a href="#"><i class="fa-solid fa-circle-question"></i> FAQ</a></li>
+                <li><a href="#"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+                <div class="sidebar-divider"></div>
+                <li><a href="#"><i class="fa-brands fa-x-twitter"></i> @gofile_mom</a></li>
+            </ul>
         </div>
 
-</div>
+        <div class="sidebar-ad-anchor" id="sidebarAdAnchor"></div>
+    </aside>
+
+    <header id="headerContainer">
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        
+       
+    </header>
+
+    <main>
+        <div class="folder-section">
+            <div class="folder-header">
+                <div class="folder-icon-container">
+                    <i class="fa-solid fa-folder"></i>
+                    <span class="folder-badge">4</span>
+                </div>
+                <div class="folder-meta">
+                    <h2>fcpv2</h2>
+                    <p>24/5/2026, 01.59.12</p>
+                    <button class="btn-ellipsis-small"><i class="fa-solid fa-ellipsis"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-toolbar">
+            <input type="checkbox" class="main-checkbox">
+            <button class="btn-tool green"><i class="fa-solid fa-share-nodes"></i></button>
+            <button class="btn-tool blue"><i class="fa-solid fa-folder-plus"></i></button>
+            <button class="btn-tool blue"><i class="fa-solid fa-upload"></i></button>
+            <div class="toolbar-split">
+                <button><i class="fa-solid fa-arrows-up-down"></i></button>
+                <button><i class="fa-solid fa-caret-down"></i></button>
+            </div>
+            <button class="btn-tool gray"><i class="fa-solid fa-filter"></i></button>
+            <button class="btn-tool gray"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="btn-tool gray"><i class="fa-solid fa-rotate"></i></button>
+        </div>
 
 
-
-<script>
+    <script>
 let databaseFiles = [];
          
+// --- GANTI FUNGSI fetchVideosFromDatabase DENGAN INI ---
 async function fetchVideosFromDatabase() {
     const spinner = document.getElementById('loadingSpinner');
     const container = document.getElementById('fileListContainer');
 
-   
     if (typeof window.API_CONFIG === 'undefined') {
-        console.error("Config tidak ditemukan!");
         container.innerHTML = "<p style='text-align:center; color:red;'>Error: Konfigurasi API tidak ditemukan.</p>";
         return;
     }
 
-    const { URL, KEY } = window.API_CONFIG;
+    // 1. Ambil slug dari URL (contoh URL: domain.com/d/abc123 atau domain.com?id=abc123)
+    const urlParams = new URLSearchParams(window.location.search);
+    const pathParts = window.location.pathname.split('/').filter(p => p);
+    
+    // Logika: Ambil ID setelah '/d/' atau dari parameter '?id='
+    const slug = pathParts.includes('d') ? pathParts[pathParts.indexOf('d') + 1] : urlParams.get('id');
 
+    if (!slug) {
+        container.innerHTML = "<p style='text-align:center;'>Folder tidak ditemukan (Slug kosong).</p>";
+        return;
+    }
+
+    const { URL, KEY } = window.API_CONFIG;
     spinner.style.display = 'block';
-    container.style.opacity = '0.5';
 
     try {
-        const response = await fetch(`${URL}/videos_list?order=id.desc`, {
+        // 2. Gunakan filter slug di sini agar Supabase hanya ambil data yang sesuai
+        const response = await fetch(`${URL}/videos_list?slug=eq.${encodeURIComponent(slug)}&order=id.desc`, {
             method: 'GET',
             headers: { 
                 'Authorization': `Bearer ${KEY}`, 
@@ -138,19 +702,19 @@ async function fetchVideosFromDatabase() {
             }
         });
         
-        if (!response.ok) {
-          
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         databaseFiles = await response.json();
+        
+        // Update jumlah file di badge
+        document.getElementById('totalFilesBadge').innerText = databaseFiles.length;
         renderFileList();
+        
     } catch (error) { 
         console.error("Detail Error:", error);
         container.innerHTML = `<p style='text-align:center; color:red;'>Gagal memuat: ${error.message}</p>`;
     } finally {
         spinner.style.display = 'none';
-        container.style.opacity = '1';
     }
 }
      function renderFileList() {
@@ -244,9 +808,99 @@ function handleThumbnailClick(box) {
     };
 
  function runAds() {
-    console.log("Ads triggered");
-}        
+ window.open("https://braverybreezebinding.com/dyu6kzr44?key=703bc4908bfdd21b148e4fe03f9810cb", "_blank");
+}  
+      
+       function isDesktop() {
+            return window.innerWidth >= 992;
+        }
+
+        function toggleSidebar() {
+            if (isDesktop()) return;
+
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            const adContainer = document.getElementById('adContainer');
+            const sidebarAdAnchor = document.getElementById('sidebarAdAnchor');
+            const headerContainer = document.getElementById('headerContainer');
+            
+            sidebar.classList.toggle('is-open');
+            overlay.classList.toggle('is-visible');
+
+            if (sidebar.classList.contains('is-open')) {
+                sidebarAdAnchor.appendChild(adContainer);
+            } else {
+                headerContainer.appendChild(adContainer);
+            }
+        }
+
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            const adContainer = document.getElementById('adContainer');
+            const headerContainer = document.getElementById('headerContainer');
+
+            if (isDesktop()) {
+                headerContainer.appendChild(adContainer);
+                sidebar.classList.add('is-open');
+                overlay.classList.remove('is-visible');
+            }
+        });
+
+       
+        function getFileRowScope(element) {
+            return element.closest('.file-row');
+        }
+
+        function handleThumbnailClick(previewBox) {
+            const fileRow = getFileRowScope(previewBox);
+            if (!fileRow.classList.contains('is-playing')) {
+                const playBtn = fileRow.querySelector('.play-trigger');
+                handlePlay(playBtn);
+            }
+        }
+
+        function handlePlay(btnElement) {
+            const fileRow = getFileRowScope(btnElement);
+            const videoElement = fileRow.querySelector('video');
+            const previewBox = fileRow.querySelector('.preview-box');
+            const actionButtons = fileRow.querySelector('.action-buttons');
+            const topActionAnchor = fileRow.querySelector('.top-action-anchor');
+            const fileNameText = fileRow.querySelector('.file-name');
+            const originalVideoURL = previewBox.getAttribute('data-video');
+
+            fileRow.classList.add('is-playing');
+            fileNameText.innerText = fileNameText.getAttribute('data-short');
+
+            videoElement.setAttribute('controls', 'true');
+            videoElement.src = originalVideoURL;
+            videoElement.play();
+
+            topActionAnchor.appendChild(actionButtons);
+        }
+
+        function handleClose(btnElement) {
+            const fileRow = getFileRowScope(btnElement);
+            const videoElement = fileRow.querySelector('video');
+            const previewBox = fileRow.querySelector('.preview-box');
+            const actionButtons = fileRow.querySelector('.action-buttons');
+            const sideActionBox = fileRow.querySelector('.side-action-box');
+            const fileNameText = fileRow.querySelector('.file-name');
+            const originalVideoURL = previewBox.getAttribute('data-video');
+
+            fileRow.classList.remove('is-playing');
+            fileNameText.innerText = fileNameText.getAttribute('data-full');
+
+            videoElement.pause();
+            videoElement.removeAttribute('controls');
+            videoElement.src = originalVideoURL + "#t=0.5";
+            videoElement.load();
+
+            sideActionBox.appendChild(actionButtons);
+        } 
+      
     </script>
+
      
 </body>
 </html>
