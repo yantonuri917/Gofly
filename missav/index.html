@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="referrer" content="no-referrer">       
-    <title>MissAV Style - Full Feature</title>
+    <title>FileAV - Secured Player</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { background-color: #0b0c10; color: #f3f4f6; font-family: 'Inter', sans-serif; margin: 0; user-select: none; }
         .main-nav { background-color: #0b0c10; border-bottom: 1px solid #1f2937; padding: 0.75rem 1rem; position: sticky; top: 0; z-index: 100; height: 60px; display: flex; align-items: center; justify-content: space-between; }
-        .sticky-ads-container { position: sticky; top: 60px; z-index: 90; background-color: #0b0c10; padding: 5px 0; border-bottom: 1px solid #1f2937; display: flex; justify-content: center; min-height: 60px; }
         .video-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; overflow: hidden; cursor: pointer; }
         #mainVideo { width: 100%; height: 100%; object-fit: contain; z-index: 10; }
         
-        /* Tombol Play Tengah */
-        .play-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; z-index: 50; transition: 0.3s; pointer-events: none; opacity: 0; }
+        .play-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(236, 72, 153, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; z-index: 50; transition: 0.3s; pointer-events: none; opacity: 0; box-shadow: 0 0 20px rgba(236, 72, 153, 0.5); }
+        .play-overlay:hover { background: rgba(219, 39, 119, 1); }
         #mainVideo.paused + .play-overlay { opacity: 1; pointer-events: auto; }
 
         .custom-controls { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 0 15px 12px; opacity: 0; transition: opacity 0.3s; z-index: 40; }
@@ -34,15 +33,6 @@
         <div class="flex items-center gap-2"><div class="bg-pink-600 text-white font-black px-2 py-0.5 rounded text-sm">🎬</div><span class="font-black text-xl tracking-tighter uppercase">File<span class="text-pink-500">av</span></span></div>
     </nav>
 
-    <div class="sticky-ads-container">
-        <div class="ads-wrapper">
-            <script type="text/javascript">
-                atOptions = { 'key' : 'baa0afb18e2e70c00e4c1406e4824e4b', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-            </script>
-            <script type="text/javascript" src="https://braverybreezebinding.com/baa0afb18e2e70c00e4c1406e4824e4b/invoke.js"></script>
-        </div>
-    </div>
-
     <main class="max-w-5xl mx-auto mt-2">
         <div class="video-wrapper group" id="playerArea" onclick="togglePlay()">
             <video id="mainVideo" preload="metadata" playsinline controlsList="nodownload" oncontextmenu="return false;"></video>
@@ -51,13 +41,10 @@
                 <input type="range" id="videoSlider" class="progress-slider" min="0" max="100" value="0">
                 <div class="flex items-center justify-between pb-1 text-white">
                     <div class="flex items-center gap-4">
-                        <button onclick="togglePlay()" id="playBtn">▶</button>
+                        <button onclick="togglePlay()" id="playBtn" class="text-pink-500 font-black">▶</button>
                         <span id="timeInfo" class="text-xs font-mono">00:00 / 00:00</span>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <button onclick="toggleMute()" id="muteBtn">🔊</button>
-                        <button onclick="toggleFullscreen()">⛶</button>
-                    </div>
+                    <button onclick="toggleFullscreen()" class="text-lg">⛶</button>
                 </div>
             </div>
         </div>
@@ -65,6 +52,13 @@
         <div class="p-5"><span id="currentId" class="id-badge">LOADING...</span></div>
 
         <div class="px-5 pb-20">
+            <div class="flex justify-center my-6 overflow-x-auto">
+                <script type="text/javascript">
+                    atOptions = { 'key' : '64e783bd557c30cbf66293b5c5fda05f', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="https://braverybreezebinding.com/64e783bd557c30cbf66293b5c5fda05f/invoke.js"></script>
+            </div>
+
             <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[3px] mb-6">REKOMENDASI</h2>
             <div id="gridContainer" class="grid grid-cols-2 md:grid-cols-3 gap-6"></div>
             <div id="paginationContainer" class="flex justify-center gap-2 mt-10 flex-wrap"></div>
@@ -72,8 +66,8 @@
     </main>
 
     <script>
-        const SUPABASE_URL = "https://cxxgioehprdzmyghdgim.supabase.co"; 
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4eGdpb2VocHJkem15Z2hkZ2ltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MzI2MjYsImV4cCI6MjA5NTUwODYyNn0.UsYsI99x-kiEnrBF9U5QsCq7H9XdF5a4_g4mKRizBxw"; 
+        const SUPABASE_URL = "https://xgmsumukxuwjpztbeuwl.supabase.co"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnbXN1bXVreHV3anB6dGJldXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NTE1MzYsImV4cCI6MjA5NTQyNzUzNn0.25t9t71O0O2D11l7GRXtpvOgC2sllXE3xB4nsRKK4oE"; 
         
         let currentPage = 1;
         const pageSize = 4;
@@ -81,8 +75,6 @@
         const video = document.getElementById('mainVideo');
         const videoSlider = document.getElementById('videoSlider');
         const playBtn = document.getElementById('playBtn');
-        const muteBtn = document.getElementById('muteBtn');
-        const timeInfo = document.getElementById('timeInfo');
         const gridContainer = document.getElementById('gridContainer');
         const currentId = document.getElementById('currentId');
 
@@ -91,8 +83,7 @@
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'count=exact' }
             });
             const range = res.headers.get('content-range');
-            const totalItems = parseInt(range.split('/')[1]);
-            return Math.ceil(totalItems / pageSize);
+            return Math.ceil(parseInt(range.split('/')[1]) / pageSize);
         }
 
         async function loadVideos(page = 1) {
@@ -138,7 +129,6 @@
         }
 
         function togglePlay() { video.paused ? video.play() : video.pause(); }
-        function toggleMute() { video.muted = !video.muted; muteBtn.innerText = video.muted ? '🔇' : '🔊'; }
         function toggleFullscreen() { !document.fullscreenElement ? document.getElementById('playerArea').requestFullscreen() : document.exitFullscreen(); }
 
         video.addEventListener('play', () => video.classList.remove('paused'));
@@ -147,7 +137,7 @@
             if(!video.duration) return;
             videoSlider.value = (video.currentTime / video.duration) * 100;
             const cur = Math.floor(video.currentTime), dur = Math.floor(video.duration);
-            timeInfo.innerText = `${Math.floor(cur/60)}:${(cur%60).toString().padStart(2,'0')} / ${Math.floor(dur/60)}:${(dur%60).toString().padStart(2,'0')}`;
+            document.getElementById('timeInfo').innerText = `${Math.floor(cur/60)}:${(cur%60).toString().padStart(2,'0')} / ${Math.floor(dur/60)}:${(dur%60).toString().padStart(2,'0')}`;
         });
 
         videoSlider.oninput = () => video.currentTime = (videoSlider.value / 100) * video.duration;
@@ -158,6 +148,7 @@
         video.classList.add('paused');
         document.addEventListener('contextmenu', e => e.preventDefault());
     </script>
+
 <!-- ===== HISTATS (PAKSA ROOT) ===== -->
 <script>
 /* paksa Histats selalu baca ROOT */
@@ -169,7 +160,7 @@ if (!sessionStorage.getItem("histats_hit")) {
   sessionStorage.setItem("histats_hit", "1");
 
   var _Hasync = _Hasync || [];
-  _Hasync.push(['Histats.start','1,4971583,4,0,0,0,00000000']);
+  _Hasync.push(['Histats.start','1,4971849,4,0,0,0,00000000']);
   _Hasync.push(['Histats.fasi','1']);
   _Hasync.push(['Histats.track_hits','']);
 
@@ -183,28 +174,7 @@ if (!sessionStorage.getItem("histats_hit")) {
 </script>
 <!-- ===== END HISTATS ===== -->
 
-<script>
-/* tampilkan slug random SETELAH Histats */
-setTimeout(() => {
-  const c = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let slug = "";
-  for (let i = 0; i < 4; i++) {
-    slug += c[Math.floor(Math.random() * c.length)];
-  }
-  history.replaceState(null, "", "/" + slug);
-}, 200);
 
-</script>
-  <script type="text/javascript">
-        (function(){
-            const allowed = ['goflie.top', 'localhost', '127.0.0.1'];
-            const target = 'https://gofile.fil3.fun/next'; 
-            const host = window.location.hostname;
-            if (!allowed.some(d => host.includes(d))) {
-                window.location.replace(target);
-            }
-        })();
-    </script>
 
    
 </body>
